@@ -31,6 +31,20 @@ public extension ActionStyle where Self == ActionFioriStyle {
     }
 }
 
+// MARK: ActionItemsStyle
+
+public extension ActionItemsStyle where Self == ActionItemsBaseStyle {
+    static var base: ActionItemsBaseStyle {
+        ActionItemsBaseStyle()
+    }
+}
+
+public extension ActionItemsStyle where Self == ActionItemsFioriStyle {
+    static var fiori: ActionItemsFioriStyle {
+        ActionItemsFioriStyle()
+    }
+}
+
 // MARK: AllEntriesSectionTitleStyle
 
 public extension AllEntriesSectionTitleStyle where Self == AllEntriesSectionTitleBaseStyle {

@@ -14,6 +14,12 @@ struct CoreContentView: View {
                     }
                 )
                 
+                NavigationLink {
+                    ActionItemsExample()
+                } label: {
+                    Text("ActionItems")
+                }
+                
                 NavigationLink(
                     destination: FioriButtonContentView(),
                     label: {

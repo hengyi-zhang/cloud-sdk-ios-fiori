@@ -41,6 +41,7 @@
 		6D10F8A02C7DB3F50071DD3E /* BannerMultiMessageExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D10F89F2C7DB3F50071DD3E /* BannerMultiMessageExample.swift */; };
 		6D14F05E2C9290F20053BA98 /* BannerMultiMessageCustomInitExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D14F05D2C9290F20053BA98 /* BannerMultiMessageCustomInitExample.swift */; };
 		6D3A3DE92CDB5F1E004D4597 /* ObjectCellEnhancementExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3A3DE82CDB5F1E004D4597 /* ObjectCellEnhancementExample.swift */; };
+		6D66D9362D07E52900F7A97D /* ActionItemsExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D66D9352D07E52900F7A97D /* ActionItemsExample.swift */; };
 		6D6E86252C50D42000EDB6F4 /* FioriButtonInListExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6E86242C50D42000EDB6F4 /* FioriButtonInListExample.swift */; };
 		6D6E86292C50E5F900EDB6F4 /* FioriButtonInListMultipleLineExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6E86282C50E5F900EDB6F4 /* FioriButtonInListMultipleLineExample.swift */; };
 		6D6E86672C50FDBE00EDB6F4 /* FioriButtonInCollectionExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D6E86662C50FDBE00EDB6F4 /* FioriButtonInCollectionExample.swift */; };
@@ -262,6 +263,7 @@
 		6D10F89F2C7DB3F50071DD3E /* BannerMultiMessageExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerMultiMessageExample.swift; sourceTree = "<group>"; };
 		6D14F05D2C9290F20053BA98 /* BannerMultiMessageCustomInitExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerMultiMessageCustomInitExample.swift; sourceTree = "<group>"; };
 		6D3A3DE82CDB5F1E004D4597 /* ObjectCellEnhancementExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectCellEnhancementExample.swift; sourceTree = "<group>"; };
+		6D66D9352D07E52900F7A97D /* ActionItemsExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionItemsExample.swift; sourceTree = "<group>"; };
 		6D6E86242C50D42000EDB6F4 /* FioriButtonInListExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FioriButtonInListExample.swift; sourceTree = "<group>"; };
 		6D6E86282C50E5F900EDB6F4 /* FioriButtonInListMultipleLineExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FioriButtonInListMultipleLineExample.swift; sourceTree = "<group>"; };
 		6D6E86662C50FDBE00EDB6F4 /* FioriButtonInCollectionExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FioriButtonInCollectionExample.swift; sourceTree = "<group>"; };
@@ -569,6 +571,14 @@
 			path = SideBar;
 			sourceTree = "<group>";
 		};
+		6D66D9342D07E50D00F7A97D /* ActionItems */ = {
+			isa = PBXGroup;
+			children = (
+				6D66D9352D07E52900F7A97D /* ActionItemsExample.swift */,
+			);
+			path = ActionItems;
+			sourceTree = "<group>";
+		};
 		8732C2C32C35092D002110E9 /* Timeline */ = {
 			isa = PBXGroup;
 			children = (
@@ -662,6 +672,7 @@
 		8A5579C824C1293C0098003A /* FioriSwiftUICore */ = {
 			isa = PBXGroup;
 			children = (
+				6D66D9342D07E50D00F7A97D /* ActionItems */,
 				87F14B192CD86F65004A69A0 /* DocumentScannerView */,
 				3CD71F272CDB625000B037EB /* CheckoutIndicator */,
 				3CC870942CB6F4E20081909C /* ToastMessage */,
@@ -1230,6 +1241,7 @@
 				8AD9DFB125D49967007448EC /* ContactItemStateAndDataBindingExample.swift in Sources */,
 				C150CCCC2B86B78E00118DF7 /* ChromeEffect.swift in Sources */,
 				8732C2C92C3524C9002110E9 /* SimpleTimelineExample.swift in Sources */,
+				6D66D9362D07E52900F7A97D /* ActionItemsExample.swift in Sources */,
 				B190065A2C201BBE000C8B10 /* ProfileHeaderExample.swift in Sources */,
 				B86F02A82679835F0049DDA7 /* ObjectItemInitExamples.swift in Sources */,
 				6D6E86292C50E5F900EDB6F4 /* FioriButtonInListMultipleLineExample.swift in Sources */,

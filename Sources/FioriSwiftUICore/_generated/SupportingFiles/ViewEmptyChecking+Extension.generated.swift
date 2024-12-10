@@ -15,6 +15,12 @@ extension Action: _ViewEmptyChecking {
     }
 }
 
+extension ActionItems: _ViewEmptyChecking {
+    public var isEmpty: Bool {
+        false
+    }
+}
+
 extension AllEntriesSectionTitle: _ViewEmptyChecking {
     public var isEmpty: Bool {
         allEntriesSectionTitle.isEmpty
