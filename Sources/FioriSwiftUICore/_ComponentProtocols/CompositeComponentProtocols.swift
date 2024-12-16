@@ -741,3 +741,14 @@ protocol _ActivityItemComponent: _IconComponent, _SubtitleComponent {
     // sourcery: defaultValue = .vertical
     var layout: ActivityItemLayout { get }
 }
+
+/// `ActivityItems` provides a view that show serval items with activity
+///
+/// ## Usage
+/// ```swift
+/// ActivityItems(actionItems: [.init(type: .phone), .init(type: .email), .init(type: .message), .init(type: .videoCall), .init(type: .detail)]) { dataType in
+///     print("\(dataType)")
+/// }
+/// ```
+// sourcery: CompositeComponent
+protocol _ActivityItemsComponent: _ActionItemsComponent {}

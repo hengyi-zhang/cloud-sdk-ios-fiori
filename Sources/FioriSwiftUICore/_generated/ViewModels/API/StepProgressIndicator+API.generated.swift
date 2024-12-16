@@ -14,10 +14,10 @@ public struct StepProgressIndicator<Title: View, ActionView: View, Steps: Indexe
 	let _steps: Steps
 	let _cancelAction: CancelActionView
 	@State var scrollBounds: CGRect = .zero
+	var axis: Axis = .horizontal
 	var stepItems: [StepItem] = []
 	@State var stepFrames: [String: CGRect] = [:]
 	@State var isPresented: Bool = false
-	var axis: Axis = .horizontal
 
     private var isModelInit: Bool = false
 	private var isTitleNil: Bool = false

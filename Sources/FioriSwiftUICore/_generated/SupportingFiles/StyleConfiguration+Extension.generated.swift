@@ -5,6 +5,14 @@ import SwiftUI
 
 // This file provides APIs for easy component construction which can be used when implementing the base layout.
 
+// MARK: ActivityItemsConfiguration
+
+extension ActivityItemsConfiguration {
+    var _actionItems: ActionItems {
+        ActionItems(.init(actionItems: self.actionItems, didSelectActivityItem: self.didSelectActivityItem), shouldApplyDefaultStyle: true)
+    }
+}
+
 // MARK: CardConfiguration
 
 extension CardConfiguration {
