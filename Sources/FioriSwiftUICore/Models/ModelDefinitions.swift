@@ -94,7 +94,11 @@ public protocol _ActionModel: ActionComponent {}
 public protocol ActionModel: ActionComponent {}
 
 // sourcery: generated_component_not_configurable
-public protocol TextInputModel: TextInputComponent {}
+public protocol _TextInputModel: TextInputComponent {}
+
+/// Deprecated TextInput
+@available(*, unavailable, renamed: "_TextInputModel", message: "Will be removed in the future release. Please create Action with other initializers instead.")
+public protocol TextInputModel {}
 
 // sourcery: generated_component
 public protocol _ActivityItemModel: IconComponent, SubtitleComponent {}
@@ -169,9 +173,9 @@ public protocol ContactItemModel {}
 
 // sourcery: add_env_props = ["horizontalSizeClass"]
 // sourcery: generated_component_composite
-public protocol WelcomeScreenModel: TitleComponent, DescriptionTextComponent, SubtitleComponent, FootnoteComponent, IconComponent {
+public protocol _WelcomeScreenModel: TitleComponent, DescriptionTextComponent, SubtitleComponent, FootnoteComponent, IconComponent {
     // sourcery: genericParameter.name = TextInputView
-    var textInput: TextInputModel? { get }
+    var textInput: _TextInputModel? { get }
     
     // sourcery: genericParameter.name = ActionView
     var action: _ActionModel? { get }
@@ -179,6 +183,9 @@ public protocol WelcomeScreenModel: TitleComponent, DescriptionTextComponent, Su
     // sourcery: genericParameter.name = SecondaryActionView
     var secondaryAction: _ActionModel? { get }
 }
+
+@available(*, unavailable, renamed: "_WelcomeScreenModel", message: "Will be removed in the future release. Please create WelcomeScreen with other initializers instead.")
+public protocol WelcomeScreenModel {}
 
 // sourcery: generated_component_composite
 public protocol ActivationScreenModel: TitleComponent, DescriptionTextComponent, FootnoteComponent {
@@ -189,7 +196,7 @@ public protocol ActivationScreenModel: TitleComponent, DescriptionTextComponent,
     var secondaryAction: _ActionModel? { get }
     
     // sourcery: genericParameter.name = TextInputView
-    var textInput: TextInputModel? { get }
+    var textInput: _TextInputModel? { get }
 }
 
 // sourcery: generated_component_composite

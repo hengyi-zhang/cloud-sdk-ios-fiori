@@ -1,0 +1,55 @@
+// Generated using Sourcery 2.1.7 — https://github.com/krzysztofzablocki/Sourcery
+// DO NOT EDIT
+import Foundation
+import SwiftUI
+
+public protocol WelcomeScreenStyle: DynamicProperty {
+    associatedtype Body: View
+
+    func makeBody(_ configuration: WelcomeScreenConfiguration) -> Body
+}
+
+struct AnyWelcomeScreenStyle: WelcomeScreenStyle {
+    let content: (WelcomeScreenConfiguration) -> any View
+
+    init(@ViewBuilder _ content: @escaping (WelcomeScreenConfiguration) -> any View) {
+        self.content = content
+    }
+
+    public func makeBody(_ configuration: WelcomeScreenConfiguration) -> some View {
+        self.content(configuration).typeErased
+    }
+}
+
+public struct WelcomeScreenConfiguration {
+    public let title: Title
+    public let subtitle: Subtitle
+    public let description: Description
+    public let icon: Icon
+    public let footnote: Footnote
+    public let action: Action
+    public let secondaryAction: SecondaryAction
+    public let textInput: TextInput
+
+    public typealias Title = ConfigurationViewWrapper
+    public typealias Subtitle = ConfigurationViewWrapper
+    public typealias Description = ConfigurationViewWrapper
+    public typealias Icon = ConfigurationViewWrapper
+    public typealias Footnote = ConfigurationViewWrapper
+    public typealias Action = ConfigurationViewWrapper
+    public typealias SecondaryAction = ConfigurationViewWrapper
+    public typealias TextInput = ConfigurationViewWrapper
+}
+
+public struct WelcomeScreenFioriStyle: WelcomeScreenStyle {
+    public func makeBody(_ configuration: WelcomeScreenConfiguration) -> some View {
+        WelcomeScreen(configuration)
+            .titleStyle(TitleFioriStyle(welcomeScreenConfiguration: configuration))
+            .subtitleStyle(SubtitleFioriStyle(welcomeScreenConfiguration: configuration))
+            .descriptionStyle(DescriptionFioriStyle(welcomeScreenConfiguration: configuration))
+            .iconStyle(IconFioriStyle(welcomeScreenConfiguration: configuration))
+            .footnoteStyle(FootnoteFioriStyle(welcomeScreenConfiguration: configuration))
+            .actionStyle(ActionFioriStyle(welcomeScreenConfiguration: configuration))
+            .secondaryActionStyle(SecondaryActionFioriStyle(welcomeScreenConfiguration: configuration))
+    }
+}

@@ -1907,6 +1907,23 @@ public extension View {
     }
 }
 
+// MARK: TextInputStyle
+
+public extension View {
+    func textInputStyle(_ style: some TextInputStyle) -> some View {
+        self.transformEnvironment(\.textInputStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func textInputStyle(@ViewBuilder content: @escaping (TextInputConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.textInputStyleStack) { stack in
+            let style = AnyTextInputStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
 // MARK: TextInputFieldStyle
 
 public extension View {
@@ -2225,6 +2242,23 @@ public extension View {
     func valuePickerStyle(@ViewBuilder content: @escaping (ValuePickerConfiguration) -> some View) -> some View {
         self.transformEnvironment(\.valuePickerStyleStack) { stack in
             let style = AnyValuePickerStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
+// MARK: WelcomeScreenStyle
+
+public extension View {
+    func welcomeScreenStyle(_ style: some WelcomeScreenStyle) -> some View {
+        self.transformEnvironment(\.welcomeScreenStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func welcomeScreenStyle(@ViewBuilder content: @escaping (WelcomeScreenConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.welcomeScreenStyleStack) { stack in
+            let style = AnyWelcomeScreenStyle(content)
             stack.append(style)
         }
     }

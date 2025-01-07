@@ -1795,6 +1795,22 @@ extension TextFieldFormViewStyle {
     }
 }
 
+// MARK: TextInputStyle
+
+struct ResolvedTextInputStyle<Style: TextInputStyle>: View {
+    let style: Style
+    let configuration: TextInputConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension TextInputStyle {
+    func resolve(configuration: TextInputConfiguration) -> some View {
+        ResolvedTextInputStyle(style: self, configuration: configuration)
+    }
+}
+
 // MARK: TextInputFieldStyle
 
 struct ResolvedTextInputFieldStyle<Style: TextInputFieldStyle>: View {
@@ -2096,5 +2112,21 @@ struct ResolvedValuePickerStyle<Style: ValuePickerStyle>: View {
 extension ValuePickerStyle {
     func resolve(configuration: ValuePickerConfiguration) -> some View {
         ResolvedValuePickerStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: WelcomeScreenStyle
+
+struct ResolvedWelcomeScreenStyle<Style: WelcomeScreenStyle>: View {
+    let style: Style
+    let configuration: WelcomeScreenConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension WelcomeScreenStyle {
+    func resolve(configuration: WelcomeScreenConfiguration) -> some View {
+        ResolvedWelcomeScreenStyle(style: self, configuration: configuration)
     }
 }

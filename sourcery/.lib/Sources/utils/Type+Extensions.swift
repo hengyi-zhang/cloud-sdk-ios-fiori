@@ -70,12 +70,14 @@ public extension Type {
         var name = name
         let deprecatedComponents = ["_ListPickerItemModel",
                                     "_ActionModel",
+                                    "_TextInputModel",
                                     "_ObjectItemModel",
                                     "_SideBarModel",
                                     "_SideBarListItemModel",
                                     "_ActivityItemModel",
                                     "_ActivityItemsModel",
                                     "_ContactItemModel",
+                                    "_WelcomeScreenModel",
                                     "_ProgressIndicatorModel",
                                     "_SingleStepModel",
                                     "_StepProgressIndicatorModel"]

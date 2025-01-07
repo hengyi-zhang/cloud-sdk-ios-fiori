@@ -1,10 +1,12 @@
 import SwiftUI
 
 struct OnboardingExamples: View {
+    var _isNewObjectItem: Bool = false
+    
     var body: some View {
         List {
             NavigationLink(
-                destination: WelcomeExamples())
+                destination: WelcomeExamples(_isNewObjectItem: self._isNewObjectItem))
             {
                 Text("WelcomeScreen Examples")
             }
@@ -39,10 +41,11 @@ struct OnboardingExamples: View {
 }
 
 struct WelcomeExamples: View {
+    var _isNewObjectItem: Bool = false
     var body: some View {
         List {
             NavigationLink(
-                destination: WelcomeScreenSample())
+                destination: WelcomeScreenSample(_isNewObjectItem: self._isNewObjectItem))
             {
                 Text("WelcomeScreen")
             }
