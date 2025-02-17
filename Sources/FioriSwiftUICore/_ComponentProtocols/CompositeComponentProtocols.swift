@@ -801,6 +801,12 @@ protocol _ActivityItemComponent: _IconComponent, _SubtitleComponent {
 protocol _ContactItemComponent: _TitleComponent, _SubtitleComponent, _DescriptionComponent, _DetailImageComponent, _ActivityItemsComponent {}
 
 // sourcery: CompositeComponent
+protocol _WelcomeScreenComponent: _TitleComponent, _SubtitleComponent, _DescriptionComponent, _IconComponent, _FootnoteComponent, _ActionComponent, _SecondaryActionComponent {
+    // sourcery: @ViewBuilder
+    var textInput: TextInput? { get }
+}
+
+// sourcery: CompositeComponent
 protocol _RangeSliderControlComponent: _LowerThumbComponent, _UpperThumbComponent, _ActiveTrackComponent, _InactiveTrackComponent {
     // sourcery: @Binding
     /// The lower value of range slider.

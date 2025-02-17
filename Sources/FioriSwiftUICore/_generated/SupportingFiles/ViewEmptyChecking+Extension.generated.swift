@@ -965,6 +965,12 @@ extension TextFieldFormView: _ViewEmptyChecking {
     }
 }
 
+extension TextInput: _ViewEmptyChecking {
+    public var isEmpty: Bool {
+        false
+    }
+}
+
 extension TextInputField: _ViewEmptyChecking {
     public var isEmpty: Bool {
         false
@@ -1116,6 +1122,19 @@ extension ValuePicker: _ViewEmptyChecking {
 extension Watermark: _ViewEmptyChecking {
     public var isEmpty: Bool {
         watermark.isEmpty
+    }
+}
+
+extension WelcomeScreen: _ViewEmptyChecking {
+    public var isEmpty: Bool {
+        title.isEmpty &&
+            subtitle.isEmpty &&
+            description.isEmpty &&
+            icon.isEmpty &&
+            footnote.isEmpty &&
+            action.isEmpty &&
+            secondaryAction.isEmpty &&
+            textInput.isEmpty
     }
 }
 
