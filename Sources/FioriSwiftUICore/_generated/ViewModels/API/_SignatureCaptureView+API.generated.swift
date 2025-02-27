@@ -20,35 +20,35 @@ public struct _SignatureCaptureView<StartActionView: View, RestartActionView: Vi
 	let _signatureImage: UIImage?
 	let _onSave: ((UIImage) -> Void)?
 	let _onDelete: (() -> Void)?
-	var titleColor = Color.preferredColor(.primaryLabel)
-	var watermarkText: String?
+	var hidesSignatureLine = false
 	var addsTimestampInImage: Bool = false
+	var watermarkTextFont: UIFont = .preferredFont(forTextStyle: .caption1)
+	@State var isReenterTapped = false
+	var isRequired = false
+	var watermarkTextAlignment: NSTextAlignment = .natural
+	@State var fullSignatureImage: UIImage?
+	var titleColor = Color.preferredColor(.primaryLabel)
+	@State var isSaved = false
+	var indicatorFont = Font.fiori(forTextStyle: .subheadline).weight(.semibold)
+	var watermarkTextColor: Color = .preferredColor(.tertiaryLabel)
 	@State var drawings = [Drawing]()
 	var timestampFormatter: DateFormatter?
+	var watermarkText: String?
 	var appliesTintColorToImage = true
+	@State var currentDrawing = Drawing()
 	var cropsImage = false
-	var strokeColor = Color.preferredColor(.primaryLabel)
-	var hidesSignatureLine = false
-	var _drawingViewMaxHeight: CGFloat?
-	var drawingViewBackgroundColor = Color.preferredColor(.primaryBackground)
-	@State var fullSignatureImage: UIImage?
-	var indicatorFont = Font.fiori(forTextStyle: .subheadline).weight(.semibold)
-	var titleFont = Font.fiori(forTextStyle: .subheadline).weight(.semibold)
-	@State var isReenterTapped = false
+	var signatureLineColor = Color.preferredColor(.quaternaryLabel)
+	var strokeWidth: CGFloat = 3.0
 	@State var isEditing = false
 	var indicatorColor = Color.preferredColor(.primaryLabel)
-	var watermarkTextFont: UIFont = .preferredFont(forTextStyle: .caption1)
-	@State var currentDrawing = Drawing()
-	var isRequired = false
-	var strokeWidth: CGFloat = 3.0
-	public private(set) var _heightDidChangePublisher = CurrentValueSubject<CGFloat, Never>(0)
-	var xmarkColor = Color.preferredColor(.quaternaryLabel)
 	var hidesXmark = false
-	var watermarkTextColor: Color = .preferredColor(.tertiaryLabel)
-	var watermarkTextAlignment: NSTextAlignment = .natural
-	var signatureLineColor = Color.preferredColor(.quaternaryLabel)
-	@State var isSaved = false
+	var xmarkColor = Color.preferredColor(.quaternaryLabel)
+	public private(set) var _heightDidChangePublisher = CurrentValueSubject<CGFloat, Never>(0)
+	var strokeColor = Color.preferredColor(.primaryLabel)
+	var titleFont = Font.fiori(forTextStyle: .subheadline).weight(.semibold)
+	var drawingViewBackgroundColor = Color.preferredColor(.primaryBackground)
 	let _drawingViewMinHeight: CGFloat = 256
+	var _drawingViewMaxHeight: CGFloat?
 
     private var isModelInit: Bool = false
 	private var isTitleNil: Bool = false

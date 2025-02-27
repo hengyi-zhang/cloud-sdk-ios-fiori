@@ -21,6 +21,14 @@ struct ContentView: View {
                 {
                     Text("Theme Manager")
                 }
+                
+                Section {
+                    NavigationLink {
+                        OnBoardingWelcomeScreenExamples()
+                    } label: {
+                        Text("OnBoarding - WelcomeScreen")
+                    }
+                }
             }
             .navigationBarTitle("Examples")
             .navigationViewStyle(StackNavigationViewStyle())

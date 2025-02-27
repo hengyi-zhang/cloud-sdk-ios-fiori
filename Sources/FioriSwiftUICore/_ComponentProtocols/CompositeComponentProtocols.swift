@@ -847,6 +847,45 @@ protocol _ActivityItemComponent: _IconComponent, _SubtitleComponent {
 protocol _ContactItemComponent: _TitleComponent, _SubtitleComponent, _DescriptionComponent, _DetailImageComponent, _ActivityItemsComponent {}
 
 // sourcery: CompositeComponent
+protocol _WelcomeScreenComponent: _TitleComponent, _DescriptionComponent, _IconComponent, _FootnoteComponent, _ActionComponent, _SecondaryActionComponent {
+    // sourcery: @ViewBuilder
+    var illustratedMessage: IllustratedMessage? { get }
+    
+    @ViewBuilder
+    ///  This image view is to be displayed on the top center of the welcome screen and is typically the company logo image.
+    var headlineImage: (() -> any View)? { get }
+    // sourcery: @Binding
+    // sourcery: defaultValue = ".constant("")"
+    var inputText: String { get }
+    // sourcery: @ViewBuilder
+    var legalText: AttributedString? { get }
+    // sourcery: defaultValue = false
+    /// A flag indicating whether the user must agree to a legal agreement before proceeding. Default is false.
+    /// When set to `true`, a checkbox with user-defined text in `legalTextView` will be displayed. The `primaryActionButton` will remain disabled until the checkbox is selected. Otherwise, both the `legalCheckbox` and `legalTextView` will be hidden.
+    var isLegalAgreementRequired: Bool { get }
+    // sourcery: defaultValue = false
+    /// A flag determines whether the illustration message is displayed. Default is false. When `showsIllustratedMessage` is set to `true`, the `illustratedMessage` will be shown and the `description` will be hidden. Conversely, when `showsIllustratedMessage` is set to `false`, the `description` will be displayed and the `illustratedMessage` will be hidden.
+    var showsIllustratedMessage: Bool { get }
+    
+    // sourcery: defaultValue = .notConfigured
+    /// A property to indicate the state in the onboarding process. The default is `.notConfigured`, to indicate the application has not been configured and additionally setting `options` to allow end-users to provide configuration settings during onboarding.  An `.isConfigured` state indicates that the application contains the necessary configurations to connect to mobile services and should prompt the user to Start.
+    /// - See `FUIWelcomeControllerConfigurationOption` for possible configuration options when `state` is `.notConfigured`
+    var state: WelcomeScreenState { get }
+    
+    // sourcery: defaultValue = Set<WelcomeScreenOption>()
+    /// A property to indicate the configuration option(s) in the onboarding process when `state` is `.notConfigured`.  Default sets no configuration options.
+    var options: Set<WelcomeScreenOption> { get }
+    
+    // sourcery: defaultValue = true
+    /// A flag to indicate demo availability.  Default is true.  Only when it's true, display `Want to explore` label and `Try the Demo` button.  Corresponding `delegate` function is `didSelectDemoMode(_:)` if the property is true.
+    var isDemoAvailable: Bool { get }
+    
+    // sourcery: @ViewBuilder
+    /// Designated for displaying text on the footer of the Welcome screen, such as terms of service.
+    var footerText: AttributedString? { get }
+}
+
+// sourcery: CompositeComponent
 protocol _RangeSliderControlComponent: _LowerThumbComponent, _UpperThumbComponent, _ActiveTrackComponent, _InactiveTrackComponent {
     // sourcery: @Binding
     /// The lower value of range slider.
