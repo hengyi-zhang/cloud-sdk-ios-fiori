@@ -37,7 +37,12 @@ struct SortFilterExample: View {
         ],
         [
             .datetime(item: .init(name: "Completion Date", value: nil), showsOnFilterFeedbackBar: true)
-        ]
+        ],
+        [
+            .title(item: .init(name: "Title", text: "This is default text.", placeholder: "Please input", maxTextLength: 20, isCharCountEnabled: true, charCountBeyondLimitMsg: "Char count beyond limit"), showsOnFilterFeedbackBar: true),
+            .note(item: .init(name: "Note", text: "This is default text.", placeholder: "Please input", maxTextLength: 200, isCharCountEnabled: true, charCountBeyondLimitMsg: "Char count beyond limit"), showsOnFilterFeedbackBar: false)
+        ],
+        [.durationPicker(item: .init(name: "Duration", value: 0, maximumMinutes: 505, minimumMinutes: 0, minuteInterval: 1), showsOnFilterFeedbackBar: true)]
     ]
     
     @State private var isShowingFullCFG: Bool = false
@@ -49,7 +54,9 @@ struct SortFilterExample: View {
         VStack {
             if self.isCustomStyle {
                 FilterFeedbackBar(items: self.$items, onUpdate: self.performSortAndFilter)
-                    .filterFeedbackBarStyle(font: .subheadline, foregroundColorSelected: .red, strokeColorSelected: .red, cornerRadius: 25, maxWidth: 200)
+                    .filterFeedbackBarItemCornerRadius(0)
+                    .filterFeedbackBarItemBackgroundSelectedStrokeColor(.red)
+                    .filterFeedbackBarItemSelectedForegroundColor(.red)
                     .filterFeedbackBarButtonStyle { c in
                         FilterFeedbackBarButton(c)
                             .titleStyle(content: { titleC in
@@ -66,12 +73,9 @@ struct SortFilterExample: View {
                                 }
                             }
                     }
-//                    .trailingFullConfigurationMenuItem(icon: "command")
-//                    .leadingFullConfigurationMenuItem(icon: "command")
-//                    .leadingFullConfigurationMenuItem(name: "All")
             } else {
                 FilterFeedbackBar(items: self.$items, onUpdate: self.performSortAndFilter)
-                    .leadingFullConfigurationMenuItem(name: "All Configuration")
+                    .fullConfigurationItem(itemContent: .name("All Configuration"), position: .leading)
             }
             
             List {

@@ -8,6 +8,13 @@ struct CoreContentView: View {
         List {
             Section(header: Text("Views")) {
                 NavigationLink(
+                    destination: AttachmentExamples(),
+                    label: {
+                        Text("Attachments")
+                    }
+                )
+
+                NavigationLink(
                     destination: AvatarStackExample(),
                     label: {
                         Text("AvatarStack")
@@ -34,9 +41,9 @@ struct CoreContentView: View {
                 }
                 
                 NavigationLink(
-                    destination: EmptyStateViewExample())
+                    destination: _EmptyStateViewExample())
                 {
-                    Text("EmptyStateViewExample")
+                    Text("_EmptyStateViewExample")
                 }
                 
                 NavigationLink(
@@ -88,7 +95,7 @@ struct CoreContentView: View {
                 NavigationLink(
                     destination: SignatureCaptureViewExample2())
                 {
-                    Text("Customized Signature Inline View")
+                    Text("(Deprecated)Customized Signature Inline View")
                 }
                 
                 NavigationLink(
@@ -224,6 +231,12 @@ struct CoreContentView: View {
                 }
                 
                 NavigationLink(
+                    destination: _DurationPickerExample())
+                {
+                    Text("_DurationPicker")
+                }
+                
+                NavigationLink(
                     destination: DurationPickerExample())
                 {
                     Text("DurationPicker")
@@ -250,9 +263,14 @@ struct CoreContentView: View {
             
             Section(header: Text("Onboarding")) {
                 NavigationLink(
-                    destination: OnboardingExamples())
+                    destination: OnboardingExamples(_isNewObjectItem: true))
                 {
                     Text("Onboarding")
+                }
+                NavigationLink(
+                    destination: OnboardingExamples())
+                {
+                    Text("_Onboarding: deprecated")
                 }
             }
             
@@ -320,6 +338,12 @@ struct CoreContentView: View {
                     destination: KPIExample())
                 {
                     Text("KPI")
+                }
+                
+                NavigationLink(
+                    destination: KPIItemExample())
+                {
+                    Text("KPIItem")
                 }
                 
                 NavigationLink(

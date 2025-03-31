@@ -8,7 +8,7 @@ public struct FilterFeedbackBarItemContainer {
 
     /// Create FilterFeedbackBarItemContainer with items.
     /// - Parameter items: Data of filter feedback bar items.
-    public init(items: Binding<[[SortFilterItem]]>) {
+    public init(_ items: Binding<[[SortFilterItem]]>) {
         self.__items = items
     }
 }
@@ -63,6 +63,21 @@ extension FilterFeedbackBarItemContainer: View {
                                     .accessibilityLabel(self._items[r][c].stepper.label)
                                     .accessibilityIdentifier(self._items[r][c].stepper.name)
                                     .accessibility(addTraits: .isButton)
+                            case .title:
+                                TitleMenuItem(item: Binding<SortFilterItem.TitleItem>(get: { self._items[r][c].title }, set: { self._items[r][c].title = $0 }), onUpdate: self.onUpdate)
+                                    .accessibilityElement()
+                                    .accessibilityLabel(self._items[r][c].title.label)
+                                    .accessibilityIdentifier(self._items[r][c].title.name)
+                            case .note:
+                                NoteMenuItem(item: Binding<SortFilterItem.NoteItem>(get: { self._items[r][c].note }, set: { self._items[r][c].note = $0 }), onUpdate: self.onUpdate)
+                                    .accessibilityElement()
+                                    .accessibilityLabel(self._items[r][c].note.label)
+                                    .accessibilityIdentifier(self._items[r][c].note.name)
+                            case .durationPicker:
+                                DurationPickerMenuItem(item: Binding<SortFilterItem.DurationPickerItem>(get: { self._items[r][c].durationPicker }, set: { self._items[r][c].durationPicker = $0 }), onUpdate: self.onUpdate)
+                                    .accessibilityElement()
+                                    .accessibilityLabel(self._items[r][c].durationPicker.label)
+                                    .accessibilityIdentifier(self._items[r][c].durationPicker.name)
                             }
                         }
                     }

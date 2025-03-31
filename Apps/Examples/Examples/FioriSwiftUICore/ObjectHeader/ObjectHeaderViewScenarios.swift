@@ -158,8 +158,9 @@ struct ObjectHeaderViewScenarios: ListDataProtocol {
                                   footnote: "Due on 12/31/16",
                                   descriptionText: "Temperature sensor predicts overheating failure in 4 days Urgent and needs attention sensor predicts overheating failure in 4 days Urgent and need attention.",
                                   status: TextOrIcon.text("Very High Priority"),
-                                  substatus: TextOrIcon.text("Scheduled"),
-                                  detailContent: {})
+                                  substatus: TextOrIcon.both("Time", Image(systemName: "clock")),
+                                  detailContent: {}).environment(\.iconHorizontalAlignment, .trailing)
+                .substatusStyle(.negativeLabel)
             
             return AnyView(oh)
         
@@ -241,7 +242,7 @@ struct ObjectHeaderViewScenarios: ListDataProtocol {
                 }, trendImage: {
                     Image(systemName: "triangle.fill").foregroundColor(.preferredColor(.negativeLabel))
                 }, kpi: {
-                    KPIItem(data: .components([.metric("79"), .unit("°F")]), subtitle: "")
+                    _KPIItem(data: .components([.metric("79"), .unit("°F")]), subtitle: "")
                 })
             })
             

@@ -56,13 +56,15 @@ extension TextFieldFormViewFioriStyle {
                             }
                             .frame(minHeight: 44)
                             .padding(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8))
-                        if self.showsActionButton(configuration), let action = getAction(configuration), let actionIcon = self.getActionIcon(configuration) {
-                            actionIcon
-                                .frame(minHeight: 44)
-                                .padding(.trailing, 8)
-                                .onTapGesture {
-                                    action()
-                                }
+                        if !(configuration.isSecureEnabled ?? false) {
+                            if self.showsActionButton(configuration), let action = getAction(configuration), let actionIcon = self.getActionIcon(configuration) {
+                                actionIcon
+                                    .frame(minHeight: 44)
+                                    .padding(.trailing, 8)
+                                    .onTapGesture {
+                                        action()
+                                    }
+                            }
                         }
                     }
                     .background(RoundedRectangle(cornerRadius: 8).stroke(self.getBorderColor(configuration), lineWidth: self.getBorderWidth(configuration)).background(self.getBackgroundColor(configuration)))
@@ -199,7 +201,7 @@ extension TextFieldFormViewFioriStyle {
         
         func makeBody(_ configuration: MandatoryFieldIndicatorConfiguration) -> some View {
             MandatoryFieldIndicator(configuration)
-                .foregroundStyle(Color.preferredColor(self.textFieldFormViewConfiguration.controlState == .disabled ? .separator : .primaryLabel))
+                .foregroundStyle(Color.preferredColor(self.textFieldFormViewConfiguration.controlState == .disabled ? .quaternaryLabel : .primaryLabel))
         }
     }
 }
