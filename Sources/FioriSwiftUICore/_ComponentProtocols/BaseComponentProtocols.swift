@@ -718,3 +718,25 @@ protocol _DisagreeActionComponent {
     // sourcery: resultBuilder.defaultValue = "{ FioriButton { _ in Text("Disagree".localizedFioriString()) } }"
     var disagreeAction: FioriButton? { get }
 }
+
+// sourcery: BaseComponent
+protocol _AuthInputComponent {
+    @ViewBuilder
+    var authInput: (() -> any View)? { get }
+}
+
+// sourcery: BaseComponent
+protocol _SignInActionComponent {
+    // sourcery: @ViewBuilder
+    // sourcery: defaultValue = "FioriButton { _ in Text("Sign In".localizedFioriString()) }"
+    // sourcery: resultBuilder.defaultValue = "{ FioriButton { _ in Text("Sign In".localizedFioriString()) } }"
+    var signInAction: FioriButton? { get }
+}
+
+// sourcery: BaseComponent
+protocol _CheckmarkComponent {
+    // sourcery: @ViewBuilder
+    // sourcery: defaultValue = "Image(systemName: "checkmark")"
+    // sourcery: resultBuilder.defaultValue = "{ Image(systemName: "checkmark") }"
+    var checkmark: Image? { get }
+}

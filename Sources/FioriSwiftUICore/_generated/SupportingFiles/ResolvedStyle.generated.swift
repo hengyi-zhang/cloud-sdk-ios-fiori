@@ -51,6 +51,22 @@ extension ActionStyle {
     }
 }
 
+// MARK: ActivationScreenStyle
+
+struct ResolvedActivationScreenStyle<Style: ActivationScreenStyle>: View {
+    let style: Style
+    let configuration: ActivationScreenConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension ActivationScreenStyle {
+    func resolve(configuration: ActivationScreenConfiguration) -> some View {
+        ResolvedActivationScreenStyle(style: self, configuration: configuration)
+    }
+}
+
 // MARK: ActiveTrackStyle
 
 struct ResolvedActiveTrackStyle<Style: ActiveTrackStyle>: View {
@@ -291,6 +307,38 @@ extension AttributeStyle {
     }
 }
 
+// MARK: AuthInputStyle
+
+struct ResolvedAuthInputStyle<Style: AuthInputStyle>: View {
+    let style: Style
+    let configuration: AuthInputConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension AuthInputStyle {
+    func resolve(configuration: AuthInputConfiguration) -> some View {
+        ResolvedAuthInputStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: AuthenticationStyle
+
+struct ResolvedAuthenticationStyle<Style: AuthenticationStyle>: View {
+    let style: Style
+    let configuration: AuthenticationConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension AuthenticationStyle {
+    func resolve(configuration: AuthenticationConfiguration) -> some View {
+        ResolvedAuthenticationStyle(style: self, configuration: configuration)
+    }
+}
+
 // MARK: AvatarStackStyle
 
 struct ResolvedAvatarStackStyle<Style: AvatarStackStyle>: View {
@@ -512,6 +560,22 @@ struct ResolvedCardMediaStyle<Style: CardMediaStyle>: View {
 extension CardMediaStyle {
     func resolve(configuration: CardMediaConfiguration) -> some View {
         ResolvedCardMediaStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: CheckmarkStyle
+
+struct ResolvedCheckmarkStyle<Style: CheckmarkStyle>: View {
+    let style: Style
+    let configuration: CheckmarkConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension CheckmarkStyle {
+    func resolve(configuration: CheckmarkConfiguration) -> some View {
+        ResolvedCheckmarkStyle(style: self, configuration: configuration)
     }
 }
 
@@ -1139,6 +1203,22 @@ extension IncrementActionStyle {
     }
 }
 
+// MARK: InfoViewStyle
+
+struct ResolvedInfoViewStyle<Style: InfoViewStyle>: View {
+    let style: Style
+    let configuration: InfoViewConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension InfoViewStyle {
+    func resolve(configuration: InfoViewConfiguration) -> some View {
+        ResolvedInfoViewStyle(style: self, configuration: configuration)
+    }
+}
+
 // MARK: InformationViewStyle
 
 struct ResolvedInformationViewStyle<Style: InformationViewStyle>: View {
@@ -1200,6 +1280,22 @@ struct ResolvedKPIContentStyle<Style: KPIContentStyle>: View {
 extension KPIContentStyle {
     func resolve(configuration: KPIContentConfiguration) -> some View {
         ResolvedKPIContentStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: KPIHeaderStyle
+
+struct ResolvedKPIHeaderStyle<Style: KPIHeaderStyle>: View {
+    let style: Style
+    let configuration: KPIHeaderConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension KPIHeaderStyle {
+    func resolve(configuration: KPIHeaderConfiguration) -> some View {
+        ResolvedKPIHeaderStyle(style: self, configuration: configuration)
     }
 }
 
@@ -1715,6 +1811,22 @@ extension OnStarImageStyle {
     }
 }
 
+// MARK: OnboardingScanViewStyle
+
+struct ResolvedOnboardingScanViewStyle<Style: OnboardingScanViewStyle>: View {
+    let style: Style
+    let configuration: OnboardingScanViewConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension OnboardingScanViewStyle {
+    func resolve(configuration: OnboardingScanViewConfiguration) -> some View {
+        ResolvedOnboardingScanViewStyle(style: self, configuration: configuration)
+    }
+}
+
 // MARK: OptionalTitleStyle
 
 struct ResolvedOptionalTitleStyle<Style: OptionalTitleStyle>: View {
@@ -1744,6 +1856,22 @@ struct ResolvedOptionsStyle<Style: OptionsStyle>: View {
 extension OptionsStyle {
     func resolve(configuration: OptionsConfiguration) -> some View {
         ResolvedOptionsStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: OrderPickerStyle
+
+struct ResolvedOrderPickerStyle<Style: OrderPickerStyle>: View {
+    let style: Style
+    let configuration: OrderPickerConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension OrderPickerStyle {
+    func resolve(configuration: OrderPickerConfiguration) -> some View {
+        ResolvedOrderPickerStyle(style: self, configuration: configuration)
     }
 }
 
@@ -2227,6 +2355,22 @@ extension SideBarListItemStyle {
     }
 }
 
+// MARK: SignInActionStyle
+
+struct ResolvedSignInActionStyle<Style: SignInActionStyle>: View {
+    let style: Style
+    let configuration: SignInActionConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension SignInActionStyle {
+    func resolve(configuration: SignInActionConfiguration) -> some View {
+        ResolvedSignInActionStyle(style: self, configuration: configuration)
+    }
+}
+
 // MARK: SignatureCaptureViewStyle
 
 struct ResolvedSignatureCaptureViewStyle<Style: SignatureCaptureViewStyle>: View {
@@ -2256,6 +2400,22 @@ struct ResolvedSingleStepStyle<Style: SingleStepStyle>: View {
 extension SingleStepStyle {
     func resolve(configuration: SingleStepConfiguration) -> some View {
         ResolvedSingleStepStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: SortCriterionStyle
+
+struct ResolvedSortCriterionStyle<Style: SortCriterionStyle>: View {
+    let style: Style
+    let configuration: SortCriterionConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension SortCriterionStyle {
+    func resolve(configuration: SortCriterionConfiguration) -> some View {
+        ResolvedSortCriterionStyle(style: self, configuration: configuration)
     }
 }
 
