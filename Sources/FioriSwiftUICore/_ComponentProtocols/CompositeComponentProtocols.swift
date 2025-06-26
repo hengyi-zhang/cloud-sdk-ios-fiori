@@ -2172,7 +2172,7 @@ protocol _ActivationScreenComponent: _TitleComponent, _DescriptionTextComponent,
 }
 
 // sourcery: CompositeComponent
-protocol _SortCriterionComponent: _CheckmarkComponent, _TitleComponent, _SubtitleComponent, _AccessoryIconComponent {
+protocol _SortCriterionComponent: _CheckmarkComponent, _TitleComponent, _SubtitleComponent {
     // sourcery: @Binding
     /// The data of the Order Picker Item
     var data: OrderPickerItemModel { get }
@@ -2227,6 +2227,95 @@ protocol _OrderPickerComponent: _OptionalTitleComponent {
     // sourcery: defaultValue = .normal
     /// The `ControlState` of the  view. Currently, `.disabled`, `.normal` and `.readOnly` are supported. The default is `normal`.
     var controlState: ControlState { get }
+}
+
+/// `AIUserFeedback` is used to display a feedback page with customizable title, description, navigation title, filter form view and key value form view.
+/// `AIUserFeedback` can be presented modally using .sheet, or pushed onto a navigation stack.
+/// ## Usage
+/// ```swift
+/// @State var filterFormViewSelectionValue: [Int] = [0]
+/// @State var valueText: String = ""
+/// let valueOptions: [AttributedString] = ["Inaccuraies", "Inappropriate Content", "Security Risks", "Slow Response", "Repetitive or Wordy", "Others"]
+/// let filterFormView = FilterFormView(title: "Select all that apply", isRequired: true, options: valueOptions, errorMessage: nil, isEnabled: true, allowsMultipleSelection: true, allowsEmptySelection: false, value: self.$filterFormViewSelectionValue, buttonSize: .fixed, onValueChange: { value in
+///    print("FilterFormView value change: \(value)")
+/// })
+/// let keyValueFormView = KeyValueFormView(title: "Additional feedback", text: self.$valueText, placeholder: "Write additional comments here", errorMessage: nil, minTextEditorHeight: 88, maxTextEditorHeight: 200, maxTextLength: 200, hintText: AttributedString("Hint Text"), isCharCountEnabled: true, allowsBeyondLimit: false, isRequired: true)
+///
+/// AIUserFeedback(title: { Title(title: "How was your AI experience?") },
+///             description: { Text("Please rate your experience to help us improve.") },
+///             navigationTitle: "Feedback" ,
+///             filterFormView: filterFormView,
+///             keyValueFormView: keyValueFormView,
+///             displayMode: .sheet,
+///             onCancel: {
+///
+///             }, onUpVote: {
+///
+///             }, onDownVote: {
+///
+///             }, onSubmit: { voteState, feedbacks, additional, submitResult in
+///                 submitResult(true)
+///             }, voteState: .notDetermined)
+/// ```
+///  ### Toggle:
+/// ```swift
+/// @State var isFeedbackPresented = false
+/// Button {
+///     isFeedbackPresented.toggle()
+/// } label: {
+///     Text("Present AI User Feedback")
+/// }
+/// .popover(isPresented: $isFeedbackPresented) {
+///     AIUserFeedback
+/// }
+/// ```
+// sourcery: CompositeComponent
+protocol _AIUserFeedbackComponent: _IllustratedMessageComponent, _SubmitActionComponent, _CancelActionComponent {
+    var navigationTitle: AttributedString? { get }
+    
+    /// The view for selecting the reasons for negative feedback.
+    var filterFormView: FilterFormView? { get }
+    
+    /// The view for inputting additional reason for negative feedback.
+    var keyValueFormView: KeyValueFormView? { get }
+    
+    /// Indicate whether the AIUserFeedback is pushed in, poped up or as an inspector. Default value is `.sheet`.
+    /// When it is pushed in, the height of sheet is fixed. The drag indicator is hidden, sheet can not be dragged.
+    // sourcery: defaultValue = .sheet
+    var displayMode: AIUserFeedbackDisplayMode { get }
+    
+    /// Whether the user can interact with the background when AIUserFeedback is presented as a modal..
+    // sourcery: defaultValue = false
+    var isBackgroundInteractionEnabled: Bool { get }
+    
+    /// The custom error view when an error occurs when submitting.
+    // sourcery: @ViewBuilder
+    var errorView: IllustratedMessage? { get }
+    
+    /// The action to be performed when the cancel button is tapped.
+    // sourcery: default.value = nil
+    // sourcery: no_view
+    var onCancel: (() -> Void)? { get }
+    
+    /// The action to be performed when the up vote button is tapped.
+    // sourcery: default.value = nil
+    // sourcery: no_view
+    var onUpVote: (() -> Void)? { get }
+    
+    /// The action to be performed when the down vote button is tapped.
+    // sourcery: default.value = nil
+    // sourcery: no_view
+    var onDownVote: (() -> Void)? { get }
+    
+    /// The action to be performed when the submit button is tapped.
+    /// Application can get the user feedback values, can tell the component the submition result with the `submitResult` call back.
+    // sourcery: default.value = nil
+    // sourcery: no_view
+    var onSubmit: ((_ voteState: AIUserFeedbackVoteState, _ feedbacks: [String], _ additional: String, _ submitResult: @escaping (Bool) -> Void) -> Void)? { get }
+    
+    /// The state of vote. Default is `notDetermined`.
+    // sourcery: defaultValue = .notDetermined
+    var voteState: AIUserFeedbackVoteState { get }
 }
 
 /// `OnboardingScanView` is used to display a scanner view to scan a QR code for app activation.

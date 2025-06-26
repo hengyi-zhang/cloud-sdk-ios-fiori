@@ -1327,8 +1327,7 @@ struct DurationPickerMenuItem: View {
                     .buttonStyle(ApplyButtonStyle())
                 } components: {
                     DurationPickerViewWrapper(selection: self.$item.workingValue, maximumMinutes: self.item.maximumMinutes, minimumMinutes: self.item.minimumMinutes, minuteInterval: self.item.minuteInterval, measurementFormatter: self.item.measurementFormatter)
-                        .frame(width: 232, height: 204)
-                        .background(Color.preferredColor(.primaryBackground))
+                        .frame(height: 204)
                         .foregroundColor(Color.preferredColor(.primaryLabel))
                         .padding([.leading, .trailing], 16)
                         .padding(.bottom, 8)
@@ -1369,6 +1368,119 @@ struct DurationPickerMenuItem: View {
                         }
                 })
             })
+    }
+}
+
+struct OrderPickerMenuItem: View {
+    @Binding var item: SortFilterItem.OrderPickerItem
+
+    @State var isSheetVisible = false
+
+    @State var detentHeight: CGFloat = 0
+    @State var barItemFrame: CGRect = .zero
+
+    var onUpdate: () -> Void
+    
+    let popoverWidth = 393.0
+    
+    public init(item: Binding<SortFilterItem.OrderPickerItem>, onUpdate: @escaping () -> Void) {
+        self._item = item
+        self.onUpdate = onUpdate
+    }
+    
+    var body: some View {
+        FilterFeedbackBarItem(icon: icon(name: self.item.icon, isVisible: true), title: AttributedString(self.item.label), accessoryIcon: Image(systemName: "chevron.down"), isSelected: self.item.isChecked)
+            .onTapGesture {
+                self.isSheetVisible.toggle()
+            }
+            .popover(isPresented: self.$isSheetVisible, arrowEdge: self.barItemFrame.arrowDirection()) {
+                CancellableResettableDialogNavigationForm {
+                    SortFilterItemTitle(title: self.item.name)
+                } cancelAction: {
+                    _Action(actionText: NSLocalizedString("Cancel", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: ""), didSelectAction: {
+                        self.item.cancel()
+                        self.isSheetVisible.toggle()
+                    })
+                    .buttonStyle(CancelButtonStyle())
+                } resetAction: {
+                    _Action(actionText: NSLocalizedString("Reset", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: ""), didSelectAction: {
+                        self.item.reset()
+                    })
+                    .buttonStyle(ResetButtonStyle())
+                    .disabled(self.item.isOriginal)
+                } applyAction: {
+                    _Action(actionText: NSLocalizedString("Apply", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: ""), didSelectAction: { [self] in
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                        self.item.apply()
+                        self.onUpdate()
+                        self.isSheetVisible.toggle()
+                    })
+                    .buttonStyle(ApplyButtonStyle())
+                } components: {
+                    OrderPicker(
+                        optionalTitle: self.item.title,
+                        data: self.$item.workingValue,
+                        isAtLeastOneSelected: self.item.isAtLeastOneSelected,
+                        onChangeHandler: { _, newModel in
+                            self.item.workingValue = newModel
+                        },
+                        controlState: self.item.controlState
+                    )
+                    .padding(.bottom, 8)
+                    .modifier(FioriIntrospectModifier<UIScrollView> { scrollView in
+                        DispatchQueue.main.async {
+                            let calculateHeight = self.calculateDetentHeight(scrollViewContentHeight: scrollView.contentSize.height)
+                            if self.detentHeight != calculateHeight {
+                                self.detentHeight = calculateHeight
+                            }
+                        }
+                    })
+                    .onAppear {
+                        self.item.workingValue = self.item.value
+                    }
+                }
+                .ifApply(UIDevice.current.userInterfaceIdiom != .phone, content: { v in
+                    v.frame(width: self.popoverWidth)
+                })
+                .frame(idealHeight: self.detentHeight)
+                .presentationDetents([.height(self.detentHeight)])
+            }
+            .ifApply(UIDevice.current.userInterfaceIdiom != .phone, content: { v in
+                v.background(GeometryReader { geometry in
+                    Color.clear
+                        .onAppear {
+                            self.barItemFrame = geometry.frame(in: .global)
+                        }
+                        .setOnChange(of: geometry.frame(in: .global), action1: { newValue in
+                            self.barItemFrame = newValue
+                        }) { _, newValue in
+                            self.barItemFrame = newValue
+                        }
+                })
+            })
+    }
+    
+    private func calculateDetentHeight(scrollViewContentHeight: CGFloat) -> CGFloat {
+        let screenHeight = Screen.bounds.size.height
+        let safeAreaInset = UIEdgeInsets.getSafeAreaInsets()
+        var maxPopoverViewHeight = 0.0
+        var calaulatePopoverViewHeight = scrollViewContentHeight
+        if UIDevice.current.userInterfaceIdiom != .phone {
+            if self.barItemFrame.arrowDirection() == .top {
+                maxPopoverViewHeight = screenHeight - self.barItemFrame.maxY - safeAreaInset.bottom - 30
+            } else if self.barItemFrame.arrowDirection() == .bottom {
+                maxPopoverViewHeight = screenHeight - (screenHeight - self.barItemFrame.minY) + safeAreaInset.top
+            }
+            calaulatePopoverViewHeight += 50 + 70
+        } else {
+            maxPopoverViewHeight = screenHeight - safeAreaInset.top - 30
+            calaulatePopoverViewHeight += 56 + 20 + safeAreaInset.bottom
+            if calaulatePopoverViewHeight > screenHeight - safeAreaInset.top - 60 {
+                return screenHeight / 2
+            }
+        }
+
+        return min(maxPopoverViewHeight, calaulatePopoverViewHeight)
     }
 }
 

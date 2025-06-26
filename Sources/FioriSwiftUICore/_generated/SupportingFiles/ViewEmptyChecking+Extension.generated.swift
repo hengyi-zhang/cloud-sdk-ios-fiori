@@ -9,6 +9,19 @@ extension AINotice: _ViewEmptyChecking {
     }
 }
 
+extension AIUserFeedback: _ViewEmptyChecking {
+    public var isEmpty: Bool {
+        detailImage.isEmpty &&
+            title.isEmpty &&
+            description.isEmpty &&
+            action.isEmpty &&
+            secondaryAction.isEmpty &&
+            submitAction.isEmpty &&
+            cancelAction.isEmpty &&
+            errorView.isEmpty
+    }
+}
+
 extension AccessoryIcon: _ViewEmptyChecking {
     public var isEmpty: Bool {
         accessoryIcon.isEmpty
@@ -386,6 +399,12 @@ extension DimensionSelector: _ViewEmptyChecking {
 extension DisagreeAction: _ViewEmptyChecking {
     public var isEmpty: Bool {
         disagreeAction.isEmpty
+    }
+}
+
+extension DownVoteAction: _ViewEmptyChecking {
+    public var isEmpty: Bool {
+        downVoteAction.isEmpty
     }
 }
 
@@ -1088,8 +1107,7 @@ extension SortCriterion: _ViewEmptyChecking {
     public var isEmpty: Bool {
         checkmark.isEmpty &&
             title.isEmpty &&
-            subtitle.isEmpty &&
-            accessoryIcon.isEmpty
+            subtitle.isEmpty
     }
 }
 
@@ -1143,6 +1161,12 @@ extension StepperView: _ViewEmptyChecking {
 extension SubAttribute: _ViewEmptyChecking {
     public var isEmpty: Bool {
         subAttribute.isEmpty
+    }
+}
+
+extension SubmitAction: _ViewEmptyChecking {
+    public var isEmpty: Bool {
+        submitAction.isEmpty
     }
 }
 
@@ -1320,6 +1344,12 @@ extension Trend: _ViewEmptyChecking {
 extension TrendImage: _ViewEmptyChecking {
     public var isEmpty: Bool {
         trendImage.isEmpty
+    }
+}
+
+extension UpVoteAction: _ViewEmptyChecking {
+    public var isEmpty: Bool {
+        upVoteAction.isEmpty
     }
 }
 
