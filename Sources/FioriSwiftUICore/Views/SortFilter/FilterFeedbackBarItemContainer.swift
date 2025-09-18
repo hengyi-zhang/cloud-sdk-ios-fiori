@@ -101,11 +101,15 @@ extension FilterFeedbackBarItemContainer: View {
     
     private func switchItemAccessibilityLabel(switchItem: SortFilterItem.SwitchItem) -> String {
         var accessibilityLabel = switchItem.name
+        let statusText: String
+        
         if let value = switchItem.value {
-            accessibilityLabel += "\(value ? 1 : 0)"
+            statusText = value ? "Switch Item Off".localizedFioriString() : "Switch Item On".localizedFioriString()
         } else {
-            accessibilityLabel += "\(0)"
+            statusText = "Switch Item On".localizedFioriString()
         }
+        
+        accessibilityLabel += statusText
         return accessibilityLabel
     }
 }
