@@ -920,6 +920,20 @@ public extension AvatarsTitleStyle where Self == AvatarsTitleFioriStyle {
     }
 }
 
+// MARK: BackActionStyle
+
+public extension BackActionStyle where Self == BackActionBaseStyle {
+    static var base: BackActionBaseStyle {
+        BackActionBaseStyle()
+    }
+}
+
+public extension BackActionStyle where Self == BackActionFioriStyle {
+    static var fiori: BackActionFioriStyle {
+        BackActionFioriStyle()
+    }
+}
+
 // MARK: BannerMessageStyle
 
 public extension BannerMessageStyle where Self == BannerMessageBaseStyle {
@@ -2481,6 +2495,83 @@ public extension CounterStyle where Self == CounterFioriStyle {
     }
 }
 
+// MARK: DateRangePickerStyle
+
+public extension DateRangePickerStyle where Self == DateRangePickerBaseStyle {
+    static var base: DateRangePickerBaseStyle {
+        DateRangePickerBaseStyle()
+    }
+}
+
+public extension DateRangePickerStyle where Self == DateRangePickerFioriStyle {
+    static var fiori: DateRangePickerFioriStyle {
+        DateRangePickerFioriStyle()
+    }
+}
+
+public struct DateRangePickerTitleStyle: DateRangePickerStyle {
+    let style: any TitleStyle
+
+    public func makeBody(_ configuration: DateRangePickerConfiguration) -> some View {
+        DateRangePicker(configuration)
+            .titleStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension DateRangePickerStyle where Self == DateRangePickerTitleStyle {
+    static func titleStyle(_ style: some TitleStyle) -> DateRangePickerTitleStyle {
+        DateRangePickerTitleStyle(style: style)
+    }
+
+    static func titleStyle(@ViewBuilder content: @escaping (TitleConfiguration) -> some View) -> DateRangePickerTitleStyle {
+        let style = AnyTitleStyle(content)
+        return DateRangePickerTitleStyle(style: style)
+    }
+}
+
+public struct DateRangePickerValueLabelStyle: DateRangePickerStyle {
+    let style: any ValueLabelStyle
+
+    public func makeBody(_ configuration: DateRangePickerConfiguration) -> some View {
+        DateRangePicker(configuration)
+            .valueLabelStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension DateRangePickerStyle where Self == DateRangePickerValueLabelStyle {
+    static func valueLabelStyle(_ style: some ValueLabelStyle) -> DateRangePickerValueLabelStyle {
+        DateRangePickerValueLabelStyle(style: style)
+    }
+
+    static func valueLabelStyle(@ViewBuilder content: @escaping (ValueLabelConfiguration) -> some View) -> DateRangePickerValueLabelStyle {
+        let style = AnyValueLabelStyle(content)
+        return DateRangePickerValueLabelStyle(style: style)
+    }
+}
+
+public struct DateRangePickerFormViewStyle: DateRangePickerStyle {
+    let style: any FormViewStyle
+
+    public func makeBody(_ configuration: DateRangePickerConfiguration) -> some View {
+        DateRangePicker(configuration)
+            .formViewStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension DateRangePickerStyle where Self == DateRangePickerFormViewStyle {
+    static func formViewStyle(_ style: some FormViewStyle) -> DateRangePickerFormViewStyle {
+        DateRangePickerFormViewStyle(style: style)
+    }
+
+    static func formViewStyle(@ViewBuilder content: @escaping (FormViewConfiguration) -> some View) -> DateRangePickerFormViewStyle {
+        let style = AnyFormViewStyle(content)
+        return DateRangePickerFormViewStyle(style: style)
+    }
+}
+
 // MARK: DateTimePickerStyle
 
 public extension DateTimePickerStyle where Self == DateTimePickerBaseStyle {
@@ -2835,6 +2926,20 @@ public extension DisagreeActionStyle where Self == DisagreeActionBaseStyle {
 public extension DisagreeActionStyle where Self == DisagreeActionFioriStyle {
     static var fiori: DisagreeActionFioriStyle {
         DisagreeActionFioriStyle()
+    }
+}
+
+// MARK: DoneActionStyle
+
+public extension DoneActionStyle where Self == DoneActionBaseStyle {
+    static var base: DoneActionBaseStyle {
+        DoneActionBaseStyle()
+    }
+}
+
+public extension DoneActionStyle where Self == DoneActionFioriStyle {
+    static var fiori: DoneActionFioriStyle {
+        DoneActionFioriStyle()
     }
 }
 
@@ -6842,6 +6947,20 @@ public extension RatingControlFormViewStyle where Self == RatingControlFormViewR
     }
 }
 
+// MARK: RedoActionStyle
+
+public extension RedoActionStyle where Self == RedoActionBaseStyle {
+    static var base: RedoActionBaseStyle {
+        RedoActionBaseStyle()
+    }
+}
+
+public extension RedoActionStyle where Self == RedoActionFioriStyle {
+    static var fiori: RedoActionFioriStyle {
+        RedoActionFioriStyle()
+    }
+}
+
 // MARK: ReenterSignatureActionStyle
 
 public extension ReenterSignatureActionStyle where Self == ReenterSignatureActionBaseStyle {
@@ -9236,6 +9355,20 @@ public extension TrendImageStyle where Self == TrendImageFioriStyle {
     }
 }
 
+// MARK: UndoActionStyle
+
+public extension UndoActionStyle where Self == UndoActionBaseStyle {
+    static var base: UndoActionBaseStyle {
+        UndoActionBaseStyle()
+    }
+}
+
+public extension UndoActionStyle where Self == UndoActionFioriStyle {
+    static var fiori: UndoActionFioriStyle {
+        UndoActionFioriStyle()
+    }
+}
+
 // MARK: UpVoteActionStyle
 
 public extension UpVoteActionStyle where Self == UpVoteActionBaseStyle {
@@ -9730,6 +9863,223 @@ public extension WelcomeScreenStyle where Self == WelcomeScreenSecondaryActionSt
     static func secondaryActionStyle(@ViewBuilder content: @escaping (SecondaryActionConfiguration) -> some View) -> WelcomeScreenSecondaryActionStyle {
         let style = AnySecondaryActionStyle(content)
         return WelcomeScreenSecondaryActionStyle(style: style)
+    }
+}
+
+// MARK: WritingAssistantActionStyle
+
+public extension WritingAssistantActionStyle where Self == WritingAssistantActionBaseStyle {
+    static var base: WritingAssistantActionBaseStyle {
+        WritingAssistantActionBaseStyle()
+    }
+}
+
+public extension WritingAssistantActionStyle where Self == WritingAssistantActionFioriStyle {
+    static var fiori: WritingAssistantActionFioriStyle {
+        WritingAssistantActionFioriStyle()
+    }
+}
+
+// MARK: WritingAssistantFormStyle
+
+public extension WritingAssistantFormStyle where Self == WritingAssistantFormBaseStyle {
+    static var base: WritingAssistantFormBaseStyle {
+        WritingAssistantFormBaseStyle()
+    }
+}
+
+public extension WritingAssistantFormStyle where Self == WritingAssistantFormFioriStyle {
+    static var fiori: WritingAssistantFormFioriStyle {
+        WritingAssistantFormFioriStyle()
+    }
+}
+
+public struct WritingAssistantFormCancelActionStyle: WritingAssistantFormStyle {
+    let style: any CancelActionStyle
+
+    public func makeBody(_ configuration: WritingAssistantFormConfiguration) -> some View {
+        WritingAssistantForm(configuration)
+            .cancelActionStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension WritingAssistantFormStyle where Self == WritingAssistantFormCancelActionStyle {
+    static func cancelActionStyle(_ style: some CancelActionStyle) -> WritingAssistantFormCancelActionStyle {
+        WritingAssistantFormCancelActionStyle(style: style)
+    }
+
+    static func cancelActionStyle(@ViewBuilder content: @escaping (CancelActionConfiguration) -> some View) -> WritingAssistantFormCancelActionStyle {
+        let style = AnyCancelActionStyle(content)
+        return WritingAssistantFormCancelActionStyle(style: style)
+    }
+}
+
+public struct WritingAssistantFormDoneActionStyle: WritingAssistantFormStyle {
+    let style: any DoneActionStyle
+
+    public func makeBody(_ configuration: WritingAssistantFormConfiguration) -> some View {
+        WritingAssistantForm(configuration)
+            .doneActionStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension WritingAssistantFormStyle where Self == WritingAssistantFormDoneActionStyle {
+    static func doneActionStyle(_ style: some DoneActionStyle) -> WritingAssistantFormDoneActionStyle {
+        WritingAssistantFormDoneActionStyle(style: style)
+    }
+
+    static func doneActionStyle(@ViewBuilder content: @escaping (DoneActionConfiguration) -> some View) -> WritingAssistantFormDoneActionStyle {
+        let style = AnyDoneActionStyle(content)
+        return WritingAssistantFormDoneActionStyle(style: style)
+    }
+}
+
+public struct WritingAssistantFormCloseActionStyle: WritingAssistantFormStyle {
+    let style: any CloseActionStyle
+
+    public func makeBody(_ configuration: WritingAssistantFormConfiguration) -> some View {
+        WritingAssistantForm(configuration)
+            .closeActionStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension WritingAssistantFormStyle where Self == WritingAssistantFormCloseActionStyle {
+    static func closeActionStyle(_ style: some CloseActionStyle) -> WritingAssistantFormCloseActionStyle {
+        WritingAssistantFormCloseActionStyle(style: style)
+    }
+
+    static func closeActionStyle(@ViewBuilder content: @escaping (CloseActionConfiguration) -> some View) -> WritingAssistantFormCloseActionStyle {
+        let style = AnyCloseActionStyle(content)
+        return WritingAssistantFormCloseActionStyle(style: style)
+    }
+}
+
+public struct WritingAssistantFormBackActionStyle: WritingAssistantFormStyle {
+    let style: any BackActionStyle
+
+    public func makeBody(_ configuration: WritingAssistantFormConfiguration) -> some View {
+        WritingAssistantForm(configuration)
+            .backActionStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension WritingAssistantFormStyle where Self == WritingAssistantFormBackActionStyle {
+    static func backActionStyle(_ style: some BackActionStyle) -> WritingAssistantFormBackActionStyle {
+        WritingAssistantFormBackActionStyle(style: style)
+    }
+
+    static func backActionStyle(@ViewBuilder content: @escaping (BackActionConfiguration) -> some View) -> WritingAssistantFormBackActionStyle {
+        let style = AnyBackActionStyle(content)
+        return WritingAssistantFormBackActionStyle(style: style)
+    }
+}
+
+public struct WritingAssistantFormUndoActionStyle: WritingAssistantFormStyle {
+    let style: any UndoActionStyle
+
+    public func makeBody(_ configuration: WritingAssistantFormConfiguration) -> some View {
+        WritingAssistantForm(configuration)
+            .undoActionStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension WritingAssistantFormStyle where Self == WritingAssistantFormUndoActionStyle {
+    static func undoActionStyle(_ style: some UndoActionStyle) -> WritingAssistantFormUndoActionStyle {
+        WritingAssistantFormUndoActionStyle(style: style)
+    }
+
+    static func undoActionStyle(@ViewBuilder content: @escaping (UndoActionConfiguration) -> some View) -> WritingAssistantFormUndoActionStyle {
+        let style = AnyUndoActionStyle(content)
+        return WritingAssistantFormUndoActionStyle(style: style)
+    }
+}
+
+public struct WritingAssistantFormRedoActionStyle: WritingAssistantFormStyle {
+    let style: any RedoActionStyle
+
+    public func makeBody(_ configuration: WritingAssistantFormConfiguration) -> some View {
+        WritingAssistantForm(configuration)
+            .redoActionStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension WritingAssistantFormStyle where Self == WritingAssistantFormRedoActionStyle {
+    static func redoActionStyle(_ style: some RedoActionStyle) -> WritingAssistantFormRedoActionStyle {
+        WritingAssistantFormRedoActionStyle(style: style)
+    }
+
+    static func redoActionStyle(@ViewBuilder content: @escaping (RedoActionConfiguration) -> some View) -> WritingAssistantFormRedoActionStyle {
+        let style = AnyRedoActionStyle(content)
+        return WritingAssistantFormRedoActionStyle(style: style)
+    }
+}
+
+public struct WritingAssistantFormUpVoteActionStyle: WritingAssistantFormStyle {
+    let style: any UpVoteActionStyle
+
+    public func makeBody(_ configuration: WritingAssistantFormConfiguration) -> some View {
+        WritingAssistantForm(configuration)
+            .upVoteActionStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension WritingAssistantFormStyle where Self == WritingAssistantFormUpVoteActionStyle {
+    static func upVoteActionStyle(_ style: some UpVoteActionStyle) -> WritingAssistantFormUpVoteActionStyle {
+        WritingAssistantFormUpVoteActionStyle(style: style)
+    }
+
+    static func upVoteActionStyle(@ViewBuilder content: @escaping (UpVoteActionConfiguration) -> some View) -> WritingAssistantFormUpVoteActionStyle {
+        let style = AnyUpVoteActionStyle(content)
+        return WritingAssistantFormUpVoteActionStyle(style: style)
+    }
+}
+
+public struct WritingAssistantFormDownVoteActionStyle: WritingAssistantFormStyle {
+    let style: any DownVoteActionStyle
+
+    public func makeBody(_ configuration: WritingAssistantFormConfiguration) -> some View {
+        WritingAssistantForm(configuration)
+            .downVoteActionStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension WritingAssistantFormStyle where Self == WritingAssistantFormDownVoteActionStyle {
+    static func downVoteActionStyle(_ style: some DownVoteActionStyle) -> WritingAssistantFormDownVoteActionStyle {
+        WritingAssistantFormDownVoteActionStyle(style: style)
+    }
+
+    static func downVoteActionStyle(@ViewBuilder content: @escaping (DownVoteActionConfiguration) -> some View) -> WritingAssistantFormDownVoteActionStyle {
+        let style = AnyDownVoteActionStyle(content)
+        return WritingAssistantFormDownVoteActionStyle(style: style)
+    }
+}
+
+public struct WritingAssistantFormFootnoteStyle: WritingAssistantFormStyle {
+    let style: any FootnoteStyle
+
+    public func makeBody(_ configuration: WritingAssistantFormConfiguration) -> some View {
+        WritingAssistantForm(configuration)
+            .footnoteStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension WritingAssistantFormStyle where Self == WritingAssistantFormFootnoteStyle {
+    static func footnoteStyle(_ style: some FootnoteStyle) -> WritingAssistantFormFootnoteStyle {
+        WritingAssistantFormFootnoteStyle(style: style)
+    }
+
+    static func footnoteStyle(@ViewBuilder content: @escaping (FootnoteConfiguration) -> some View) -> WritingAssistantFormFootnoteStyle {
+        let style = AnyFootnoteStyle(content)
+        return WritingAssistantFormFootnoteStyle(style: style)
     }
 }
 
