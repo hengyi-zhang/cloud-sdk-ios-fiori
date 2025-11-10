@@ -234,6 +234,20 @@ public extension AccessoryIconStyle where Self == AccessoryIconFioriStyle {
     }
 }
 
+// MARK: AccessoryViewStyle
+
+public extension AccessoryViewStyle where Self == AccessoryViewBaseStyle {
+    static var base: AccessoryViewBaseStyle {
+        AccessoryViewBaseStyle()
+    }
+}
+
+public extension AccessoryViewStyle where Self == AccessoryViewFioriStyle {
+    static var fiori: AccessoryViewFioriStyle {
+        AccessoryViewFioriStyle()
+    }
+}
+
 // MARK: ActionStyle
 
 public extension ActionStyle where Self == ActionBaseStyle {
@@ -598,6 +612,34 @@ public extension AttachmentStyle where Self == AttachmentAttachmentFootnoteStyle
     }
 }
 
+// MARK: AttachmentElementStyle
+
+public extension AttachmentElementStyle where Self == AttachmentElementBaseStyle {
+    static var base: AttachmentElementBaseStyle {
+        AttachmentElementBaseStyle()
+    }
+}
+
+public extension AttachmentElementStyle where Self == AttachmentElementFioriStyle {
+    static var fiori: AttachmentElementFioriStyle {
+        AttachmentElementFioriStyle()
+    }
+}
+
+// MARK: AttachmentErrorTitleStyle
+
+public extension AttachmentErrorTitleStyle where Self == AttachmentErrorTitleBaseStyle {
+    static var base: AttachmentErrorTitleBaseStyle {
+        AttachmentErrorTitleBaseStyle()
+    }
+}
+
+public extension AttachmentErrorTitleStyle where Self == AttachmentErrorTitleFioriStyle {
+    static var fiori: AttachmentErrorTitleFioriStyle {
+        AttachmentErrorTitleFioriStyle()
+    }
+}
+
 // MARK: AttachmentFootnoteStyle
 
 public extension AttachmentFootnoteStyle where Self == AttachmentFootnoteBaseStyle {
@@ -647,6 +689,55 @@ public extension AttachmentGroupStyle where Self == AttachmentGroupTitleStyle {
     }
 }
 
+// MARK: AttachmentInProgressStyle
+
+public extension AttachmentInProgressStyle where Self == AttachmentInProgressBaseStyle {
+    static var base: AttachmentInProgressBaseStyle {
+        AttachmentInProgressBaseStyle()
+    }
+}
+
+public extension AttachmentInProgressStyle where Self == AttachmentInProgressFioriStyle {
+    static var fiori: AttachmentInProgressFioriStyle {
+        AttachmentInProgressFioriStyle()
+    }
+}
+
+public struct AttachmentInProgressAttachmentInProgressTitleStyle: AttachmentInProgressStyle {
+    let style: any AttachmentInProgressTitleStyle
+
+    public func makeBody(_ configuration: AttachmentInProgressConfiguration) -> some View {
+        AttachmentInProgress(configuration)
+            .attachmentInProgressTitleStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension AttachmentInProgressStyle where Self == AttachmentInProgressAttachmentInProgressTitleStyle {
+    static func attachmentInProgressTitleStyle(_ style: some AttachmentInProgressTitleStyle) -> AttachmentInProgressAttachmentInProgressTitleStyle {
+        AttachmentInProgressAttachmentInProgressTitleStyle(style: style)
+    }
+
+    static func attachmentInProgressTitleStyle(@ViewBuilder content: @escaping (AttachmentInProgressTitleConfiguration) -> some View) -> AttachmentInProgressAttachmentInProgressTitleStyle {
+        let style = AnyAttachmentInProgressTitleStyle(content)
+        return AttachmentInProgressAttachmentInProgressTitleStyle(style: style)
+    }
+}
+
+// MARK: AttachmentInProgressTitleStyle
+
+public extension AttachmentInProgressTitleStyle where Self == AttachmentInProgressTitleBaseStyle {
+    static var base: AttachmentInProgressTitleBaseStyle {
+        AttachmentInProgressTitleBaseStyle()
+    }
+}
+
+public extension AttachmentInProgressTitleStyle where Self == AttachmentInProgressTitleFioriStyle {
+    static var fiori: AttachmentInProgressTitleFioriStyle {
+        AttachmentInProgressTitleFioriStyle()
+    }
+}
+
 // MARK: AttachmentSubtitleStyle
 
 public extension AttachmentSubtitleStyle where Self == AttachmentSubtitleBaseStyle {
@@ -686,6 +777,41 @@ public extension AttachmentTitleStyle where Self == AttachmentTitleBaseStyle {
 public extension AttachmentTitleStyle where Self == AttachmentTitleFioriStyle {
     static var fiori: AttachmentTitleFioriStyle {
         AttachmentTitleFioriStyle()
+    }
+}
+
+// MARK: AttachmentWithErrorStyle
+
+public extension AttachmentWithErrorStyle where Self == AttachmentWithErrorBaseStyle {
+    static var base: AttachmentWithErrorBaseStyle {
+        AttachmentWithErrorBaseStyle()
+    }
+}
+
+public extension AttachmentWithErrorStyle where Self == AttachmentWithErrorFioriStyle {
+    static var fiori: AttachmentWithErrorFioriStyle {
+        AttachmentWithErrorFioriStyle()
+    }
+}
+
+public struct AttachmentWithErrorAttachmentErrorTitleStyle: AttachmentWithErrorStyle {
+    let style: any AttachmentErrorTitleStyle
+
+    public func makeBody(_ configuration: AttachmentWithErrorConfiguration) -> some View {
+        AttachmentWithError(configuration)
+            .attachmentErrorTitleStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension AttachmentWithErrorStyle where Self == AttachmentWithErrorAttachmentErrorTitleStyle {
+    static func attachmentErrorTitleStyle(_ style: some AttachmentErrorTitleStyle) -> AttachmentWithErrorAttachmentErrorTitleStyle {
+        AttachmentWithErrorAttachmentErrorTitleStyle(style: style)
+    }
+
+    static func attachmentErrorTitleStyle(@ViewBuilder content: @escaping (AttachmentErrorTitleConfiguration) -> some View) -> AttachmentWithErrorAttachmentErrorTitleStyle {
+        let style = AnyAttachmentErrorTitleStyle(content)
+        return AttachmentWithErrorAttachmentErrorTitleStyle(style: style)
     }
 }
 
@@ -1081,6 +1207,104 @@ public extension BodyTextStyle where Self == BodyTextFioriStyle {
     }
 }
 
+// MARK: CalendarDayViewStyle
+
+public extension CalendarDayViewStyle where Self == CalendarDayViewBaseStyle {
+    static var base: CalendarDayViewBaseStyle {
+        CalendarDayViewBaseStyle()
+    }
+}
+
+public extension CalendarDayViewStyle where Self == CalendarDayViewFioriStyle {
+    static var fiori: CalendarDayViewFioriStyle {
+        CalendarDayViewFioriStyle()
+    }
+}
+
+public struct CalendarDayViewTitleStyle: CalendarDayViewStyle {
+    let style: any TitleStyle
+
+    public func makeBody(_ configuration: CalendarDayViewConfiguration) -> some View {
+        CalendarDayView(configuration)
+            .titleStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension CalendarDayViewStyle where Self == CalendarDayViewTitleStyle {
+    static func titleStyle(_ style: some TitleStyle) -> CalendarDayViewTitleStyle {
+        CalendarDayViewTitleStyle(style: style)
+    }
+
+    static func titleStyle(@ViewBuilder content: @escaping (TitleConfiguration) -> some View) -> CalendarDayViewTitleStyle {
+        let style = AnyTitleStyle(content)
+        return CalendarDayViewTitleStyle(style: style)
+    }
+}
+
+public struct CalendarDayViewSubtitleStyle: CalendarDayViewStyle {
+    let style: any SubtitleStyle
+
+    public func makeBody(_ configuration: CalendarDayViewConfiguration) -> some View {
+        CalendarDayView(configuration)
+            .subtitleStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension CalendarDayViewStyle where Self == CalendarDayViewSubtitleStyle {
+    static func subtitleStyle(_ style: some SubtitleStyle) -> CalendarDayViewSubtitleStyle {
+        CalendarDayViewSubtitleStyle(style: style)
+    }
+
+    static func subtitleStyle(@ViewBuilder content: @escaping (SubtitleConfiguration) -> some View) -> CalendarDayViewSubtitleStyle {
+        let style = AnySubtitleStyle(content)
+        return CalendarDayViewSubtitleStyle(style: style)
+    }
+}
+
+// MARK: CalendarMonthViewStyle
+
+public extension CalendarMonthViewStyle where Self == CalendarMonthViewBaseStyle {
+    static var base: CalendarMonthViewBaseStyle {
+        CalendarMonthViewBaseStyle()
+    }
+}
+
+public extension CalendarMonthViewStyle where Self == CalendarMonthViewFioriStyle {
+    static var fiori: CalendarMonthViewFioriStyle {
+        CalendarMonthViewFioriStyle()
+    }
+}
+
+// MARK: CalendarViewStyle
+
+public extension CalendarViewStyle where Self == CalendarViewBaseStyle {
+    static var base: CalendarViewBaseStyle {
+        CalendarViewBaseStyle()
+    }
+}
+
+public extension CalendarViewStyle where Self == CalendarViewFioriStyle {
+    static var fiori: CalendarViewFioriStyle {
+        CalendarViewFioriStyle()
+    }
+}
+
+// MARK: CalendarWeekViewStyle
+
+public extension CalendarWeekViewStyle where Self == CalendarWeekViewBaseStyle {
+    static var base: CalendarWeekViewBaseStyle {
+        CalendarWeekViewBaseStyle()
+    }
+}
+
+public extension CalendarWeekViewStyle where Self == CalendarWeekViewFioriStyle {
+    static var fiori: CalendarWeekViewFioriStyle {
+        CalendarWeekViewFioriStyle()
+    }
+}
+
 // MARK: CancelActionStyle
 
 public extension CancelActionStyle where Self == CancelActionBaseStyle {
@@ -1288,6 +1512,27 @@ public extension CardStyle where Self == CardCounterStyle {
     static func counterStyle(@ViewBuilder content: @escaping (CounterConfiguration) -> some View) -> CardCounterStyle {
         let style = AnyCounterStyle(content)
         return CardCounterStyle(style: style)
+    }
+}
+
+public struct CardFlexItemStyle: CardStyle {
+    let style: any FlexItemStyle
+
+    public func makeBody(_ configuration: CardConfiguration) -> some View {
+        Card(configuration)
+            .flexItemStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension CardStyle where Self == CardFlexItemStyle {
+    static func flexItemStyle(_ style: some FlexItemStyle) -> CardFlexItemStyle {
+        CardFlexItemStyle(style: style)
+    }
+
+    static func flexItemStyle(@ViewBuilder content: @escaping (FlexItemConfiguration) -> some View) -> CardFlexItemStyle {
+        let style = AnyFlexItemStyle(content)
+        return CardFlexItemStyle(style: style)
     }
 }
 
@@ -1942,6 +2187,27 @@ public extension CardHeaderStyle where Self == CardHeaderCounterStyle {
     }
 }
 
+public struct CardHeaderFlexItemStyle: CardHeaderStyle {
+    let style: any FlexItemStyle
+
+    public func makeBody(_ configuration: CardHeaderConfiguration) -> some View {
+        CardHeader(configuration)
+            .flexItemStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension CardHeaderStyle where Self == CardHeaderFlexItemStyle {
+    static func flexItemStyle(_ style: some FlexItemStyle) -> CardHeaderFlexItemStyle {
+        CardHeaderFlexItemStyle(style: style)
+    }
+
+    static func flexItemStyle(@ViewBuilder content: @escaping (FlexItemConfiguration) -> some View) -> CardHeaderFlexItemStyle {
+        let style = AnyFlexItemStyle(content)
+        return CardHeaderFlexItemStyle(style: style)
+    }
+}
+
 public struct CardHeaderRow1Style: CardHeaderStyle {
     let style: any Row1Style
 
@@ -2247,6 +2513,27 @@ public extension CardMainHeaderStyle where Self == CardMainHeaderCounterStyle {
     static func counterStyle(@ViewBuilder content: @escaping (CounterConfiguration) -> some View) -> CardMainHeaderCounterStyle {
         let style = AnyCounterStyle(content)
         return CardMainHeaderCounterStyle(style: style)
+    }
+}
+
+public struct CardMainHeaderFlexItemStyle: CardMainHeaderStyle {
+    let style: any FlexItemStyle
+
+    public func makeBody(_ configuration: CardMainHeaderConfiguration) -> some View {
+        CardMainHeader(configuration)
+            .flexItemStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension CardMainHeaderStyle where Self == CardMainHeaderFlexItemStyle {
+    static func flexItemStyle(_ style: some FlexItemStyle) -> CardMainHeaderFlexItemStyle {
+        CardMainHeaderFlexItemStyle(style: style)
+    }
+
+    static func flexItemStyle(@ViewBuilder content: @escaping (FlexItemConfiguration) -> some View) -> CardMainHeaderFlexItemStyle {
+        let style = AnyFlexItemStyle(content)
+        return CardMainHeaderFlexItemStyle(style: style)
     }
 }
 
@@ -3657,6 +3944,20 @@ public extension FioriSliderStyle where Self == FioriSliderInformationViewStyle 
     }
 }
 
+// MARK: FlexItemStyle
+
+public extension FlexItemStyle where Self == FlexItemBaseStyle {
+    static var base: FlexItemBaseStyle {
+        FlexItemBaseStyle()
+    }
+}
+
+public extension FlexItemStyle where Self == FlexItemFioriStyle {
+    static var fiori: FlexItemFioriStyle {
+        FlexItemFioriStyle()
+    }
+}
+
 // MARK: FootnoteStyle
 
 public extension FootnoteStyle where Self == FootnoteBaseStyle {
@@ -3885,6 +4186,314 @@ public extension HelperTextStyle where Self == HelperTextBaseStyle {
 public extension HelperTextStyle where Self == HelperTextFioriStyle {
     static var fiori: HelperTextFioriStyle {
         HelperTextFioriStyle()
+    }
+}
+
+// MARK: HierarchyIndicatorStyle
+
+public extension HierarchyIndicatorStyle where Self == HierarchyIndicatorBaseStyle {
+    static var base: HierarchyIndicatorBaseStyle {
+        HierarchyIndicatorBaseStyle()
+    }
+}
+
+public extension HierarchyIndicatorStyle where Self == HierarchyIndicatorFioriStyle {
+    static var fiori: HierarchyIndicatorFioriStyle {
+        HierarchyIndicatorFioriStyle()
+    }
+}
+
+public struct HierarchyIndicatorTitleStyle: HierarchyIndicatorStyle {
+    let style: any TitleStyle
+
+    public func makeBody(_ configuration: HierarchyIndicatorConfiguration) -> some View {
+        HierarchyIndicator(configuration)
+            .titleStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension HierarchyIndicatorStyle where Self == HierarchyIndicatorTitleStyle {
+    static func titleStyle(_ style: some TitleStyle) -> HierarchyIndicatorTitleStyle {
+        HierarchyIndicatorTitleStyle(style: style)
+    }
+
+    static func titleStyle(@ViewBuilder content: @escaping (TitleConfiguration) -> some View) -> HierarchyIndicatorTitleStyle {
+        let style = AnyTitleStyle(content)
+        return HierarchyIndicatorTitleStyle(style: style)
+    }
+}
+
+public struct HierarchyIndicatorIconStyle: HierarchyIndicatorStyle {
+    let style: any IconStyle
+
+    public func makeBody(_ configuration: HierarchyIndicatorConfiguration) -> some View {
+        HierarchyIndicator(configuration)
+            .iconStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension HierarchyIndicatorStyle where Self == HierarchyIndicatorIconStyle {
+    static func iconStyle(_ style: some IconStyle) -> HierarchyIndicatorIconStyle {
+        HierarchyIndicatorIconStyle(style: style)
+    }
+
+    static func iconStyle(@ViewBuilder content: @escaping (IconConfiguration) -> some View) -> HierarchyIndicatorIconStyle {
+        let style = AnyIconStyle(content)
+        return HierarchyIndicatorIconStyle(style: style)
+    }
+}
+
+// MARK: HierarchyItemViewStyle
+
+public extension HierarchyItemViewStyle where Self == HierarchyItemViewBaseStyle {
+    static var base: HierarchyItemViewBaseStyle {
+        HierarchyItemViewBaseStyle()
+    }
+}
+
+public extension HierarchyItemViewStyle where Self == HierarchyItemViewFioriStyle {
+    static var fiori: HierarchyItemViewFioriStyle {
+        HierarchyItemViewFioriStyle()
+    }
+}
+
+public struct HierarchyItemViewTitleStyle: HierarchyItemViewStyle {
+    let style: any TitleStyle
+
+    public func makeBody(_ configuration: HierarchyItemViewConfiguration) -> some View {
+        HierarchyItemView(configuration)
+            .titleStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension HierarchyItemViewStyle where Self == HierarchyItemViewTitleStyle {
+    static func titleStyle(_ style: some TitleStyle) -> HierarchyItemViewTitleStyle {
+        HierarchyItemViewTitleStyle(style: style)
+    }
+
+    static func titleStyle(@ViewBuilder content: @escaping (TitleConfiguration) -> some View) -> HierarchyItemViewTitleStyle {
+        let style = AnyTitleStyle(content)
+        return HierarchyItemViewTitleStyle(style: style)
+    }
+}
+
+public struct HierarchyItemViewSubtitleStyle: HierarchyItemViewStyle {
+    let style: any SubtitleStyle
+
+    public func makeBody(_ configuration: HierarchyItemViewConfiguration) -> some View {
+        HierarchyItemView(configuration)
+            .subtitleStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension HierarchyItemViewStyle where Self == HierarchyItemViewSubtitleStyle {
+    static func subtitleStyle(_ style: some SubtitleStyle) -> HierarchyItemViewSubtitleStyle {
+        HierarchyItemViewSubtitleStyle(style: style)
+    }
+
+    static func subtitleStyle(@ViewBuilder content: @escaping (SubtitleConfiguration) -> some View) -> HierarchyItemViewSubtitleStyle {
+        let style = AnySubtitleStyle(content)
+        return HierarchyItemViewSubtitleStyle(style: style)
+    }
+}
+
+public struct HierarchyItemViewFootnoteStyle: HierarchyItemViewStyle {
+    let style: any FootnoteStyle
+
+    public func makeBody(_ configuration: HierarchyItemViewConfiguration) -> some View {
+        HierarchyItemView(configuration)
+            .footnoteStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension HierarchyItemViewStyle where Self == HierarchyItemViewFootnoteStyle {
+    static func footnoteStyle(_ style: some FootnoteStyle) -> HierarchyItemViewFootnoteStyle {
+        HierarchyItemViewFootnoteStyle(style: style)
+    }
+
+    static func footnoteStyle(@ViewBuilder content: @escaping (FootnoteConfiguration) -> some View) -> HierarchyItemViewFootnoteStyle {
+        let style = AnyFootnoteStyle(content)
+        return HierarchyItemViewFootnoteStyle(style: style)
+    }
+}
+
+public struct HierarchyItemViewIconsStyle: HierarchyItemViewStyle {
+    let style: any IconsStyle
+
+    public func makeBody(_ configuration: HierarchyItemViewConfiguration) -> some View {
+        HierarchyItemView(configuration)
+            .iconsStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension HierarchyItemViewStyle where Self == HierarchyItemViewIconsStyle {
+    static func iconsStyle(_ style: some IconsStyle) -> HierarchyItemViewIconsStyle {
+        HierarchyItemViewIconsStyle(style: style)
+    }
+
+    static func iconsStyle(@ViewBuilder content: @escaping (IconsConfiguration) -> some View) -> HierarchyItemViewIconsStyle {
+        let style = AnyIconsStyle(content)
+        return HierarchyItemViewIconsStyle(style: style)
+    }
+}
+
+public struct HierarchyItemViewDetailImageStyle: HierarchyItemViewStyle {
+    let style: any DetailImageStyle
+
+    public func makeBody(_ configuration: HierarchyItemViewConfiguration) -> some View {
+        HierarchyItemView(configuration)
+            .detailImageStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension HierarchyItemViewStyle where Self == HierarchyItemViewDetailImageStyle {
+    static func detailImageStyle(_ style: some DetailImageStyle) -> HierarchyItemViewDetailImageStyle {
+        HierarchyItemViewDetailImageStyle(style: style)
+    }
+
+    static func detailImageStyle(@ViewBuilder content: @escaping (DetailImageConfiguration) -> some View) -> HierarchyItemViewDetailImageStyle {
+        let style = AnyDetailImageStyle(content)
+        return HierarchyItemViewDetailImageStyle(style: style)
+    }
+}
+
+public struct HierarchyItemViewStatusStyle: HierarchyItemViewStyle {
+    let style: any StatusStyle
+
+    public func makeBody(_ configuration: HierarchyItemViewConfiguration) -> some View {
+        HierarchyItemView(configuration)
+            .statusStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension HierarchyItemViewStyle where Self == HierarchyItemViewStatusStyle {
+    static func statusStyle(_ style: some StatusStyle) -> HierarchyItemViewStatusStyle {
+        HierarchyItemViewStatusStyle(style: style)
+    }
+
+    static func statusStyle(@ViewBuilder content: @escaping (StatusConfiguration) -> some View) -> HierarchyItemViewStatusStyle {
+        let style = AnyStatusStyle(content)
+        return HierarchyItemViewStatusStyle(style: style)
+    }
+}
+
+public struct HierarchyItemViewAccessoryViewStyle: HierarchyItemViewStyle {
+    let style: any AccessoryViewStyle
+
+    public func makeBody(_ configuration: HierarchyItemViewConfiguration) -> some View {
+        HierarchyItemView(configuration)
+            .accessoryViewStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension HierarchyItemViewStyle where Self == HierarchyItemViewAccessoryViewStyle {
+    static func accessoryViewStyle(_ style: some AccessoryViewStyle) -> HierarchyItemViewAccessoryViewStyle {
+        HierarchyItemViewAccessoryViewStyle(style: style)
+    }
+
+    static func accessoryViewStyle(@ViewBuilder content: @escaping (AccessoryViewConfiguration) -> some View) -> HierarchyItemViewAccessoryViewStyle {
+        let style = AnyAccessoryViewStyle(content)
+        return HierarchyItemViewAccessoryViewStyle(style: style)
+    }
+}
+
+// MARK: HierarchyViewStyle
+
+public extension HierarchyViewStyle where Self == HierarchyViewBaseStyle {
+    static var base: HierarchyViewBaseStyle {
+        HierarchyViewBaseStyle()
+    }
+}
+
+public extension HierarchyViewStyle where Self == HierarchyViewFioriStyle {
+    static var fiori: HierarchyViewFioriStyle {
+        HierarchyViewFioriStyle()
+    }
+}
+
+// MARK: HierarchyViewHeaderStyle
+
+public extension HierarchyViewHeaderStyle where Self == HierarchyViewHeaderBaseStyle {
+    static var base: HierarchyViewHeaderBaseStyle {
+        HierarchyViewHeaderBaseStyle()
+    }
+}
+
+public extension HierarchyViewHeaderStyle where Self == HierarchyViewHeaderFioriStyle {
+    static var fiori: HierarchyViewHeaderFioriStyle {
+        HierarchyViewHeaderFioriStyle()
+    }
+}
+
+public struct HierarchyViewHeaderTitleStyle: HierarchyViewHeaderStyle {
+    let style: any TitleStyle
+
+    public func makeBody(_ configuration: HierarchyViewHeaderConfiguration) -> some View {
+        HierarchyViewHeader(configuration)
+            .titleStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension HierarchyViewHeaderStyle where Self == HierarchyViewHeaderTitleStyle {
+    static func titleStyle(_ style: some TitleStyle) -> HierarchyViewHeaderTitleStyle {
+        HierarchyViewHeaderTitleStyle(style: style)
+    }
+
+    static func titleStyle(@ViewBuilder content: @escaping (TitleConfiguration) -> some View) -> HierarchyViewHeaderTitleStyle {
+        let style = AnyTitleStyle(content)
+        return HierarchyViewHeaderTitleStyle(style: style)
+    }
+}
+
+public struct HierarchyViewHeaderLeadingAccessoryStyle: HierarchyViewHeaderStyle {
+    let style: any LeadingAccessoryStyle
+
+    public func makeBody(_ configuration: HierarchyViewHeaderConfiguration) -> some View {
+        HierarchyViewHeader(configuration)
+            .leadingAccessoryStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension HierarchyViewHeaderStyle where Self == HierarchyViewHeaderLeadingAccessoryStyle {
+    static func leadingAccessoryStyle(_ style: some LeadingAccessoryStyle) -> HierarchyViewHeaderLeadingAccessoryStyle {
+        HierarchyViewHeaderLeadingAccessoryStyle(style: style)
+    }
+
+    static func leadingAccessoryStyle(@ViewBuilder content: @escaping (LeadingAccessoryConfiguration) -> some View) -> HierarchyViewHeaderLeadingAccessoryStyle {
+        let style = AnyLeadingAccessoryStyle(content)
+        return HierarchyViewHeaderLeadingAccessoryStyle(style: style)
+    }
+}
+
+public struct HierarchyViewHeaderTrailingAccessoryStyle: HierarchyViewHeaderStyle {
+    let style: any TrailingAccessoryStyle
+
+    public func makeBody(_ configuration: HierarchyViewHeaderConfiguration) -> some View {
+        HierarchyViewHeader(configuration)
+            .trailingAccessoryStyle(self.style)
+            .typeErased
+    }
+}
+
+public extension HierarchyViewHeaderStyle where Self == HierarchyViewHeaderTrailingAccessoryStyle {
+    static func trailingAccessoryStyle(_ style: some TrailingAccessoryStyle) -> HierarchyViewHeaderTrailingAccessoryStyle {
+        HierarchyViewHeaderTrailingAccessoryStyle(style: style)
+    }
+
+    static func trailingAccessoryStyle(@ViewBuilder content: @escaping (TrailingAccessoryConfiguration) -> some View) -> HierarchyViewHeaderTrailingAccessoryStyle {
+        let style = AnyTrailingAccessoryStyle(content)
+        return HierarchyViewHeaderTrailingAccessoryStyle(style: style)
     }
 }
 
@@ -8482,19 +9091,19 @@ public extension TextInputFieldStyle where Self == TextInputFieldFioriStyle {
 
 // MARK: TextInputInfoViewStyle
 
-extension TextInputInfoViewStyle where Self == TextInputInfoViewBaseStyle {
+public extension TextInputInfoViewStyle where Self == TextInputInfoViewBaseStyle {
     static var base: TextInputInfoViewBaseStyle {
         TextInputInfoViewBaseStyle()
     }
 }
 
-extension TextInputInfoViewStyle where Self == TextInputInfoViewFioriStyle {
+public extension TextInputInfoViewStyle where Self == TextInputInfoViewFioriStyle {
     static var fiori: TextInputInfoViewFioriStyle {
         TextInputInfoViewFioriStyle()
     }
 }
 
-struct TextInputInfoViewIconStyle: TextInputInfoViewStyle {
+public struct TextInputInfoViewIconStyle: TextInputInfoViewStyle {
     let style: any IconStyle
 
     public func makeBody(_ configuration: TextInputInfoViewConfiguration) -> some View {
@@ -8504,7 +9113,7 @@ struct TextInputInfoViewIconStyle: TextInputInfoViewStyle {
     }
 }
 
-extension TextInputInfoViewStyle where Self == TextInputInfoViewIconStyle {
+public extension TextInputInfoViewStyle where Self == TextInputInfoViewIconStyle {
     static func iconStyle(_ style: some IconStyle) -> TextInputInfoViewIconStyle {
         TextInputInfoViewIconStyle(style: style)
     }
@@ -8515,7 +9124,7 @@ extension TextInputInfoViewStyle where Self == TextInputInfoViewIconStyle {
     }
 }
 
-struct TextInputInfoViewDescriptionStyle: TextInputInfoViewStyle {
+public struct TextInputInfoViewDescriptionStyle: TextInputInfoViewStyle {
     let style: any DescriptionStyle
 
     public func makeBody(_ configuration: TextInputInfoViewConfiguration) -> some View {
@@ -8525,7 +9134,7 @@ struct TextInputInfoViewDescriptionStyle: TextInputInfoViewStyle {
     }
 }
 
-extension TextInputInfoViewStyle where Self == TextInputInfoViewDescriptionStyle {
+public extension TextInputInfoViewStyle where Self == TextInputInfoViewDescriptionStyle {
     static func descriptionStyle(_ style: some DescriptionStyle) -> TextInputInfoViewDescriptionStyle {
         TextInputInfoViewDescriptionStyle(style: style)
     }
@@ -8536,7 +9145,7 @@ extension TextInputInfoViewStyle where Self == TextInputInfoViewDescriptionStyle
     }
 }
 
-struct TextInputInfoViewCounterStyle: TextInputInfoViewStyle {
+public struct TextInputInfoViewCounterStyle: TextInputInfoViewStyle {
     let style: any CounterStyle
 
     public func makeBody(_ configuration: TextInputInfoViewConfiguration) -> some View {
@@ -8546,7 +9155,7 @@ struct TextInputInfoViewCounterStyle: TextInputInfoViewStyle {
     }
 }
 
-extension TextInputInfoViewStyle where Self == TextInputInfoViewCounterStyle {
+public extension TextInputInfoViewStyle where Self == TextInputInfoViewCounterStyle {
     static func counterStyle(_ style: some CounterStyle) -> TextInputInfoViewCounterStyle {
         TextInputInfoViewCounterStyle(style: style)
     }
@@ -8557,7 +9166,7 @@ extension TextInputInfoViewStyle where Self == TextInputInfoViewCounterStyle {
     }
 }
 
-struct TextInputInfoViewInformationViewStyle: TextInputInfoViewStyle {
+public struct TextInputInfoViewInformationViewStyle: TextInputInfoViewStyle {
     let style: any InformationViewStyle
 
     public func makeBody(_ configuration: TextInputInfoViewConfiguration) -> some View {
@@ -8567,7 +9176,7 @@ struct TextInputInfoViewInformationViewStyle: TextInputInfoViewStyle {
     }
 }
 
-extension TextInputInfoViewStyle where Self == TextInputInfoViewInformationViewStyle {
+public extension TextInputInfoViewStyle where Self == TextInputInfoViewInformationViewStyle {
     static func informationViewStyle(_ style: some InformationViewStyle) -> TextInputInfoViewInformationViewStyle {
         TextInputInfoViewInformationViewStyle(style: style)
     }

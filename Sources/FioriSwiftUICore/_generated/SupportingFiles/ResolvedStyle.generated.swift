@@ -51,6 +51,22 @@ extension AccessoryIconStyle {
     }
 }
 
+// MARK: AccessoryViewStyle
+
+struct ResolvedAccessoryViewStyle<Style: AccessoryViewStyle>: View {
+    let style: Style
+    let configuration: AccessoryViewConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension AccessoryViewStyle {
+    func resolve(configuration: AccessoryViewConfiguration) -> some View {
+        ResolvedAccessoryViewStyle(style: self, configuration: configuration)
+    }
+}
+
 // MARK: ActionStyle
 
 struct ResolvedActionStyle<Style: ActionStyle>: View {
@@ -227,6 +243,38 @@ extension AttachmentStyle {
     }
 }
 
+// MARK: AttachmentElementStyle
+
+struct ResolvedAttachmentElementStyle<Style: AttachmentElementStyle>: View {
+    let style: Style
+    let configuration: AttachmentElementConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension AttachmentElementStyle {
+    func resolve(configuration: AttachmentElementConfiguration) -> some View {
+        ResolvedAttachmentElementStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: AttachmentErrorTitleStyle
+
+struct ResolvedAttachmentErrorTitleStyle<Style: AttachmentErrorTitleStyle>: View {
+    let style: Style
+    let configuration: AttachmentErrorTitleConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension AttachmentErrorTitleStyle {
+    func resolve(configuration: AttachmentErrorTitleConfiguration) -> some View {
+        ResolvedAttachmentErrorTitleStyle(style: self, configuration: configuration)
+    }
+}
+
 // MARK: AttachmentFootnoteStyle
 
 struct ResolvedAttachmentFootnoteStyle<Style: AttachmentFootnoteStyle>: View {
@@ -256,6 +304,38 @@ struct ResolvedAttachmentGroupStyle<Style: AttachmentGroupStyle>: View {
 extension AttachmentGroupStyle {
     func resolve(configuration: AttachmentGroupConfiguration) -> some View {
         ResolvedAttachmentGroupStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: AttachmentInProgressStyle
+
+struct ResolvedAttachmentInProgressStyle<Style: AttachmentInProgressStyle>: View {
+    let style: Style
+    let configuration: AttachmentInProgressConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension AttachmentInProgressStyle {
+    func resolve(configuration: AttachmentInProgressConfiguration) -> some View {
+        ResolvedAttachmentInProgressStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: AttachmentInProgressTitleStyle
+
+struct ResolvedAttachmentInProgressTitleStyle<Style: AttachmentInProgressTitleStyle>: View {
+    let style: Style
+    let configuration: AttachmentInProgressTitleConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension AttachmentInProgressTitleStyle {
+    func resolve(configuration: AttachmentInProgressTitleConfiguration) -> some View {
+        ResolvedAttachmentInProgressTitleStyle(style: self, configuration: configuration)
     }
 }
 
@@ -304,6 +384,22 @@ struct ResolvedAttachmentTitleStyle<Style: AttachmentTitleStyle>: View {
 extension AttachmentTitleStyle {
     func resolve(configuration: AttachmentTitleConfiguration) -> some View {
         ResolvedAttachmentTitleStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: AttachmentWithErrorStyle
+
+struct ResolvedAttachmentWithErrorStyle<Style: AttachmentWithErrorStyle>: View {
+    let style: Style
+    let configuration: AttachmentWithErrorConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension AttachmentWithErrorStyle {
+    func resolve(configuration: AttachmentWithErrorConfiguration) -> some View {
+        ResolvedAttachmentWithErrorStyle(style: self, configuration: configuration)
     }
 }
 
@@ -464,6 +560,70 @@ struct ResolvedBodyTextStyle<Style: BodyTextStyle>: View {
 extension BodyTextStyle {
     func resolve(configuration: BodyTextConfiguration) -> some View {
         ResolvedBodyTextStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: CalendarDayViewStyle
+
+struct ResolvedCalendarDayViewStyle<Style: CalendarDayViewStyle>: View {
+    let style: Style
+    let configuration: CalendarDayViewConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension CalendarDayViewStyle {
+    func resolve(configuration: CalendarDayViewConfiguration) -> some View {
+        ResolvedCalendarDayViewStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: CalendarMonthViewStyle
+
+struct ResolvedCalendarMonthViewStyle<Style: CalendarMonthViewStyle>: View {
+    let style: Style
+    let configuration: CalendarMonthViewConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension CalendarMonthViewStyle {
+    func resolve(configuration: CalendarMonthViewConfiguration) -> some View {
+        ResolvedCalendarMonthViewStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: CalendarViewStyle
+
+struct ResolvedCalendarViewStyle<Style: CalendarViewStyle>: View {
+    let style: Style
+    let configuration: CalendarViewConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension CalendarViewStyle {
+    func resolve(configuration: CalendarViewConfiguration) -> some View {
+        ResolvedCalendarViewStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: CalendarWeekViewStyle
+
+struct ResolvedCalendarWeekViewStyle<Style: CalendarWeekViewStyle>: View {
+    let style: Style
+    let configuration: CalendarWeekViewConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension CalendarWeekViewStyle {
+    func resolve(configuration: CalendarWeekViewConfiguration) -> some View {
+        ResolvedCalendarWeekViewStyle(style: self, configuration: configuration)
     }
 }
 
@@ -1059,6 +1219,22 @@ extension FioriSliderStyle {
     }
 }
 
+// MARK: FlexItemStyle
+
+struct ResolvedFlexItemStyle<Style: FlexItemStyle>: View {
+    let style: Style
+    let configuration: FlexItemConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension FlexItemStyle {
+    func resolve(configuration: FlexItemConfiguration) -> some View {
+        ResolvedFlexItemStyle(style: self, configuration: configuration)
+    }
+}
+
 // MARK: FootnoteStyle
 
 struct ResolvedFootnoteStyle<Style: FootnoteStyle>: View {
@@ -1200,6 +1376,70 @@ struct ResolvedHelperTextStyle<Style: HelperTextStyle>: View {
 extension HelperTextStyle {
     func resolve(configuration: HelperTextConfiguration) -> some View {
         ResolvedHelperTextStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: HierarchyIndicatorStyle
+
+struct ResolvedHierarchyIndicatorStyle<Style: HierarchyIndicatorStyle>: View {
+    let style: Style
+    let configuration: HierarchyIndicatorConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension HierarchyIndicatorStyle {
+    func resolve(configuration: HierarchyIndicatorConfiguration) -> some View {
+        ResolvedHierarchyIndicatorStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: HierarchyItemViewStyle
+
+struct ResolvedHierarchyItemViewStyle<Style: HierarchyItemViewStyle>: View {
+    let style: Style
+    let configuration: HierarchyItemViewConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension HierarchyItemViewStyle {
+    func resolve(configuration: HierarchyItemViewConfiguration) -> some View {
+        ResolvedHierarchyItemViewStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: HierarchyViewStyle
+
+struct ResolvedHierarchyViewStyle<Style: HierarchyViewStyle>: View {
+    let style: Style
+    let configuration: HierarchyViewConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension HierarchyViewStyle {
+    func resolve(configuration: HierarchyViewConfiguration) -> some View {
+        ResolvedHierarchyViewStyle(style: self, configuration: configuration)
+    }
+}
+
+// MARK: HierarchyViewHeaderStyle
+
+struct ResolvedHierarchyViewHeaderStyle<Style: HierarchyViewHeaderStyle>: View {
+    let style: Style
+    let configuration: HierarchyViewHeaderConfiguration
+    var body: some View {
+        self.style.makeBody(self.configuration)
+    }
+}
+
+extension HierarchyViewHeaderStyle {
+    func resolve(configuration: HierarchyViewHeaderConfiguration) -> some View {
+        ResolvedHierarchyViewHeaderStyle(style: self, configuration: configuration)
     }
 }
 

@@ -20,6 +20,8 @@ public enum BannerMultiMessageType: Int {
 
 /// Base Layout style
 public struct BannerMessageBaseStyle: BannerMessageStyle {
+    @Environment(\.bannerMessageBackgroundColor) var bannerMessageBackgroundColor
+    
     public func makeBody(_ configuration: BannerMessageConfiguration) -> some View {
         VStack(spacing: 0) {
             configuration.topDivider.frame(height: 4)
@@ -60,7 +62,7 @@ public struct BannerMessageBaseStyle: BannerMessageStyle {
             }
         }
         .drawingGroup()
-        .background(Color.preferredColor(.tertiaryBackground))
+        .background(self.bannerMessageBackgroundColor ?? Color.preferredColor(.tertiaryBackground))
     }
     
     func getLeadingPadding(configuration: BannerMessageConfiguration) -> CGFloat {
@@ -405,6 +407,7 @@ struct BannerMessageModifier: ViewModifier {
             var viewDetail = AttributedString(NSLocalizedString("View Details", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: ""))
             viewDetail.foregroundColor = .preferredColor(.tintColor)
             viewDetail.link = URL(string: "ViewDetails")
+            viewDetail.font = .fiori(forTextStyle: .footnote, weight: .semibold)
             attributedString.append(viewDetail)
             return attributedString
         } else {
@@ -461,7 +464,11 @@ struct BannerMessageModifier: ViewModifier {
                             self.showingMessageDetail = true
                             
                             if UIDevice.current.userInterfaceIdiom == .phone {
-                                self.isPresented = false
+                                if #available(iOS 26.0, *) {
+                                    // do nothing
+                                } else {
+                                    self.isPresented = false
+                                }
                             }
                         }
                         return .handled

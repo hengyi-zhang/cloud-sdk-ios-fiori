@@ -24,21 +24,353 @@ protocol _LabelItemComponent: _IconComponent, _TitleComponent {
     var alignment: HorizontalAlignment? { get set }
 }
 
+/// CardMedia: Composite Component Protocol
+///
+/// The `_CardMediaComponent` protocol combines media image and description components for card layouts.
+/// This protocol provides a unified interface for displaying media content with descriptive text in card-based UI components.
+///
+/// ## Usage
+///
+/// This component is typically used as part of a larger card structure to display media content such as images, videos, or other visual elements along with descriptive text.
+///
+/// ```swift
+/// CardMedia {
+///     Image("card_image")
+///         .resizable()
+///         .aspectRatio(contentMode: .fill)
+///         .frame(height: 145)
+/// } description: {
+///     Text("Media Description")
+/// }
+/// ```
+///
+/// ```swift
+/// CardMedia(mediaImage: Image("sample-image"), description: "This is a sample media description")
+/// ```
+///
 // sourcery: CompositeComponent
 protocol _CardMediaComponent: _MediaImageComponent, _DescriptionComponent {}
 
+/// CardMainHeader: Composite Component Protocol
+///
+/// The `_CardMainHeaderComponent` protocol defines the main header section of a card.
+/// This protocol combines title, subtitle, icons, detail image, header action, counter, and flexible item components
+/// to create a comprehensive header layout for card-based UI components.
+///
+/// ## Usage
+///
+/// This component is used to create the primary header section of a card, providing a structured layout for displaying key information and actions.
+///
+/// ```swift
+/// CardMainHeader {
+///     Text("Card Title")
+/// } subtitle: {
+///     Text("Card subtitle with additional information")
+/// } icons: {
+///     IconStack(icons: [TextOrIcon.icon(Image(systemName: "star.fill"))])
+/// } detailImage: {
+///     Image("profile-image")
+///         .resizable()
+///         .clipShape(Circle())
+/// } headerAction: {
+///     FioriButton(title: "Action")
+/// } counter: {
+///     Text("1 of 3")
+/// } flexItem: {
+///     Text("Flexible content")
+/// } flexItemPosition: .aboveTitle
+/// ```
+///
+/// ```swift
+/// CardMainHeader(title: "Card Title",
+///                subtitle: "Card subtitle with additional information",
+///                icons: [TextOrIcon.icon(Image(systemName: "star.fill"))],
+///                detailImage: Image("profile-image"),
+///                headerAction: FioriButton(title: "Action"),
+///                counter: "1 of 3",
+///                flexItem: { Text("Flexible content") },
+///                flexItemPosition: .aboveTitle)
+/// ```
+///
 // sourcery: CompositeComponent
-protocol _CardMainHeaderComponent: _TitleComponent, _SubtitleComponent, _IconsComponent, _DetailImageComponent, _HeaderActionComponent, _CounterComponent {}
+protocol _CardMainHeaderComponent: _TitleComponent, _SubtitleComponent, _IconsComponent, _DetailImageComponent, _HeaderActionComponent, _CounterComponent, _FlexItemComponent {
+    /// Determines the position of the flex item within the header layout.
+    /// This property controls where flexible content is placed relative to other header elements.
+    /// Available positions include: `.aboveMainHeader`, `.aboveTitle`, `.betweenTitleAndSubtitle`, `.belowSubtitle`
+    var flexItemPosition: FlexItemPositionType? { get set }
+}
 
+/// CardExtHeader: Composite Component Protocol
+///
+/// The `_CardExtHeaderComponent` protocol defines the extended header section of a card.
+/// This protocol combines multiple row components and KPI (Key Performance Indicator) components
+/// to create an extended header layout with structured data display capabilities.
+///
+/// ## Usage
+///
+/// This component is used to create an extended header section that can display structured data in rows and key performance indicators.
+///
+/// ```swift
+/// CardExtHeader(row1: {
+///     HStack {
+///         LabelItem(icon: Image(systemName: "exclamationmark.triangle.fill"), title: "Negative")
+///             .titleStyle { config in
+///                 config.title.foregroundStyle(Color.preferredColor(.negativeLabel))
+///             }
+///         LabelItem(title: "Critical")
+///             .titleStyle { config in
+///                 config.title.foregroundStyle(Color.preferredColor(.criticalLabel))
+///             }
+///         LabelItem(icon: Image(systemName: "checkmark.circle"), title: "Positive")
+///             .titleStyle { config in
+///                 config.title.foregroundStyle(Color.preferredColor(.positiveLabel))
+///             }
+///     }
+/// }, row2: {
+///     HStack {
+///         Text("256 reviews")
+///     }
+/// }, row3: {
+///     HStack {
+///         Tag(verbatim: "Tag")
+///         Tag(verbatim: "Tag")
+///         Tag(verbatim: "Tag")
+///     }
+/// }, kpi: {
+///     _KPIItem(KPIItemData.components([.icon(Image(systemName: "arrowtriangle.up.fill")),
+///                                      .unit("$"),
+///                                      .metric("26.9"),
+///                                      .unit("M")]))
+/// }, kpiCaption: {
+///     Text("Revenue")
+/// })
+/// ```
+///
+/// ```swift
+/// CardExtHeader(row1: { Text("Row 1 Content") },
+///               row2: { Text("Row 2 Content") },
+///               row3: { Text("Row 3 Content") },
+///               kpi: KPIItemData.components([.unit("$"), .metric("26.9"), .unit("M")]),
+///               kpiCaption: "Revenue")
+/// ```
+///
 // sourcery: CompositeComponent
 protocol _CardExtHeaderComponent: _Row1Component, _Row2Component, _Row3Component, _KpiComponent, _KpiCaptionComponent {}
 
+/// CardFooter: Composite Component Protocol
+///
+/// The `_CardFooterComponent` protocol defines the footer section of a card.
+/// This protocol combines primary, secondary, tertiary, and overflow action components
+/// to create a comprehensive footer layout with multiple interaction options.
+///
+/// ## Usage
+///
+/// This component is used to create a footer section with multiple action buttons and overflow options.
+///
+/// ```swift
+/// CardFooter {
+///     FioriButton(title: "Primary")
+/// } secondaryAction: {
+///     FioriButton(title: "Secondary")
+/// } tertiaryAction: {
+///     FioriButton(title: "Tertiary")
+/// } overflowAction: {
+///     FioriButton(title: "Overflow")
+/// }
+/// ```
+///
+/// ```swift
+/// CardFooter(action: FioriButton(title: "Primary"),
+///            secondaryAction: FioriButton(title: "Secondary"),
+///            tertiaryAction: FioriButton(title: "Tertiary"),
+///            overflowAction: FioriButton(title: "Overflow"))
+/// ```
+///
 // sourcery: CompositeComponent
 protocol _CardFooterComponent: _ActionComponent, _SecondaryActionComponent, _TertiaryActionComponent, _OverflowActionComponent {}
 
+/// CardHeader: Composite Component Protocol
+///
+/// The `_CardHeaderComponent` protocol defines the complete header section of a card.
+/// This protocol combines media, main header, and extended header components
+/// to create a comprehensive header layout that can accommodate various content types and layouts.
+///
+/// ## Usage
+///
+/// This component serves as a container that combines all header-related components into a unified interface.
+///
+/// ```swift
+/// CardHeader {
+///     Image("productThumbnail")
+///         .resizable()
+///         .aspectRatio(contentMode: .fill)
+///         .frame(height: 145)
+/// } description: {
+///     Text("Title")
+/// } title: {
+///     Text("Title that goes to two lines before truncating")
+/// } subtitle: {
+///     Text("Subtitle that goes to multiple lines before truncating")
+/// } icons: {
+///     IconStack(icons: [TextOrIcon.icon(Image(systemName: "circle.fill")),
+///                      TextOrIcon.icon(Image(systemName: "paperclip")),
+///                      TextOrIcon.text("1")])
+/// } detailImage: {
+///     Image("ProfilePic")
+///         .resizable()
+///         .clipShape(Circle())
+/// } headerAction: {
+///     FioriButton(title: "Action")
+/// } counter: {
+///     Text("1 of 3")
+/// } row1: {
+///     HStack {
+///         LabelItem(icon: Image(systemName: "exclamationmark.triangle.fill"), title: "Negative")
+///             .titleStyle { config in
+///                 config.title.foregroundStyle(Color.preferredColor(.negativeLabel))
+///             }
+///         LabelItem(title: "Critical")
+///             .titleStyle { config in
+///                 config.title.foregroundStyle(Color.preferredColor(.criticalLabel))
+///             }
+///         LabelItem(icon: Image(systemName: "checkmark.circle"), title: "Positive")
+///             .titleStyle { config in
+///                 config.title.foregroundStyle(Color.preferredColor(.positiveLabel))
+///             }
+///     }
+/// } row2: {
+///     HStack {
+///         Text("256 reviews")
+///     }
+/// } row3: {
+///     HStack {
+///         Tag(verbatim: "Tag")
+///         Tag(verbatim: "Tag")
+///         Tag(verbatim: "Tag")
+///     }
+/// } kpi: {
+///     _KPIItem(KPIItemData.components([.icon(Image(systemName: "arrowtriangle.up.fill")),
+///                                      .unit("$"),
+///                                      .metric("26.9"),
+///                                      .unit("M")]))
+/// } kpiCaption: {
+///     Text("Revenue")
+/// }
+/// ```
+///
+/// ```swift
+/// CardHeader(mediaImage: Image("productThumbnail"),
+///            description: "Title",
+///            title: "Title",
+///            subtitle: "Subtitle",
+///            icons: [TextOrIcon.icon(Image(systemName: "circle.fill"))],
+///            detailImage: Image("ProfilePic"),
+///            headerAction: FioriButton(title: "Action"),
+///            counter: "1 of 3",
+///            kpi: KPIItemData.components([.unit("$"), .metric("26.9"), .unit("M")]),
+///            kpiCaption: "Revenue")
+/// ```
+///
 // sourcery: CompositeComponent
 protocol _CardHeaderComponent: _CardMediaComponent, _CardMainHeaderComponent, _CardExtHeaderComponent {}
 
+/// Card: Composite Component Protocol
+///
+/// The `_CardComponent` protocol defines the complete card structure.
+/// This protocol combines header, body, and footer components to create a comprehensive card layout
+/// that provides a complete container for displaying structured content with consistent styling and behavior.
+///
+/// ## Usage
+///
+/// This is the top-level component that combines all card sections into a unified interface.
+///
+/// ```swift
+/// Card {
+///     Image("productThumbnail")
+///         .resizable()
+///         .aspectRatio(contentMode: .fill)
+///         .frame(height: 145)
+/// } description: {
+///     Text("Title")
+/// } title: {
+///     Text("Title that goes to two lines before truncating")
+/// } subtitle: {
+///     Text("Subtitle that goes to multiple lines before truncating")
+/// } icons: {
+///     IconStack(icons: [TextOrIcon.icon(Image(systemName: "circle.fill")),
+///                      TextOrIcon.icon(Image(systemName: "paperclip")),
+///                      TextOrIcon.text("1")])
+/// } detailImage: {
+///     Image("ProfilePic")
+///         .resizable()
+///         .clipShape(Circle())
+/// } headerAction: {
+///     FioriButton(title: "Action")
+/// } counter: {
+///     Text("1 of 3")
+/// } row1: {
+///     HStack {
+///         LabelItem(icon: Image(systemName: "exclamationmark.triangle.fill"), title: "Negative")
+///             .titleStyle { config in
+///                 config.title.foregroundStyle(Color.preferredColor(.negativeLabel))
+///             }
+///         LabelItem(title: "Critical")
+///             .titleStyle { config in
+///                 config.title.foregroundStyle(Color.preferredColor(.criticalLabel))
+///             }
+///         LabelItem(icon: Image(systemName: "checkmark.circle"), title: "Positive")
+///             .titleStyle { config in
+///                 config.title.foregroundStyle(Color.preferredColor(.positiveLabel))
+///             }
+///     }
+/// } row2: {
+///     HStack {
+///         Text("256 reviews")
+///     }
+/// } row3: {
+///     HStack {
+///         Tag(verbatim: "Tag")
+///         Tag(verbatim: "Tag")
+///         Tag(verbatim: "Tag")
+///     }
+/// } kpi: {
+///     _KPIItem(KPIItemData.components([.icon(Image(systemName: "arrowtriangle.up.fill")),
+///                                      .unit("$"),
+///                                      .metric("26.9"),
+///                                      .unit("M")]))
+/// } kpiCaption: {
+///     Text("Revenue")
+/// } cardBody: {
+///     VStack(alignment: .leading, spacing: 4) {
+///         DataTable(model: tableModel)
+///             .frame(height: 80)
+///
+///         Divider()
+///
+///         TagExample(num: 4, withDot: true)
+///     }
+/// } action: {
+///     FioriButton(title: "Approve")
+/// } secondaryAction: {
+///     FioriButton(title: "Decline")
+/// }
+/// ```
+///
+/// ```swift
+/// Card(mediaImage: Image("productThumbnail"),
+///      description: "Title",
+///      title: "Title",
+///      subtitle: "Subtitle",
+///      icons: [TextOrIcon.icon(Image(systemName: "circle.fill"))],
+///      detailImage: Image("ProfilePic"),
+///      headerAction: FioriButton(title: "Action"),
+///      counter: "1 of 3",
+///      kpi: KPIItemData.components([.unit("$"), .metric("26.9"), .unit("M")]),
+///      kpiCaption: "Revenue",
+///      action: FioriButton(title: "Primary"),
+///      secondaryAction: FioriButton(title: "Secondary"))
+/// ```
+///
 // sourcery: CompositeComponent
 protocol _CardComponent: _CardHeaderComponent, _CardBodyComponent, _CardFooterComponent {}
 
@@ -57,7 +389,25 @@ protocol _IllustratedMessageComponent: _DetailImageComponent, _TitleComponent, _
 // sourcery: CompositeComponent
 protocol _InformationViewComponent: _IconComponent, _DescriptionComponent {}
 
-// sourcery: CompositeComponent, InternalComponent
+/// A protocol that combines informational and counter capabilities for use below a text input field.
+///
+/// This protocol enables a unified component to display auxiliary content beneath a `TextField`,
+/// such as an optional icon, descriptive text, and a character/input counter. The appearance (e.g., color, styling)
+/// is controlled via modifiers like `.textInputInfoViewStyle(.success)`, `.error`, `.informational`, or `.warning`.
+///
+/// Usage example:
+/// ```swift
+/// TextInputInfoView(
+///     icon: Image(systemName: "checkmark.circle"),
+///     description: AttributedString("Valid input"),
+///     counter: AttributedString("10/50")
+/// )
+/// .textInputInfoViewStyle(.success)
+/// .textInputInfoViewStyle(.error)
+/// .textInputInfoViewStyle(.informational)
+/// .textInputInfoViewStyle(.warning)
+/// ```
+// sourcery: CompositeComponent
 protocol _TextInputInfoViewComponent: _InformationViewComponent, _CounterComponent {}
 
 // sourcery: CompositeComponent
@@ -78,6 +428,8 @@ protocol _TextInputFieldComponent {
     var text: String { get set }
     // sourcery: defaultValue = false
     var isSecureEnabled: Bool? { get set }
+    // sourcery: default.value = nil
+    var formatter: FormattedStringEditing? { get set }
 }
 
 // sourcery: CompositeComponent
@@ -106,6 +458,9 @@ protocol _NoteFormViewComponent: _PlaceholderTextEditorComponent, _FormViewCompo
     var charCountReachLimitMessage: String? { get }
     /// The custom error message when the character count exceeds the limitation. If this property is `nil`, the default localized message will be used.
     var charCountBeyondLimitMsg: String? { get }
+    // sourcery: defaultValue = false
+    /// Determine whether AINoticeView is displayed. The default is `false`.
+    var isAINoticeEnabled: Bool { get }
 }
 
 // sourcery: CompositeComponent
@@ -133,6 +488,9 @@ protocol _TitleFormViewComponent: _PlaceholderTextFieldComponent, _FormViewCompo
     var charCountReachLimitMessage: String? { get }
     /// The custom error message when the character count exceeds the limitation. If this property is `nil`, the default localized message will be used.
     var charCountBeyondLimitMsg: String? { get }
+    // sourcery: defaultValue = false
+    /// Determine whether AINoticeView is displayed. The default is `false`.
+    var isAINoticeEnabled: Bool { get }
 }
 
 // sourcery: CompositeComponent
@@ -629,6 +987,10 @@ protocol _DateTimePickerComponent: _TitleComponent, _ValueLabelComponent, _Manda
     // sourcery: @Binding
     /// This property indicates whether the picker is to be displayed.
     var pickerVisible: Bool { get set }
+    
+    // sourcery: defaultValue = false
+    /// This property indicates whether the separator is to be displayed. Default is false.
+    var hidesSeparator: Bool { get }
 }
 
 /// `DateRangePicker`  provides a title and value label with Fiori styling and a `MultiDatePicker`.
@@ -1327,39 +1689,222 @@ protocol _StepProgressIndicatorComponent: _TitleComponent, _ActionComponent, _Ca
     var steps: [StepItem] { get }
 }
 
-/// `Attachment` is the UI component to be used by `AttachmentGroup` along with `AttachmentButtonImage` to support users' operation, such as adding a photo or a file and to render attachment list.
+/// `AttachmentElement` is a foundational UI component used by `AttachmentGroup` for displaying and managing
+/// attachment items in different states (normal, uploading, error).
+///
+/// This protocol defines the core properties and interactions required for attachment rendering:
+/// - Displaying attachment information
+/// - Handling state changes through control states
+/// - Managing user interactions like previewing and deletion
+/// - Supporting dynamic updates to attachment metadata
+///
+/// `AttachmentElement` serves as the base protocol for more specialized attachment components like
+/// `Attachment`, `AttachmentWithError`, and `AttachmentInProgress`.
 ///
 /// ## Usage
 /// ```swift
-/// Attachment {
-///   AttachmentThumbnail(url: fileURL)
+/// // Basic usage with required properties
+/// AttachmentElement(
+///     attachmentInfo: myAttachmentInfo,
+///     controlState: .normal,
+///     onPreview: { attachmentInfo in
+///         // Handle preview action
+///         previewController.preview(attachmentInfo.primaryURL)
+///     },
+///     onExtraInfoChange: { extraInfo in
+///         // Update attachment with new metadata
+///         updateAttachment(with: extraInfo)
+///     },
+///     onDelete: { attachmentInfo in
+///         // Handle deletion
+///         deleteAttachment(attachmentInfo)
+///     }
+/// )
+///
+/// // In context of looping through attachment array
+/// ForEach(configuration.attachments.indices, id: \.self) { index in
+///     AttachmentElement(
+///         attachmentInfo: configuration.attachments[index],
+///         controlState: configuration.controlState,
+///         onPreview: { info in
+///             previewManager.showPreview(for: info)
+///         },
+///         onExtraInfoChange: { extraInfo in
+///             // Update with new metadata while preserving state
+///             if case .uploaded(let destURL, let srcURL, _) = configuration.attachments[index] {
+///                 configuration.attachments[index] = .uploaded(
+///                     destinationURL: destURL,
+///                     sourceURL: srcURL,
+///                     extraInfo: extraInfo
+///                 )
+///             }
+///         },
+///         onDelete: { info in
+///             configuration.attachments.remove(at: index)
+///         }
+///     )
+/// }
+/// ```
+// sourcery: CompositeComponent
+protocol _AttachmentElementComponent {
+    /// The attachment information object containing metadata and state.
+    ///
+    /// This property holds the `AttachmentInfo` instance representing the current state
+    /// of the attachment (uploading, uploaded, or error) and its associated metadata.
+    var attachmentInfo: AttachmentInfo { get }
+    
+    // sourcery: defaultValue = .normal
+    /// The control state that determines how the attachment element responds to user interaction.
+    ///
+    /// Possible values:
+    /// - `.normal`: Fully interactive (default)
+    /// - `.disabled`: Not interactive but visually unchanged
+    /// - `.readOnly`: Not interactive and visually indicates read-only state
+    var controlState: ControlState { get }
+    
+    /// A closure called when the extra information associated with an attachment needs to be updated.
+    ///
+    /// This is only applicable to attachments in the `.uploaded` state, and is not relevant for
+    /// attachments in `.uploading` or `.error` states.
+    ///
+    /// - Parameter AttachmentExtraInfo: The new metadata to associate with the attachment
+    var onExtraInfoChange: ((any AttachmentExtraInfo) -> Void)? { get }
+
+    /// A closure called when the user requests to preview the attachment.
+    ///
+    /// This is typically triggered when the user taps on the attachment thumbnail or preview.
+    /// Implementations should handle displaying appropriate preview UI for the attachment type.
+    ///
+    /// - Parameter AttachmentInfo: The attachment information for the attachment to preview
+    var onPreview: ((AttachmentInfo) -> Void)? { get }
+    
+    /// A closure called when the user requests to delete the attachment.
+    ///
+    /// This is typically triggered when the user taps a delete button or performs a deletion gesture.
+    /// Implementations should handle both UI updates and any backend deletion operations.
+    ///
+    /// - Parameter AttachmentInfo: The attachment information for the attachment to delete
+    var onDelete: ((AttachmentInfo) -> Void)? { get }
+}
+
+/// `Attachment` is the UI component used for displaying a single attachment within an `AttachmentGroup`.
+/// It presents attachment details including a thumbnail or preview image, title, subtitle, and footnote.
+///
+/// The component handles various states of attachments:
+/// - Display of uploaded attachments with thumbnail previews
+/// - Support for custom content through the default content view builder
+/// - Interaction events for preview and deletion
+///
+/// ## Usage
+/// Use the `Attachment` component to display a file or image attachment with its metadata:
+///
+/// ```swift
+/// // Display an attachment with a thumbnail generated from a file URL
+/// Attachment(attachmentInfo: myAttachmentInfo) {
+///   AttachmentThumbnail(url: myAttachmentInfo.primaryURL)
 /// } attachmentTitle: {
-///   Text("Leaf")
+///   Text(myAttachmentInfo.attachmentName)
 /// } attachmentSubtitle: {
 ///   Text("15MB")
 /// } attachmentFootnote: {
-///   Text("Aug 15, 2024")
+///   Text("Oct 20, 2025")
 /// }
 ///
-/// Attachment {
-///   Image(systemName: "leaf")
+/// // Display an attachment with a custom image
+/// Attachment(attachmentInfo: myAttachmentInfo) {
+///   Image(systemName: "doc.text")
 ///     .resizable()
+///     .aspectRatio(contentMode: .fit)
 /// } attachmentTitle: {
-///   Text("Leaf")
+///   Text(myAttachmentInfo.attachmentName)
 /// } attachmentSubtitle: {
-///   Text("15MB")
+///   Text("PDF Document")
 /// } attachmentFootnote: {
-///   Text("Aug 15, 2024")
+///   Text("Recently modified")
+/// }
+/// ```
+///
+/// Use with `AttachmentGroup` to manage collections of attachments:
+///
+/// ```swift
+/// AttachmentGroup(attachments: $myAttachments) {
+///   // Custom attachment rendering
+///   ForEach(myAttachments, id: \.id) { attachment in
+///     Attachment(attachmentInfo: attachment) {
+///       AttachmentThumbnail(url: attachment.primaryURL)
+///     } attachmentTitle: {
+///       Text(attachment.attachmentName)
+///     }
+///   }
 /// }
 /// ```
 // sourcery: CompositeComponent
 protocol _AttachmentComponent: _AttachmentTitleComponent, _AttachmentSubtitleComponent, _AttachmentFootnoteComponent {
     /// The collection of local attachment URLs, which are prepared by Apps.
-    var url: URL { get }
+    var attachmentInfo: AttachmentInfo { get }
     
     // sourcery: defaultValue = .normal
-    /// The state of attachement group component
+    /// The state of attachment group component
     var controlState: ControlState { get }
+    
+    /// Trigger update on extraInfo of AttachmentInfo
+    var onExtraInfoChange: ((AnyHashable) -> Void)? { get }
+
+    /// Triggering preview
+    var onPreview: ((AttachmentInfo) -> Void)? { get }
+    
+    /// Triggering delete.
+    var onDelete: ((AttachmentInfo) -> Void)? { get }
+}
+
+/// `AttachmentWithError` is the UI component to be used by `AttachmentGroup` along with `AttachmentButtonImage` to support error state of failed upload.
+///
+/// ## Usage
+/// ```swift
+/// AttachmentWithError(
+///     attachmentErrorTitle: {
+///         Text(configuration.attachmentInfo.attachmentName)
+///     },
+///     attachmentInfo: configuration.$attachmentInfo,
+///     onPreview: configuration.onPreview,
+///     onDelete: configuration.onDelete
+/// )
+/// ```
+// sourcery: CompositeComponent
+protocol _AttachmentWithErrorComponent: _AttachmentErrorTitleComponent {
+    /// The collection of local attachment data model, which are prepared by Apps.
+    var attachmentInfo: AttachmentInfo { get }
+    
+    /// Triggering preview
+    var onPreview: ((AttachmentInfo) -> Void)? { get }
+    
+    /// Triggering delete.
+    var onDelete: ((AttachmentInfo) -> Void)? { get }
+}
+
+/// `AttachmentInProgress` is the UI component to be used by `AttachmentGroup` along with `AttachmentButtonImage` to support rendering in-progress uploading state.
+///
+/// ## Usage
+/// ```swift
+/// AttachmentInProgress(
+///     attachmentInProgressTitle: {
+///         Text(configuration.attachmentInfo.attachmentName)
+///     },
+///     attachmentInfo: configuration.$attachmentInfo,
+///     onPreview: configuration.onPreview,
+///     onDelete: configuration.onDelete
+/// )
+/// ```
+// sourcery: CompositeComponent
+protocol _AttachmentInProgressComponent: _AttachmentInProgressTitleComponent {
+    /// The collection of local attachment data model, which are prepared by Apps.
+    var attachmentInfo: AttachmentInfo { get }
+
+    /// Triggering preview
+    var onPreview: ((AttachmentInfo) -> Void)? { get }
+    
+    /// Triggering delete.
+    var onDelete: ((AttachmentInfo) -> Void)? { get }
 }
 
 /// `AttachmentButtonImage` provides the default `Add` button following visual design.
@@ -1371,7 +1916,7 @@ protocol _AttachmentComponent: _AttachmentTitleComponent, _AttachmentSubtitleCom
 /// let delegate: AttachmentDelegate
 ///
 /// AttachmentGroup(
-///   title: { Text("Attachements") },
+///   title: { Text("Attachments") },
 ///   attachments: self.$attachments,
 ///   maxCount: 5,
 ///   delegate: self.delegate,
@@ -1388,58 +1933,75 @@ protocol _AttachmentComponent: _AttachmentTitleComponent, _AttachmentSubtitleCom
 // sourcery: CompositeComponent
 // sourcery: importFrameworks = ["FioriThemeManager"]
 protocol _AttachmentButtonImageComponent {
-    //// The image to be used for "Add" menu or dialog for operations, such as poping up image picker or file picker.
+    //// The image to be used for "Add" menu or dialog for operations, such as popping up image picker or file picker.
     // sourcery: @ViewBuilder
     // sourcery: defaultValue = "FioriIcon.actions.add.renderingMode(.template).resizable()"
     var addButtonImage: Image { get }
 
     // sourcery: defaultValue = .normal
-    /// The state of attachement group component
+    /// The state of attachment group component
     var controlState: ControlState { get }
 }
 
-/// `AttachmentGroup` is the UI component for adding, removing, and rendering thumbnails and previews.
+/// `AttachmentGroup` is a UI component that manages a collection of attachments with support for
+/// adding, removing, and viewing attachments from various sources.
+///
+/// This component provides a complete interface for attachment management, including:
+/// - Displaying existing attachments with thumbnails
+/// - Adding new attachments from photos, camera, files, or scanned documents
+/// - Previewing attachments
+/// - Showing upload progress and error states
+/// - Enforcing maximum attachment limits
 ///
 /// ## Usage
 /// ```swift
+/// @State private var attachments: [AttachmentInfo] = []
+/// @State private var errorMessage: AttributedString?
+/// let myAttachmentDelegate = MyAttachmentDelegate()
+///
 /// AttachmentGroup(
-///   title: { Text("Attachements") },
-///   attachments: self.$attachments,
-///   maxCount: 5,
-///   delegate: self.delegate,
-///   errorMessage: self.$attachmentError,
-///   operations: {
-///       AttachmentButtonImage()
-///           .operationsMenu {
-///               PhotosPickerMenuItem(filter: [.images])
-///               FilesPickerMenuItem(filter: [.pdf, .presentation])
-///           }
-///       }
-///  )
+///    title: { Text("Documents") },
+///    attachments: $attachments,
+///    maxCount: 5,
+///    delegate: myAttachmentDelegate,
+///    errorMessage: $errorMessage,
+///    operations: {
+///        AttachmentButtonImage()
+///            .operationsMenu {
+///                PhotosPickerMenuItem(filter: [.images])
+///                FilesPickerMenuItem(filter: [.pdf, .documents])
+///                CameraMenuItem()
+///            }
+///    }
+/// )
 /// ```
 // sourcery: CompositeComponent
 protocol _AttachmentGroupComponent: _TitleComponent, _MandatoryField {
+    // sourcery: @StateObject
+    // sourcery: defaultValue = "AttachmentContext()"
+    var context: AttachmentContext { get }
+
     // sourcery: @Binding
     /// The collection of local attachment URLs, which are prepared by Apps.
-    var attachments: [URL] { get }
+    var attachments: [AttachmentInfo] { get }
     
     // sourcery: defaultValue = "nil"
-    /// The maximium number of attachments
+    /// The maximum number of attachments
     var maxCount: Int? { get }
-
+    
     // sourcery: defaultValue = "BasicAttachmentDelegate()"
-    /// App specific attachemnt processing logics for adding or deleting attachments.
+    /// App specific attachment processing logics for adding or deleting attachments.
     var delegate: AttachmentDelegate { get }
-
+    
     // sourcery: defaultValue = .normal
-    /// The state of attachement group component
+    /// The state of attachment group component
     var controlState: ControlState { get }
     
     // sourcery: @Binding
     // sourcery: defaultValue = ".constant(nil)"
     /// The error message of the form view.
     var errorMessage: AttributedString? { get }
-
+    
     // sourcery: defaultValue = "{ EmptyView() }"
     /// For adding App specific operations, such as picking photos and files.
     @ViewBuilder
@@ -1448,29 +2010,70 @@ protocol _AttachmentGroupComponent: _TitleComponent, _MandatoryField {
     // sourcery: defaultValue = "nil"
     /// Triggering App specific preview, otherwise using default preview.
     var onPreview: ((URL) -> Void)? { get }
+    
+    /// Allows apps to provide extra info, which is to be used in custom AttachmentStyle
+    var defaultAttachmentExtraInfo: (() -> any AttachmentExtraInfo)? { get }
 }
 
-/// `AttachmentThumbnail` is the UI component for rendering attachment file thumbnails asynchronously starting with static icons.
+/// `AttachmentThumbnail` is a specialized UI component that renders previews for attachment files asynchronously.
+///
+/// This component intelligently handles different file types by:
+/// - Initially displaying appropriate static file type icons while loading
+/// - Generating thumbnail previews for supported file types (images, PDFs, etc.)
+/// - Maintaining the file type icon for non-previewable file types
+/// - Adapting its appearance based on control state (normal, disabled, read-only)
+///
+/// The thumbnail generation process happens in the background to maintain UI responsiveness,
+/// and the component automatically updates when the preview becomes available.
 ///
 /// ## Usage
+/// Use `AttachmentThumbnail` within an `Attachment` component to display file previews:
+///
 /// ```swift
+/// // Basic usage with an image file
 /// Attachment {
-///   AttachmentThumbnail(url: fileURL)
+///   AttachmentThumbnail(url: imageURL)
 /// } attachmentTitle: {
-///   Text("Leaf")
+///   Text("Photo")
 /// } attachmentSubtitle: {
-///   Text("15MB")
+///   Text("2.5MB")
 /// } attachmentFootnote: {
-///   Text("Aug 15, 2024")
+///   Text("Oct 20, 2025")
 /// }
+///
+/// // Usage with a PDF document
+/// Attachment {
+///   AttachmentThumbnail(url: pdfURL, controlState: viewModel.isEditable ? .normal : .readOnly)
+/// } attachmentTitle: {
+///   Text("Contract")
+/// } attachmentSubtitle: {
+///   Text("PDF • 1.2MB")
+/// } attachmentFootnote: {
+///   Text("Last modified today")
+/// }
+/// ```
+///
+/// The component can also be used standalone when needed:
+///
+/// ```swift
+/// AttachmentThumbnail(url: fileURL)
+/// ```
 // sourcery: CompositeComponent
 // sourcery: importFrameworks = ["FioriThemeManager"]
 protocol _AttachmentThumbnailComponent {
-    ////  URL of document for rendering thumbnail
+    /// The URL of the file for which to render a thumbnail.
+    ///
+    /// This can be a local file URL or a remote URL. For remote URLs, the component
+    /// will download the file data as needed to generate the thumbnail.
     var url: URL { get }
     
     // sourcery: defaultValue = .normal
-    /// The state of attachement group component
+    /// The control state that determines the visual appearance of the thumbnail.
+    ///
+    /// Possible values:
+    /// - `.normal`: Standard appearance for interactive contexts (default)
+    /// - `.disabled`: Visually indicates the thumbnail is non-interactive
+    /// - `.readOnly`: Indicates the attachment is in read-only mode
     var controlState: ControlState { get }
 }
 
@@ -2483,7 +3086,7 @@ protocol _AIUserFeedbackComponent: _IllustratedMessageComponent, _SubmitActionCo
     /// The view for inputting additional reason for negative feedback.
     var keyValueFormView: KeyValueFormView? { get }
     
-    /// Indicate whether the AIUserFeedback is pushed in, poped up or as an inspector. Default value is `.sheet`.
+    /// Indicate whether the AIUserFeedback is pushed in, popped up or as an inspector. Default value is `.sheet`.
     /// When it is pushed in, the height of sheet is fixed. The drag indicator is hidden, sheet can not be dragged.
     // sourcery: defaultValue = .sheet
     var displayMode: AIUserFeedbackDisplayMode { get }
@@ -2512,7 +3115,7 @@ protocol _AIUserFeedbackComponent: _IllustratedMessageComponent, _SubmitActionCo
     var onDownVote: (() -> Void)? { get }
     
     /// The action to be performed when the submit button is tapped.
-    /// Application can get the user feedback values, can tell the component the submition result with the `submitResult` call back.
+    /// Application can get the user feedback values, can tell the component the submission result with the `submitResult` call back.
     // sourcery: default.value = nil
     // sourcery: no_view
     var onSubmit: ((_ voteState: AIUserFeedbackVoteState, _ feedbacks: [String], _ additional: String, _ submitResult: @escaping (Bool) -> Void) -> Void)? { get }
@@ -2602,4 +3205,620 @@ protocol _WritingAssistantFormComponent: _CancelActionComponent, _DoneActionComp
     var text: String { get }
     
     var menus: [[WAMenu]] { get }
+}
+
+/// `CalendarDayView` is used to display a day with title, subtitle and eventIndicator.
+///
+/// ## Usage
+/// ```swift
+/// var calendarItemTintAttributes: [CalendarPropertyRef: [CalendarItemControlState: Color]] {
+///     let result: [CalendarPropertyRef: [CalendarItemControlState: Color]] = [
+///         .title: [
+///             .normal: Color(UIColor.blue),
+///             .disabled: Color(UIColor.red),
+///             .highlighted: Color(UIColor.green),
+///             .selected: Color(UIColor.yellow)
+///         ]
+///     ]
+///     return result
+/// }
+/// CalendarDayView(title: "10", subtitle: "22", isEventIndicatorVisible: true, state: .singleSelectedAndToday, customEventView: Rectangle().foregroundStyle(Color.red))
+/// .environment(\.eventViewColor, .red)
+/// .environment(\.selectionSingleColor, .yellow)
+/// .environment(\.calendarItemTintAttributes, calendarItemTintAttributes)
+///
+/// CalendarDayView(title: "10", subtitle: "22", isEventIndicatorVisible: true, state: .disabled)
+/// .environment(\.eventViewColorDisabled, .gray)
+///
+/// CalendarDayView(title: "10", subtitle: "22", isEventIndicatorVisible: true, state: .multiSelectedStart)
+/// .environment(\.selectionRangeColor, .red)
+/// ```
+// sourcery: CompositeComponent
+protocol _CalendarDayViewComponent: _TitleComponent, _SubtitleComponent {
+    /// This property indicates whether the event view is to be displayed or not. The default is false.
+    // sourcery: default.value = false
+    var isEventIndicatorVisible: Bool { get }
+    
+    /// The state of the day  view. The default is `.normal`.
+    // sourcery: default.value = .normal
+    var state: CalendarDayState { get }
+    
+    /// This property is used to customize event view.
+    // sourcery: default.value = EmptyView()
+    var customEventView: any View { get }
+}
+
+/// `CalendarWeekView` is used to display the dates in one week.
+///
+/// Developer can set the `.showsWeekNumbers` environment to show the week numberText. If calendarStyle is `.datesSelection` or `.rangeSelection`, and when the first date of the week is out of month, always hide the week number.
+/// ## Usage
+/// ```swift
+/// var fm: DateFormatter {
+///     let fm = DateFormatter()
+///     fm.timeZone = Calendar.current.timeZone
+///     fm.locale = Calendar.current.locale
+///     fm.dateFormat = "yyyy MM dd"
+///     return fm
+/// }
+/// var calendarItemTintAttributes: [CalendarPropertyRef: [CalendarItemControlState: Color]] {
+///     let result: [CalendarPropertyRef: [CalendarItemControlState: Color]] = [
+///         .title: [
+///             .normal: Color(UIColor.blue),
+///             .disabled: Color(UIColor.red),
+///             .highlighted: Color(UIColor.green),
+///             .selected: Color(UIColor.yellow)
+///         ],
+///         .weekNumberText: [
+///             .normal: Color(UIColor.green)
+///         ]
+///     ]
+///     return result
+/// }
+/// let info = CalendarWeekInfo(year: 2025, month: 10, weekNumber: 43, dates: [
+///     self.fm.date(from: "2025 10 26")!,
+///     self.fm.date(from: "2025 10 27")!,
+///     self.fm.date(from: "2025 10 28")!,
+///     self.fm.date(from: "2025 10 29")!,
+///     self.fm.date(from: "2025 10 30")!,
+///     self.fm.date(from: "2025 10 31")!,
+///     self.fm.date(from: "2025 11 01")!
+/// ])
+/// @State var selectedDate: Date? = .now
+/// CalendarWeekView(calendarStyle: .month, weekInfo: info, startDate: self.fm.date(from: "2025 01 01")!, endDate: self.fm.date(from: "2025 12 31")!, showsOutOfMonthDates: true, selectedDate: selectedDate, dayTappedCallback: { date, state in
+///     print("Tap on a date:\(date), with state:\(state)")
+///     self.selectedDate = date
+/// }, customEventView: { date in
+///     Rectangle()
+/// })
+/// .environment(\.showsWeekNumbers, true)
+/// .environment(\.hasEventIndicator, true)
+/// .environment(\.alternateCalendarType, .chinese)
+/// .environment(\.alternateCalendarLocale, Locale(identifier: "en"))
+/// .environment(\.calendarItemTintAttributes, calendarItemTintAttributes)
+/// ```
+// sourcery: CompositeComponent
+protocol _CalendarWeekViewComponent {
+    /// The calendar style.
+    var calendarStyle: CalendarStyle { get }
+    
+    /// This property is used to display the dates in one week.
+    var weekInfo: CalendarWeekInfo { get }
+    
+    /// The start date of the calendar.
+    var startDate: Date { get }
+    
+    /// The end date of the calendar.
+    var endDate: Date { get }
+    
+    /// Whether to show a day or not when the day is in `.outOfMonth` state.
+    // sourcery: default.value = true
+    var showsOutOfMonthDates: Bool { get }
+    
+    /// The selected date in the calendar, used to single select, when the style is `.month`, `.fullScreenMonth`, `.week` or `.expandable`.
+    // sourcery: default.value = nil
+    var selectedDate: Date? { get }
+    
+    /// The selected dates in the calendar, used to multi select, when the style is `.datesSelection`.
+    // sourcery: default.value = nil
+    var selectedDates: Set<Date>? { get }
+    
+    /// The selected range in the calendar, used to range select, when the style is `.rangeSelection`.
+    // sourcery: default.value = nil
+    var selectedRange: ClosedRange<Date>? { get }
+    
+    /// The disabled dates. Default is nil, which means all in month displayed dates are selectable.
+    // sourcery: default.value = nil
+    var disabledDates: CalendarDisabledDates? { get }
+    
+    /// Callback when a day is tapped. The day should be in available state to response to tap gesture, like .normal, .today, .singleSelected, .singleSelectedAndToday, .multiSelectedStart, .multiSelectedMiddle and multiSelectedEnd.
+    // sourcery: default.value = nil
+    var dayTappedCallback: ((Date, CalendarDayState) -> Void)? { get }
+    
+    /// This property is used to customize event view for each date.
+    // sourcery: defaultValue = "{ _ in EmptyView() }"
+    // sourcery: resultBuilder.defaultValue = "{ _ in EmptyView() }"
+    @ViewBuilder
+    var customEventView: (Date) -> any View { get }
+}
+
+/// `CalendarMonthView` is used to display one month in the calendar.
+///
+/// ## Usage
+/// ```swift
+///     var fm: DateFormatter {
+///         let fm = DateFormatter()
+///         fm.timeZone = Calendar.current.timeZone
+///         fm.locale = Calendar.current.locale
+///         fm.dateFormat = "yyyy MM dd"
+///         return fm
+///     }
+///     var calendarItemTintAttributes: [CalendarPropertyRef: [CalendarItemControlState: Color]] {
+///         let result: [CalendarPropertyRef: [CalendarItemControlState: Color]] = [
+///             .title: [
+///                 .normal: Color(UIColor.blue),
+///                 .disabled: Color(UIColor.red),
+///                 .highlighted: Color(UIColor.green),
+///                 .selected: Color(UIColor.yellow)
+///             ],
+///             .monthHeaderText: [
+///                 .normal: Color(UIColor.green)
+///             ],
+///             .weekDayText: [
+///                 .normal: Color(UIColor.blue),
+///                 .highlighted: Color(UIColor.green)
+///             ],
+///             .weekNumberText: [
+///                 .normal: Color(UIColor.green)
+///             ]
+///         ]
+///         return result
+///     }
+///     let year = 2025
+///     let month = 10
+///     let startDate = self.fm.date(from: "2025 01 01")!
+///     let endDate = self.fm.date(from: "2025 12 31")!
+///     let selectedDate = self.fm.date(from: "2025 10 27")!
+///     let disabledDates = CalendarDisabledDates(weekdays: [1, 2])
+///     let weeks: [CalendarWeekInfo] = [
+///         CalendarWeekInfo(year: year, month: month, weekNumber: 39, dates: [self.fm.date(from: "2025 09 28")!, self.fm.date(from: "2025 09 29")!, self.fm.date(from: "2025 09 30")!, self.fm.date(from: "2025 10 01")!, self.fm.date(from: "2025 10 02")!, self.fm.date(from: "2025 10 03")!, self.fm.date(from: "2025 10 04")!]),
+///         CalendarWeekInfo(year: year, month: month, weekNumber: 40, dates: [self.fm.date(from: "2025 10 05")!, self.fm.date(from: "2025 10 06")!, self.fm.date(from: "2025 10 07")!, self.fm.date(from: "2025 10 08")!, self.fm.date(from: "2025 10 09")!, self.fm.date(from: "2025 10 10")!, self.fm.date(from: "2025 10 11")!]),
+///         CalendarWeekInfo(year: year, month: month, weekNumber: 41, dates: [self.fm.date(from: "2025 10 12")!, self.fm.date(from: "2025 10 13")!, self.fm.date(from: "2025 10 14")!, self.fm.date(from: "2025 10 15")!, self.fm.date(from: "2025 10 16")!, self.fm.date(from: "2025 10 17")!, self.fm.date(from: "2025 10 18")!]),
+///         CalendarWeekInfo(year: year, month: month, weekNumber: 42, dates: [self.fm.date(from: "2025 10 19")!, self.fm.date(from: "2025 10 20")!, self.fm.date(from: "2025 10 21")!, self.fm.date(from: "2025 10 22")!, self.fm.date(from: "2025 10 23")!, self.fm.date(from: "2025 10 24")!, self.fm.date(from: "2025 10 25")!]),
+///         CalendarWeekInfo(year: year, month: month, weekNumber: 43, dates: [self.fm.date(from: "2025 10 26")!, self.fm.date(from: "2025 10 27")!, self.fm.date(from: "2025 10 28")!, self.fm.date(from: "2025 10 29")!, self.fm.date(from: "2025 10 30")!, self.fm.date(from: "2025 10 31")!, self.fm.date(from: "2025 11 01")!])
+///     ]
+///     let model = CalendarMonthModel(year: year, month: month, weeks: weeks)
+///     let dayTappedCallback: (Date, CalendarDayState) -> Void = { date, state in
+///         print("Tapped date:\(date), state:\(state)")
+///     }
+///     CalendarMonthView(calendarStyle: .month, model: model, startDate: startDate, endDate: endDate, showsMonthHeader: true, selectedDate: selectedDate, disabledDates: disabledDates, dayTappedCallback: dayTappedCallback) { _ in
+///         Circle()
+///     }
+///     .background(
+///         Color.preferredColor(.primaryGroupedBackground)
+///     )
+///     .environment(\.showsWeekNumbers, true)
+///     .environment(\.hasEventIndicator, true)
+///     .environment(\.alternateCalendarType, .chinese)
+///     .environment(\.alternateCalendarLocale, Locale(identifier: "en"))
+///     .environment(\.calendarItemTintAttributes, calendarItemTintAttributes)
+///     .environment(\.customLanguageId, "en")
+/// ```
+// sourcery: CompositeComponent
+protocol _CalendarMonthViewComponent {
+    /// The calendar style.
+    var calendarStyle: CalendarStyle { get }
+    
+    /// The date model of the calendar month view.
+    var model: CalendarMonthModel { get }
+    
+    /// The start date of the calendar.
+    var startDate: Date { get }
+    
+    /// The end date of the calendar.
+    var endDate: Date { get }
+    
+    /// Whether to show the month header or not. The default is false.
+    // sourcery: default.value = false
+    var showsMonthHeader: Bool { get }
+    
+    /// Whether to show a day or not when the day is in `.outOfMonth` state. The default is true.
+    // sourcery: default.value = true
+    var showsOutOfMonthDates: Bool { get }
+    
+    /// The selected date in the calendar, used to single select, when the style is `.month`, `.fullScreenMonth`, `.week` or `.expandable`.
+    // sourcery: default.value = nil
+    var selectedDate: Date? { get }
+    
+    /// The selected dates in the calendar, used to multi select, when the style is `.datesSelection`.
+    // sourcery: default.value = nil
+    var selectedDates: Set<Date>? { get }
+    
+    /// The selected range in the calendar, used to range select, when the style is `.rangeSelection`.
+    // sourcery: default.value = nil
+    var selectedRange: ClosedRange<Date>? { get }
+    
+    /// The disabled dates. Default is nil, which means all in month displayed dates are selectable.
+    // sourcery: default.value = nil
+    var disabledDates: CalendarDisabledDates? { get }
+    
+    /// Callback when a day is tapped. The day should be in available state to response to tap gesture, like .normal, .today, .singleSelected, .singleSelectedAndToday, .multiSelectedStart, .multiSelectedMiddle and multiSelectedEnd.
+    // sourcery: default.value = nil
+    var dayTappedCallback: ((Date, CalendarDayState) -> Void)? { get }
+    
+    /// This property is used to customize event view for each date.
+    // sourcery: defaultValue = "{ _ in EmptyView() }"
+    // sourcery: resultBuilder.defaultValue = "{ _ in EmptyView() }"
+    @ViewBuilder
+    var customEventView: (Date) -> any View { get }
+}
+
+/// `CalendarView` is used to display the calendar. The calendar supports `.week`, `.month`, `.expandable`, `.fullScrollMonth`, `.rangeSelection`, and `.datesSelection` style.
+///
+/// ## Usage:
+/// ```swift
+///     @State var model = CalendarModel(calendarStyle: .month)
+///     var fm: DateFormatter {
+///         let fm = DateFormatter()
+///         fm.timeZone = Calendar.current.timeZone
+///         fm.locale = Calendar.current.locale
+///         fm.dateFormat = "yyyy MM dd"
+///         return fm
+///     }
+///     var calendarItemTintAttributes: [CalendarPropertyRef: [CalendarItemControlState: Color]] {
+///         let result: [CalendarPropertyRef: [CalendarItemControlState: Color]] = [
+///             .title: [
+///                 .normal: Color(UIColor.blue),
+///                 .disabled: Color(UIColor.red),
+///                 .highlighted: Color(UIColor.green),
+///                 .selected: Color(UIColor.yellow)
+///             ],
+///             .monthHeaderText: [
+///                 .normal: Color(UIColor.green)
+///             ],
+///             .weekDayText: [
+///                 .normal: Color(UIColor.blue),
+///                 .highlighted: Color(UIColor.green)
+///             ],
+///             .weekNumberText: [
+///                 .normal: Color(UIColor.green)
+///             ]
+///         ]
+///         return result
+///     }
+///     VStack {
+///         CalendarView(model: model, titleChangeCallback: { _ in
+///         }, customCalendarBackgroundColor: .white) { date in
+///             Rectangle()
+///         }
+///         .environment(\.showsWeekNumbers, true)
+///         .environment(\.hasEventIndicator, true)
+///         .environment(\.alternateCalendarType, .chinese)
+///         .environment(\.alternateCalendarLocale, Locale(identifier: "en"))
+///         .environment(\.calendarItemTintAttributes, calendarItemTintAttributes)
+///         .environment(\.customLanguageId, "zh-Hans")
+///         Spacer()
+///     }
+///
+/// ScrollView {
+///     CalendarView(model: self.model)
+///     .padding([.leading, .trailing], self.horizontalSizeClass == .compact ? 0 : 50)
+///     .frame(maxHeight: self.maxHeight)
+/// }
+/// .onGeometryChange(for: CGSize.self, of: { proxy in
+///     proxy.size
+/// }, action: { size in
+///     self.maxHeight = size.height
+/// })
+/// ```
+/// ## Notes:
+/// When style is `.fullScrollMonth`, `.rangeSelection`, or `.datesSelection`, and the CalendarView is used in ScrollView or List, the maxHeight of the CalendarView should be configured (e.g., the available screen height), otherwise it will slow down the scrolling, and the whole CalendarView will scroll in the ScrollView or List.
+// sourcery: CompositeComponent
+protocol _CalendarViewComponent {
+    /// The model of the calendar view.
+    var model: CalendarModel { get }
+    
+    /// Callback when the title is Changed.
+    // sourcery: default.value = nil
+    var titleChangeCallback: ((String) -> Void)? { get }
+    
+    /// Customized background color for the calendar view.
+    // sourcery: default.value = nil
+    var customCalendarBackgroundColor: Color? { get }
+    
+    /// This property is used to customize event view for each date.
+    // sourcery: defaultValue = "{ _ in EmptyView() }"
+    // sourcery: resultBuilder.defaultValue = "{ _ in EmptyView() }"
+    @ViewBuilder
+    var customEventView: (Date) -> any View { get }
+}
+
+/// `HierarchyIndicator` is a stack view including an icon and the specific title text. It is intended to be used with `HierarchItemView`.
+///
+/// ### Overview
+/// Use HierarchyIndicator to convey an item's relationship or navigability within a hierarchy. It is typically embedded in a HierarchyItemView and, when used inside a HierarchyView, can facilitate forward navigation by returning a child item ID from its onClick action. The indicator can also be used standalone to represent contextual information outside of a hierarchy.
+///
+/// ## Usage
+/// The indicator is typically used with `HierarchyItemView` within a `HierarchyView`to provide context about the item's status within the hierarchy. It can also be employed
+/// independently to represent information outside of a structured view. Consumers of this component should initialize the indicator based on their specific use cases,
+/// ensuring that it accurately represents the appropriate data and state depending on whether it is used in conjunction with `HierarchyItemView` and `HierarchyView`, or as a standalone component.
+///
+/// Within a `HierarchyView`, consumers should provide the `onClick` event handler that returns the item's UUID. This ensures that the data can be navigated correctly when the next button in the `HierarchyHeader` is clicked.
+/// ```swift
+///
+/// @State var activeChildItem: String?
+/// HierarchyView(
+///     dataSource: dataSource,
+///     hierarchyItem: { id in
+///         hierarchyIndicator: {
+///             let childrenCount = dataSource.numberOfChildren(for: id)
+///             HierarchyIndicator(
+///                 title: AttributedString(String("\(id)")),
+///                 isMultiline: self.isMultiline,
+///                 isSelected: activeChildItem == id,
+///                 isClickable: childrenCount > 0
+///          ){
+///             id
+///          }
+///    },
+///    activeChildItem: self.$activeChildItem
+/// )
+/// ```
+///
+/// ### See Also
+/// HierarchyView, HierarchyItemView.
+// sourcery: CompositeComponent
+protocol _HierarchyIndicatorComponent: _TitleComponent, _IconComponent {
+    /// A Boolean value indicating whether the indicator should support multiline content.
+    ///
+    /// The default value is `true`, meaning that the indicator will display content in multiple lines if necessary.
+    // sourcery: defaultValue = "true"
+    var isMultiline: Bool { get }
+    
+    /// A Boolean value indicating whether the indicator represents a selected hierarchy item.
+    ///
+    /// The default value is `false`, meaning the indicator will not display the item as selected by default.
+    // sourcery: defaultValue = "false"
+    var isSelected: Bool { get }
+    
+    /// A Boolean value indicating whether the hierarchy indicator is interactive (clickable).
+    ///
+    /// The default value is `true`, but the indicator may be set to non-clickable if the item does not have any child items in the `HierarchyView`.
+    // sourcery: defaultValue = "true"
+    var isClickable: Bool { get }
+    
+    /// The action that will be performed be performed when the clickable indicator is clicked.
+    ///
+    /// Returning a non-empty hierarchy child item ID is mandatory when the indicator is used with `HierarchyItemView` in the `HierarchyView`;
+    /// the selected item will be set as the current item displayed in the hierarchy header view.
+    ///
+    /// However, if it is used with `HierarchyItemView` independently, without `HierarchyView`, the returned ID is not mandatory.
+    /// Consumers may provide event handling according to their specific use case.
+    var onClick: (() -> String?)? { get }
+}
+
+/// A `HierarchyItemView` representing a component for displaying a collection item's business object content and hierarchy information in a user interface.
+///
+/// ### Overview
+/// It serves as the default item view for presenting hierarchy items within a `HierarchyItemView`. It includes various components such as titles, subtitles, footnotes, icons, detail images, statuses, and accessory views that together provide a comprehensive representation of the data associated with the hierarchy item.
+/// The `HierarchyItemView` can be utilized within a `HierarchyView` to display hierarchical information. Alternatively, it can also be used independently to present an item without the context of a hierarchical structure.
+///
+/// ### Key Features
+/// - Composable content slots: title, subtitle, footnote, icons, detail image, status, accessory view.
+/// - Optional hierarchyIndicator slot for navigation or contextual counts.
+/// - Integrates with HierarchyView for navigation and selection.
+/// - Supports standard accessory styles (e.g. disclosure).
+///
+/// ## Usage Independent:
+/// To use `HierarchyItemView` independently and without `HierarchyView`.
+///
+/// ```swift
+/// List {
+///     ForEach(0..<5) { index in
+///         HierarchyItemView(
+///             title: { Text("Title \(index)") },
+///             subtitle: { Text("Subtitle \(index)") },
+///             footnote: { Text("Footnote \(index)") },
+///             icons: {
+///                 FioriIcon.message.badge.foregroundStyle(Color.preferredColor(.tintColor))
+///                 FioriIcon.actions.bookmark.foregroundStyle(Color.preferredColor(.tintColor))
+///                 FioriIcon.actions.attachment.foregroundStyle(Color.preferredColor(.tintColor))
+///             },
+///             detailImage: { FioriIcon.message.messageInformation.resizable().foregroundStyle(Color.preferredColor(.tintColor)) },
+///             status: { Image(systemName: "exclamationmark.square.fill").foregroundStyle(Color.preferredColor(.negativeLabel)) },
+///             accessoryType: .disclosure,
+///             hierarchyIndicator: {
+///                 HierarchyIndicator(
+///                     title: index == 4 ? { EmptyView()} : { Text(self.formatNumber(indicatorNumber[index])) },
+///                     isMultiline: false,
+///                     isSelected: false,
+///                     isClickable: false
+///                 )
+///             })
+///    }
+/// }
+/// ```
+///
+/// ### See Also
+/// HierarchyView, HierarchyIndicator.
+// sourcery: CompositeComponent
+protocol _HierarchyItemViewComponent: _TitleComponent, _SubtitleComponent, _FootnoteComponent, _IconsComponent, _DetailImageComponent, _StatusComponent, _AccessoryViewComponent {
+    @ViewBuilder
+    /// The indicator view of the hierarchy view
+    var hierarchyIndicator: (() -> any View)? { get }
+}
+
+/// `HierarchyViewHeader` provides navigation controls and summary context at the top of a HierarchyView.
+///
+/// ### Overview
+/// Use `HierarchyViewHeader` to display the title of the currently focused parent item and to offer backward/forward navigation across the hierarchy. The header can be customized to add leading and trailing accessory views. If no custom header is provided, HierarchyView displays a default HierarchyViewHeader.
+///
+/// ### Key Features
+/// - Title content to reflect current hierarchy context.
+/// - Leading and trailing accessory slots for custom navigation controls.
+/// - Integrates with HierarchyView’s activeChildItem to drive forward navigation.
+///
+/// ### See Also
+/// HierarchyView, HierarchyIndicator, HierarchyItemView.
+// sourcery: CompositeComponent
+protocol _HierarchyViewHeaderComponent: _TitleComponent, _LeadingAccessoryComponent, _TrailingAccessoryComponent {}
+
+/// `HierarchyView` displays tree-structured data using `HierarchyItemView` rows and an optional `HierarchyHeader`, which is available for customization purposes.
+///
+/// ### Overview
+/// Use `HierarchyView` when you need to browse, navigate, and (optionally) select items in a hierarchical data set (parent/child relationships).
+/// The component delegates data access to a `HierarchyViewDataSource` so large or dynamic trees can be served efficiently.
+///
+/// ### Key Features
+/// - Pluggable data source (HierarchyViewDataSource) defining root, children, parent lookups, and titles.
+/// - Custom per-item view content via the hierarchyItem closure.
+/// - Optional header view for customized navigation controls / summary information.
+/// - Built-in selection handling (single / multiple / none) controlled by the hierarchyItemSelectionMode environment value.
+/// - Style system (Fiori & custom) applied through hierarchyViewStyle modifiers.
+///
+/// ### Data Source Contract (Summary)
+/// Your data source must provide stable, unique String identifiers for every item. Child counts and IDs should remain consistent during a single render pass.
+/// See HierarchyViewDataSource for full protocol requirements.
+///
+/// ```swift
+/// struct HierarchySimpleDataSource: HierarchyViewDataSource {
+///     func rootID() -> String {
+///         return "100"
+///     }
+///
+///     func numberOfChildren(for id: String) -> Int {
+///         return Int.random(in: 0...5)
+///     }
+///
+///     func childID(idForChildItemAt index: Int, with parentID: String) -> String {
+///         if let intValue = Int(parentID) {
+///             return String(intValue + index)
+///         } else {
+///             return ""
+///         }
+///     }
+///
+///     func parentID(for id: String) -> String? {
+///         if let intValue = Int(id), intValue > 100 {
+///             return String(intValue - 100)
+///         } else {
+///             return nil
+///         }
+///     }
+///
+///     func itemTitle(for id: String) -> String? {
+///         return id
+///     }
+/// }
+/// ```
+///
+/// ### State Bindings
+/// - activeChildItem: The identifier that will become active (e.g. next navigated child) when the user invokes forward navigation in the header.
+/// - selectedItems: Collection of currently selected item IDs (optional array in the generated initializer).
+/// In single-selection mode only the first element is considered; in multiple-selection mode all elements are used.
+///
+/// ### Selection Mode
+/// Controlled externally via environment:
+/// ```swift
+/// .environment(\.hierarchyItemSelectionMode, .none)     // selection disabled
+/// .environment(\.hierarchyItemSelectionMode, .single)   // single selection
+/// .environment(\.hierarchyItemSelectionMode, .multiple) // multi selection
+/// ```
+/// Selection affordances (selection buttons) are only visible while EditMode is .active and the selection mode is not .none.
+///
+/// ### Usage
+/// #### 1. Simple Initialization (generated initializer)
+///
+/// ```swift
+/// @State var activeChildItem: String?
+/// @State var selectedItems: [String]? = []
+/// @State var isEditing = true
+/// @State var selectionMode = HierarchyItemSelectionMode.single
+///
+/// let dataSource = HierarchySimpleDataSource()
+///
+/// HierarchyView(
+///     dataSource: dataSource,
+///     hierarchyItem: { id in
+///         title: { Text(id) },
+///         hierarchyIndicator: {
+///             let childrenCount = dataSource.numberOfChildren(for: id)
+///             HierarchyIndicator(
+///                 title: AttributedString(String("Indicator \(id)")),
+///                 isMultiline: self.isMultiline,
+///                 isSelected: activeChildItem == id,
+///                 isClickable: childrenCount > 0
+///          ){
+///             id
+///          }
+///    },
+///    activeChildItem: self.$activeChildItem,
+///    selectedItems: self.$selectedItems
+/// )
+/// .environment(\.editMode, .constant(isEditing ? EditMode.active : EditMode.inactive))
+/// .environment(\.hierarchyItemSelectionMode, selectionMode)
+/// ```
+///
+/// #### 2. Single Selection Convenience (see public API extension)
+///
+/// ```swift
+/// @State private var activeChild: String? = nil
+/// @State private var selected: String? = nil
+/// HierarchyView.singleSelection(
+///     dataSource: dataSource,
+///     hierarchyItem: { id in Text(id) },
+///     activeChildItem: $activeChild,
+///     selectedItem: $selected
+/// )
+/// .environment(\.hierarchyItemSelectionMode, .single)
+/// ```
+///
+/// #### 3. Multi Selection With Set (see public API extension)
+///
+/// ```swift
+/// @State private var activeChild: String? = nil
+/// @State private var selectedSet: Set<String> = []
+/// HierarchyView.multiSelection(
+///     dataSource: dataSource,
+///     hierarchyItem: { id in Text(id) },
+///     activeChildItem: $activeChild,
+///     selectedItems: $selectedSet
+/// )
+/// .environment(\.hierarchyItemSelectionMode, .multiple)
+/// ```
+///
+/// ### Styling
+///
+/// Apply or compose styles using:
+/// ```swift
+/// HierarchyView(...)
+/// .hierarchyViewStyle(MyCustomHierarchyStyle())
+/// ```
+/// Custom styles implement HierarchyViewStyle and can be layered; the environment maintains an internal style stack.
+///
+/// ### See Also
+/// HierarchyViewDataSource, HierarchyItemView, HierarchyHeader, HierarchyIndicator, HierarchyViewStyle.
+// sourcery: CompositeComponent
+protocol _HierarchyViewComponent {
+    /// The data source object of hierarchy view.
+    var dataSource: any HierarchyViewDataSource { get }
+    
+    /// The header view for the `HierarchyView`, represented by `HierarchyViewHeader`.
+    ///
+    /// By default, a header view is not specified unless customization is desired.
+    /// Consumers can provide a custom header view to tailor the appearance and behavior of the hierarchy view to meet specific requirements.
+    @ViewBuilder
+    var header: (() -> any View)? { get }
+    
+    /// The hierarchy item view, represented by `HierarchyItemView`, is used as a child item view within the `HierarchyView`.
+    /// Consumers can provide an instance of `HierarchyItemView` based on the given child item id to customize the representation of each item in the hierarchy.
+    @ViewBuilder
+    var hierarchyItem: (String) -> any View { get }
+    
+    /// Indicates the ID of the child hierarchy item that will be displayed when the next button in the `HierarchyHeader` is clicked.
+    // sourcery: @Binding
+    var activeChildItem: String? { get }
+    
+    /// Indicates the ID of the selected hierarchy item. IIn `HierarchyItemSelectionMode.single` mode, only one item can be selected.
+    // sourcery: @Binding
+    var selectedItems: [String]? { get }
 }

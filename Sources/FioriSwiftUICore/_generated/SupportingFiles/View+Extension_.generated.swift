@@ -1,4 +1,4 @@
-// Generated using Sourcery 2.2.7 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 2.1.7 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 import Foundation
 import SwiftUI
@@ -49,6 +49,23 @@ public extension View {
     func accessoryIconStyle(@ViewBuilder content: @escaping (AccessoryIconConfiguration) -> some View) -> some View {
         self.transformEnvironment(\.accessoryIconStyleStack) { stack in
             let style = AnyAccessoryIconStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
+// MARK: AccessoryViewStyle
+
+public extension View {
+    func accessoryViewStyle(_ style: some AccessoryViewStyle) -> some View {
+        self.transformEnvironment(\.accessoryViewStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func accessoryViewStyle(@ViewBuilder content: @escaping (AccessoryViewConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.accessoryViewStyleStack) { stack in
+            let style = AnyAccessoryViewStyle(content)
             stack.append(style)
         }
     }
@@ -241,6 +258,40 @@ public extension View {
     }
 }
 
+// MARK: AttachmentElementStyle
+
+public extension View {
+    func attachmentElementStyle(_ style: some AttachmentElementStyle) -> some View {
+        self.transformEnvironment(\.attachmentElementStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func attachmentElementStyle(@ViewBuilder content: @escaping (AttachmentElementConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.attachmentElementStyleStack) { stack in
+            let style = AnyAttachmentElementStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
+// MARK: AttachmentErrorTitleStyle
+
+public extension View {
+    func attachmentErrorTitleStyle(_ style: some AttachmentErrorTitleStyle) -> some View {
+        self.transformEnvironment(\.attachmentErrorTitleStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func attachmentErrorTitleStyle(@ViewBuilder content: @escaping (AttachmentErrorTitleConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.attachmentErrorTitleStyleStack) { stack in
+            let style = AnyAttachmentErrorTitleStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
 // MARK: AttachmentFootnoteStyle
 
 public extension View {
@@ -270,6 +321,40 @@ public extension View {
     func attachmentGroupStyle(@ViewBuilder content: @escaping (AttachmentGroupConfiguration) -> some View) -> some View {
         self.transformEnvironment(\.attachmentGroupStyleStack) { stack in
             let style = AnyAttachmentGroupStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
+// MARK: AttachmentInProgressStyle
+
+public extension View {
+    func attachmentInProgressStyle(_ style: some AttachmentInProgressStyle) -> some View {
+        self.transformEnvironment(\.attachmentInProgressStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func attachmentInProgressStyle(@ViewBuilder content: @escaping (AttachmentInProgressConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.attachmentInProgressStyleStack) { stack in
+            let style = AnyAttachmentInProgressStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
+// MARK: AttachmentInProgressTitleStyle
+
+public extension View {
+    func attachmentInProgressTitleStyle(_ style: some AttachmentInProgressTitleStyle) -> some View {
+        self.transformEnvironment(\.attachmentInProgressTitleStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func attachmentInProgressTitleStyle(@ViewBuilder content: @escaping (AttachmentInProgressTitleConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.attachmentInProgressTitleStyleStack) { stack in
+            let style = AnyAttachmentInProgressTitleStyle(content)
             stack.append(style)
         }
     }
@@ -321,6 +406,23 @@ public extension View {
     func attachmentTitleStyle(@ViewBuilder content: @escaping (AttachmentTitleConfiguration) -> some View) -> some View {
         self.transformEnvironment(\.attachmentTitleStyleStack) { stack in
             let style = AnyAttachmentTitleStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
+// MARK: AttachmentWithErrorStyle
+
+public extension View {
+    func attachmentWithErrorStyle(_ style: some AttachmentWithErrorStyle) -> some View {
+        self.transformEnvironment(\.attachmentWithErrorStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func attachmentWithErrorStyle(@ViewBuilder content: @escaping (AttachmentWithErrorConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.attachmentWithErrorStyleStack) { stack in
+            let style = AnyAttachmentWithErrorStyle(content)
             stack.append(style)
         }
     }
@@ -491,6 +593,74 @@ public extension View {
     func bodyTextStyle(@ViewBuilder content: @escaping (BodyTextConfiguration) -> some View) -> some View {
         self.transformEnvironment(\.bodyTextStyleStack) { stack in
             let style = AnyBodyTextStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
+// MARK: CalendarDayViewStyle
+
+public extension View {
+    func calendarDayViewStyle(_ style: some CalendarDayViewStyle) -> some View {
+        self.transformEnvironment(\.calendarDayViewStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func calendarDayViewStyle(@ViewBuilder content: @escaping (CalendarDayViewConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.calendarDayViewStyleStack) { stack in
+            let style = AnyCalendarDayViewStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
+// MARK: CalendarMonthViewStyle
+
+public extension View {
+    func calendarMonthViewStyle(_ style: some CalendarMonthViewStyle) -> some View {
+        self.transformEnvironment(\.calendarMonthViewStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func calendarMonthViewStyle(@ViewBuilder content: @escaping (CalendarMonthViewConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.calendarMonthViewStyleStack) { stack in
+            let style = AnyCalendarMonthViewStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
+// MARK: CalendarViewStyle
+
+public extension View {
+    func calendarViewStyle(_ style: some CalendarViewStyle) -> some View {
+        self.transformEnvironment(\.calendarViewStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func calendarViewStyle(@ViewBuilder content: @escaping (CalendarViewConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.calendarViewStyleStack) { stack in
+            let style = AnyCalendarViewStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
+// MARK: CalendarWeekViewStyle
+
+public extension View {
+    func calendarWeekViewStyle(_ style: some CalendarWeekViewStyle) -> some View {
+        self.transformEnvironment(\.calendarWeekViewStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func calendarWeekViewStyle(@ViewBuilder content: @escaping (CalendarWeekViewConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.calendarWeekViewStyleStack) { stack in
+            let style = AnyCalendarWeekViewStyle(content)
             stack.append(style)
         }
     }
@@ -1125,6 +1295,23 @@ public extension View {
     }
 }
 
+// MARK: FlexItemStyle
+
+public extension View {
+    func flexItemStyle(_ style: some FlexItemStyle) -> some View {
+        self.transformEnvironment(\.flexItemStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func flexItemStyle(@ViewBuilder content: @escaping (FlexItemConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.flexItemStyleStack) { stack in
+            let style = AnyFlexItemStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
 // MARK: FootnoteStyle
 
 public extension View {
@@ -1273,6 +1460,74 @@ public extension View {
     func helperTextStyle(@ViewBuilder content: @escaping (HelperTextConfiguration) -> some View) -> some View {
         self.transformEnvironment(\.helperTextStyleStack) { stack in
             let style = AnyHelperTextStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
+// MARK: HierarchyIndicatorStyle
+
+public extension View {
+    func hierarchyIndicatorStyle(_ style: some HierarchyIndicatorStyle) -> some View {
+        self.transformEnvironment(\.hierarchyIndicatorStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func hierarchyIndicatorStyle(@ViewBuilder content: @escaping (HierarchyIndicatorConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.hierarchyIndicatorStyleStack) { stack in
+            let style = AnyHierarchyIndicatorStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
+// MARK: HierarchyItemViewStyle
+
+public extension View {
+    func hierarchyItemViewStyle(_ style: some HierarchyItemViewStyle) -> some View {
+        self.transformEnvironment(\.hierarchyItemViewStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func hierarchyItemViewStyle(@ViewBuilder content: @escaping (HierarchyItemViewConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.hierarchyItemViewStyleStack) { stack in
+            let style = AnyHierarchyItemViewStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
+// MARK: HierarchyViewStyle
+
+public extension View {
+    func hierarchyViewStyle(_ style: some HierarchyViewStyle) -> some View {
+        self.transformEnvironment(\.hierarchyViewStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func hierarchyViewStyle(@ViewBuilder content: @escaping (HierarchyViewConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.hierarchyViewStyleStack) { stack in
+            let style = AnyHierarchyViewStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
+// MARK: HierarchyViewHeaderStyle
+
+public extension View {
+    func hierarchyViewHeaderStyle(_ style: some HierarchyViewHeaderStyle) -> some View {
+        self.transformEnvironment(\.hierarchyViewHeaderStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+
+    func hierarchyViewHeaderStyle(@ViewBuilder content: @escaping (HierarchyViewHeaderConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.hierarchyViewHeaderStyleStack) { stack in
+            let style = AnyHierarchyViewHeaderStyle(content)
             stack.append(style)
         }
     }
@@ -2980,7 +3235,7 @@ public extension View {
 
 // MARK: TextInputInfoViewStyle
 
-extension View {
+public extension View {
     func textInputInfoViewStyle(_ style: some TextInputInfoViewStyle) -> some View {
         self.transformEnvironment(\.textInputInfoViewStyleStack) { stack in
             stack.append(style)

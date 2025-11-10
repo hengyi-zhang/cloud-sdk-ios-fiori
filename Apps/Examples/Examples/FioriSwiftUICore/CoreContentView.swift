@@ -41,6 +41,8 @@ struct CoreContentView: View {
             MenuItem(title: "Signature Inline View", section: "Views", destination: SignatureCaptureViewExample()),
             MenuItem(title: "(Deprecated)Customized Signature Inline View", section: "Views", destination: SignatureCaptureViewExample2()),
             MenuItem(title: "AI User Feedback", section: "Views", destination: AIUserFeedbackExample()),
+            MenuItem(title: "Tag", section: "Views", destination: TagExample()),
+            MenuItem(title: "Hierarchy View", section: "Views", destination: HierarchyViewExample()),
             
             // Scanners
             MenuItem(title: "Document Scanner View", section: "Scanners", destination: DocumentScannerViewExample()),
@@ -60,6 +62,7 @@ struct CoreContentView: View {
             MenuItem(title: "SectionHeader/Footer Example", section: "Headers", destination: SectionHeaderFooterExample()),
             
             // Controls
+            MenuItem(title: "Format Text Input", section: "Controls", destination: TextInputExample()),
             MenuItem(title: "Customized TabView", section: "Controls", destination: TabViewExample()),
             MenuItem(title: "Customized Toolbar", section: "Controls", destination: ToolbarExample()),
             MenuItem(title: "Dimension Selector", section: "Controls", destination: DimensionSelectorExample()),
@@ -124,6 +127,9 @@ struct CoreContentView: View {
             MenuItem(title: "Object Cell Skeleton Loading", section: "Skeleton Loading", destination: ObjectCellSkeletonLoading()),
             MenuItem(title: "Card Skeleton Loading", section: "Skeleton Loading", destination: CardSkeletonLoading()),
             MenuItem(title: "Profile Header Skeleton Loading", section: "Skeleton Loading", destination: ProfileHeaderSkeletonLoading()),
+            
+            // Calendar
+            MenuItem(title: "Calendar", section: "Calendar", destination: CalendarExamples()),
             
             // Experimental
             MenuItem(title: "🚧 Experimental 🚧", section: "ExperimentalContentView", destination: ExperimentalContentView())

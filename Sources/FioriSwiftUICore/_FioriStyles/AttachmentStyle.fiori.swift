@@ -6,7 +6,7 @@ import SwiftUI
 public struct AttachmentBaseStyle: AttachmentStyle {
     public func makeBody(_ configuration: AttachmentConfiguration) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            AttachmentThumbnail(url: configuration.url, controlState: configuration.controlState)
+            AttachmentThumbnail(url: configuration.attachmentInfo.primaryURL, controlState: configuration.controlState)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(NSLocalizedString("Thumbnail", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: "Thumbnail"))
                 .id(UUID().uuidString)
@@ -17,6 +17,10 @@ public struct AttachmentBaseStyle: AttachmentStyle {
             }
         }
         .frame(width: AttachmentConstants.thumbnailWidth)
+        .id("Attachment:Thumbnail\(configuration.attachmentInfo.primaryURL.absoluteString)")
+        .accessibilityIdentifier("Attachment:Thumbnail\(configuration.attachmentInfo.primaryURL.absoluteString)")
+        .accessibilityElement(children: .combine)
+        .attachmentDefaultGuestures(configuration: configuration)
     }
 }
 
@@ -35,7 +39,7 @@ extension AttachmentFioriStyle {
             AttachmentThumbnail(configuration)
         }
     }
-    
+
     struct AttachmentTitleFioriStyle: AttachmentTitleStyle {
         let attachmentConfiguration: AttachmentConfiguration
         

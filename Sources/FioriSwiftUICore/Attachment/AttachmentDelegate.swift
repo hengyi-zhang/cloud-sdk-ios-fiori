@@ -1,12 +1,12 @@
 import Foundation
 
-/// Delegate protocl defines how to upload and remove attachments.
+/// Delegate protocol defines how to upload and remove attachments.
 public protocol AttachmentDelegate: AnyObject {
     /// delete attachment
     func delete(url: URL, onCompletion: @escaping (URL, Error?) -> Void)
     
     /// upload attachment
-    func upload(contentFrom provider: NSItemProvider, onCompletion: @escaping (URL?, Error?) -> Void)
+    func upload(contentFrom provider: NSItemProvider, onStarting: ((URL) -> Void)?, onCompletion: @escaping (URL?, Error?) -> Void)
 }
 
 /// Errors occurs during attachment upload or deletion

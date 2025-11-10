@@ -3,7 +3,7 @@ import PhotosUI
 import SwiftUI
 
 struct AttachmentPreviewExample: View {
-    @State var urls = [
+    @State var attachments = [
         Bundle.main.url(forResource: "Square Image", withExtension: "jpeg")!,
         Bundle.main.url(forResource: "Big Tree with spring picnic - Landscape", withExtension: "jpg")!,
         Bundle.main.url(forResource: "Burr Oaked Redux - Portrait", withExtension: "jpg")!,
@@ -28,17 +28,46 @@ struct AttachmentPreviewExample: View {
         URL(string: "https://ace.com/My Video.f4b")!,
         URL(string: "https://ace.com/My Text.rtf")!,
         URL(string: "https://ace.com/My Document/")!
-    ]
+    ].map { AttachmentInfo.uploaded(destinationURL: $0, sourceURL: $0, extraInfo: nil) }
     
     @State var erorMessage: AttributedString? = nil
+    @State var showConfiguraton = false
+    @State var showPreview = false
 
     var body: some View {
         ScrollView {
             VStack {
-                AttachmentGroup(title: { Text("Attachments") }, attachments: self.$urls, maxCount: 20, controlState: .readOnly, errorMessage: self.$erorMessage) {
-                    AttachmentButtonImage()
+                self.attachmentGroup
+                    .ifApply(self.showPreview) {
+                        $0.attachmentThumbnailStyle(AttachmentThumbnailWithPreviewStyle())
+                    }
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    self.showConfiguraton.toggle()
+                } label: {
+                    Image(systemName: "gearshape")
+                }
+                .popover(isPresented: self.$showConfiguraton) {
+                    VStack {
+                        Button("Close") {
+                            self.showConfiguraton.toggle()
+                        }
+                        
+                        Toggle(self.showPreview ? "Show Thumbnail" : "Icon Only ", isOn: self.$showPreview)
+                    }
+                    .padding()
+                    .presentationCompactAdaptation(.popover)
                 }
             }
+        }
+    }
+        
+    var attachmentGroup: some View {
+        AttachmentGroup(title: { Text("Attachments") }, attachments: self.$attachments, maxCount: 20, controlState: .readOnly, errorMessage: self.$erorMessage) {
+            AttachmentButtonImage()
         }
     }
 }
