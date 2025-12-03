@@ -150,6 +150,15 @@ struct ShimmerViewModifier: ViewModifier {
     }
 
     func body(content: Content) -> some View {
+        if #available(watchOS 10.0, *) {
+            shimmerContent(content: content)
+                .focusEffectDisabled(self.isLoading)
+        } else {
+            self.shimmerContent(content: content)
+        }
+    }
+    
+    func shimmerContent(content: Content) -> some View {
         content
             .foregroundColor(self.redactedForegroundColor)
             .redacted(reason: self.isLoading ? .placeholder : [])
@@ -275,6 +284,22 @@ public struct SkeletonLoadingContainer<Content: View>: View {
             .foregroundColor(self.isLoading ? Color.preferredColor(.separator) : nil)
             .redacted(reason: self.isLoading ? .placeholder : [])
             .skeletonLoading(isLoading: self.isLoading, isTintColor: self.isAILoading)
+            .accessibilityElement(children: .combine)
+            .modifier(LoadingAccessibilityModifier(isLoading: self.isLoading))
+    }
+}
+
+/// A view modifier that adds accessibility support for loading state
+private struct LoadingAccessibilityModifier: ViewModifier {
+    let isLoading: Bool
+    
+    func body(content: Content) -> some View {
+        if self.isLoading {
+            content
+                .accessibilityValue(NSLocalizedString("Loading...", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: "Loading..."))
+        } else {
+            content
+        }
     }
 }
 

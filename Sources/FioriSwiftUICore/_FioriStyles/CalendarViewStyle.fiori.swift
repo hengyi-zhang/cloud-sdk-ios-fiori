@@ -137,6 +137,8 @@ public struct CalendarViewBaseStyle: CalendarViewStyle {
                 
                 if configuration.model.calendarStyle == .expandable {
                     CalendarDragView()
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel(Text("Handle to switch from month view to week view".localizedFioriString()))
                         .gesture(
                             DragGesture()
                                 .onChanged { value in
@@ -215,7 +217,10 @@ public struct CalendarViewBaseStyle: CalendarViewStyle {
                     if calendar.compare(date, to: checkRange.upperBound, toGranularity: .day) != .orderedDescending,
                        calendar.compare(date, to: checkRange.lowerBound, toGranularity: .day) != .orderedAscending
                     {
-                        configuration.model.selectedRange = checkRange.lowerBound ... date
+                        let bounds = [checkRange.lowerBound, date].sorted()
+                        if let first = bounds.first, let last = bounds.last {
+                            configuration.model.selectedRange = first ... last
+                        }
                         configuration.model.selectedDate = nil
                     } else {
                         configuration.model.selectedRange = nil
