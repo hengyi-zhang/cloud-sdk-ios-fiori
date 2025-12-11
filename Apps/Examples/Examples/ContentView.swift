@@ -22,9 +22,9 @@ struct ContentView: View {
                     Text("Core Elements")
                 }
                 NavigationLink(
-                    destination: FioriThemeManagerContentView())
+                    destination: HomeView())
                 {
-                    Text("Theme Manager")
+                    Text("HomeView")
                 }
             }
             .navigationBarTitle("Examples")

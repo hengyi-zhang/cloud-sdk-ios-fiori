@@ -155,7 +155,11 @@ public struct FioriButton: View {
             self.createStandardButtonWithProps()
                 .buttonStyle(_ButtonStyleImpl(fioriButtonStyle: self.fioriButtonStyle, label: self.label, image: self.image, imagePosition: self.imagePosition, imageTitleSpacing: self.imageTitleSpacing, isEnabled: self.isEnabled, state: self.state))
                 .overlay(GeometryReader { proxy in
-                    Color.clear.contentShape(Rectangle()).simultaneousGesture(self.createGesture(proxy.size))
+                    if #available(iOS 18, *) {
+                        Color.clear.contentShape(Rectangle()).gesture(createSimultaneousSwipeGesture(proxy.size))
+                    } else {
+                        Color.clear.contentShape(Rectangle()).simultaneousGesture(self.createGesture(proxy.size))
+                    }
                 })
                 .setOnChange(of: self.isSelectionPersistent) {
                     self._state = .normal
@@ -168,6 +172,33 @@ public struct FioriButton: View {
     
     // only handle once when gesture onChanged
     @State private var isHandledDragGestureOnChanged = false
+    
+    @available(iOS 18.0, *)
+    func createSimultaneousSwipeGesture(_ size: CGSize) -> SimultaneousSwipeGesture {
+        let touchArea = CGRect(origin: .zero, size: size).insetBy(dx: 0, dy: -self.touchAreaInset)
+        
+        return SimultaneousSwipeGesture {
+            if !self.isHandledDragGestureOnChanged {
+                self.isHandledDragGestureOnChanged = true
+                self._state = self.state == .normal ? .selected : .normal
+            }
+            print("self.state begin:\(self.state), isHandledDragGestureOnChanged:\(self.isHandledDragGestureOnChanged)")
+//        } onChanged: { _, location in
+//            if !self.isHandledDragGestureOnChanged
+//            {
+//                self.isHandledDragGestureOnChanged = true
+//                self._state = self.state == .normal ? .selected : .normal
+//            }
+//            print("self.state1:\(self.state), isHandledDragGestureOnChanged:\(isHandledDragGestureOnChanged)")
+        } onEnded: {
+            if !self.isSelectionPersistent {
+                self._state = .normal
+            }
+            self.isHandledDragGestureOnChanged = false
+            print("self.state end:\(self.state)")
+            self.action?(self.state)
+        }
+    }
     
     func createGesture(_ size: CGSize) -> some Gesture {
         let touchArea = CGRect(origin: .zero, size: size).insetBy(dx: 0, dy: -self.touchAreaInset)
@@ -205,6 +236,70 @@ public struct FioriButton: View {
                 }
                 self.action?(self.state)
             }
+    }
+}
+
+@available(iOS 18.0, *)
+struct SimultaneousSwipeGesture: UIGestureRecognizerRepresentable {
+    let onBegan: () -> Void
+    let onChanged: (UILongPressGestureRecognizer) -> Void
+    let onEnded: () -> Void
+
+    init(
+        onBegan: @escaping () -> Void = {},
+        onChanged: @escaping (UILongPressGestureRecognizer) -> Void = { _ in },
+        onEnded: @escaping () -> Void = {}
+    ) {
+        self.onBegan = onBegan
+        self.onChanged = onChanged
+        self.onEnded = onEnded
+    }
+    
+    func makeUIGestureRecognizer(context: Context) -> UILongPressGestureRecognizer {
+        let gestureRecognizer = UILongPressGestureRecognizer()
+        gestureRecognizer.minimumPressDuration = 0.0
+        gestureRecognizer.allowableMovement = CGFloat.greatestFiniteMagnitude
+        gestureRecognizer.delegate = context.coordinator
+        return gestureRecognizer
+    }
+    
+    func handleUIGestureRecognizerAction(_ recognizer: UILongPressGestureRecognizer, context: Context) {
+        switch recognizer.state {
+        case .began:
+            self.onBegan()
+            self.onChanged(recognizer)
+        case .changed:
+            self.onChanged(recognizer)
+        
+        case .ended, .cancelled:
+            self.onEnded()
+        
+        default:
+            break
+        }
+    }
+    
+    func updateUIGestureRecognizer(_ recognizer: UILongPressGestureRecognizer, context: Context) {
+        // No updates needed
+    }
+    
+    func makeCoordinator(converter: CoordinateSpaceConverter) -> Coordinator {
+        Coordinator()
+    }
+    
+    class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        func gestureRecognizer(
+            _ recognizer: UIGestureRecognizer,
+            shouldRecognizeSimultaneouslyWith otherRecognizer: UIGestureRecognizer
+        ) -> Bool {
+            true
+        }
+        
+        // Optional: Add conditions to fail early if needed
+        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            // Add any conditions here to fail early if the gesture is invalid
+            true
+        }
     }
 }
 
