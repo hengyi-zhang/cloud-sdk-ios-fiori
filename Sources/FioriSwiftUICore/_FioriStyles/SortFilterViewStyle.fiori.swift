@@ -14,56 +14,41 @@ import SwiftUI
 // Base Layout style
 public struct SortFilterViewBaseStyle: SortFilterViewStyle {
     @StateObject var context: SortFilterContext = .init()
-    @State var size: CGSize = .zero
     @Environment(\.dismiss) var dismiss
     @Environment(\.sortFilterBarItemFrame) var sortFilterBarItemFrame
 
     public func makeBody(_ configuration: SortFilterViewConfiguration) -> some View {
         // Add default layout here
-        CancellableResettableDialogNavigationForm {
+        CancellableResettableDialogNavigationForm(calculateScrollView: true, title: {
             configuration.title
-        } cancelAction: {
+        }, cancelAction: {
             configuration.cancelAction
                 .onSimultaneousTapGesture {
                     self.context.handleCancel?()
                     configuration.onCancel?()
                     self.dismiss()
                 }
-        } resetAction: {
+        }, resetAction: {
             configuration.resetAction
                 .onSimultaneousTapGesture {
                     self.context.handleReset?()
                     configuration.onReset?()
                 }
                 .environment(\.isEnabled, self.context.isResetButtonEnabled)
-        } applyAction: {
+        }, applyAction: {
             configuration.applyAction
                 .onSimultaneousTapGesture {
                     self.context.handleApply?()
                     configuration.onUpdate?()
                     self.dismiss()
                 }
-        } components: {
+        }, components: {
             SortFilterCFGItemContainer(items: configuration.$items, btnFrame: self.sortFilterBarItemFrame)
-                .sizeReader(size: { s in
-                    if self.size != s {
-                        self.size = s
-                    }
-                })
                 .environmentObject(self.context)
-        }
-        #if !os(visionOS)
-        .frame(minWidth: UIDevice.current.userInterfaceIdiom != .phone ? 393.0 : nil)
-        #else
-        .frame(minWidth: 480.0)
+        })
+        #if os(visionOS)
         .background(Color.clear)
         #endif
-        .frame(height: UIDevice.current.userInterfaceIdiom != .phone ? self.size.height + self.additionHeight() : nil)
-        .presentationDetents([.large])
-    }
-    
-    func additionHeight() -> CGFloat {
-        self.context.isPickerListShown ? (self.context.isSearchBarHidden ? 68 : (self.context.isKeyboardShown ? 100 : 120)) : 120
     }
 }
 
@@ -90,19 +75,18 @@ extension SortFilterViewFioriStyle {
 
         func makeBody(_ configuration: CancelActionConfiguration) -> some View {
             CancelAction(configuration)
-                // Add default style for CancelAction
-                .fioriButtonStyle(SortFilterCancelButtonStyle())
+                .fioriButtonStyle(FioriNavigationButtonStyle())
         }
     }
 
     struct ApplyActionFioriStyle: ApplyActionStyle {
         let sortFilterViewConfiguration: SortFilterViewConfiguration
         @Environment(\.isEnabled) private var isEnabled
-        
+        @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
         func makeBody(_ configuration: ApplyActionConfiguration) -> some View {
             ApplyAction(configuration)
-                // Add default style for ApplyAction
-                .fioriButtonStyle(SortFilterApplyButtonStyle(self.isEnabled))
+                .fioriButtonStyle(SortFilterApplyButtonStyle(self.isEnabled, self.horizontalSizeClass))
         }
     }
 
@@ -112,8 +96,7 @@ extension SortFilterViewFioriStyle {
 
         func makeBody(_ configuration: ResetActionConfiguration) -> some View {
             ResetAction(configuration)
-                // Add default style for ResetAction
-                .fioriButtonStyle(SortFilterResetButtonStyle(self.isEnabled))
+                .fioriButtonStyle(FioriNavigationButtonStyle())
         }
     }
 }
@@ -138,9 +121,11 @@ struct SortFilterCancelButtonStyle: FioriButtonStyle {
 
 struct SortFilterApplyButtonStyle: FioriButtonStyle {
     let isEnabled: Bool
+    let horizontalSizeClass: UserInterfaceSizeClass?
     
-    init(_ isEnabled: Bool) {
+    init(_ isEnabled: Bool, _ horizontalSizeClass: UserInterfaceSizeClass? = nil) {
         self.isEnabled = isEnabled
+        self.horizontalSizeClass = horizontalSizeClass
     }
     
     func makeBody(configuration: Configuration) -> some View {
@@ -158,11 +143,11 @@ struct SortFilterApplyButtonStyle: FioriButtonStyle {
                                               backgroundColor: background,
                                               font: .fiori(forTextStyle: .body, weight: .semibold),
                                               padding: EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0),
-                                              maxWidth: UIDevice.current.userInterfaceIdiom != .phone ? 393 - 13 * 2 :
-                                                  Screen.bounds.size.width - 16 * 2)
+                                              maxWidth: .infinity)
         return configuration.containerView(.unspecified)
             .fioriButtonConfiguration(config)
-            .padding([.top], UIDevice.current.userInterfaceIdiom != .phone ? 16 : 6)
+            .padding([.top], self.horizontalSizeClass == .regular ? 16 : 6)
+            .padding(.horizontal, self.horizontalSizeClass == .regular ? 13 : 16)
     }
 }
 

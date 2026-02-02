@@ -11,6 +11,7 @@ struct BannerMessageCustomInitExample: View {
     @State var isCustomStyle: Bool = false
     @State var headerSelection: BannerHeader = .object
     @State var showAINotice: Bool = false
+    @State var alignment: Int = 0
        
     let customColor = Color.preferredColor(.blue7)
     
@@ -37,7 +38,7 @@ struct BannerMessageCustomInitExample: View {
             }, label: {
                 Image(systemName: "xmark")
             })
-        }, messageType: self.showAINotice ? .aiNotice : .negative)
+        }, alignment: self.alignment == 1 ? .center : .leading, messageType: self.showAINotice ? .aiNotice : .negative)
             .ifApply(self.isCustomStyle, content: { v in
                 v.topDividerStyle { c in
                     c.topDivider.background(self.customColor)
@@ -93,6 +94,10 @@ struct BannerMessageCustomInitExample: View {
                     .alignmentGuide(.listRowSeparatorLeading, computeValue: { _ in
                         0
                     })
+                Picker("Alignment", selection: self.$alignment) {
+                    Text("Leading").tag(0)
+                    Text("Center").tag(1)
+                }
             } header: {}
         }.listStyle(.plain)
             .navigationTitle("Custom Creation")
@@ -111,6 +116,8 @@ struct BannerMessageCustomInitExample: View {
     var objectHeader: some View {
         ObjectHeader(title: {
             Text("Inspect Electric Pump Motor Long Job Title Example Wrapping Two Lines")
+                .lineLimit(11)
+                .minimumScaleFactor(0.1)
         }, subtitle: {
             Text("Job 819701")
         }, tags: {
@@ -134,9 +141,11 @@ struct BannerMessageCustomInitExample: View {
         }, descriptionText: {
             Text("Temperature sensor predicts overheating failure in 4 days Urgent and needs attention sensor predicts overheating failure in 4 days Urgent and need attention.")
         }, status: {
-            Image(systemName: "exclamationmark.square.fill").foregroundColor(.preferredColor(.negativeLabel))
+            Image(systemName: "exclamationmark.square.fill").foregroundColor(.preferredColor(.negativeLabel)).accessibilityLabel("Warning")
         }, substatus: {
             Text("High Priority")
+                .lineLimit(2)
+                .minimumScaleFactor(0.1)
         }, detailImage: {
             Image("productThumbnail").resizable()
         }, detailContent: {

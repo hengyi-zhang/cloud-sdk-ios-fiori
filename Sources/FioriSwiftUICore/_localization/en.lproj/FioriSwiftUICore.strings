@@ -289,6 +289,9 @@
 /* XMSG: banner message type desc, offline */
 "offline" = "offline";
 
+/* XMSG: information view style type, success */
+"success" = "success";
+
 /* XBUT: Reset action of filter feedback bar, see https://experience.sap.com/fiori-design-ios/article/filter-feedback-bar/#behavior-and-interaction */
 "Reset" = "Reset";
 /* XBUT: Apply action of filter feedback bar, see https://experience.sap.com/fiori-design-ios/article/filter-feedback-bar/#behavior-and-interaction */
@@ -435,6 +438,12 @@
 
 /* XACT: The accessibility hint for add button */
 "Double tap to add attachment" = "Double tap to add attachment";
+
+/* XMSG: attachment section add new file successfully announcement */
+"New attachment added successfully" = "New attachment added successfully";
+
+/* XMSG: attachment section add new file failed announcement */
+"File failed to attach" = "File failed to attach";
 
 /* XACT: The accessibility hint for attachment section */
 "read only" = "read only";
@@ -671,3 +680,23 @@
 
 /* XMSG: end date, used in DateRangePickerPopView */
 "End Date" = "End Date";
+
+/* XBUT: title for picker form cell to open */
+"DoubleTapToOpenKey" = "Double tap to open";
+
+/* XBUT: title for picker form cell to collapse */
+"DoubleTapToCollapseKey" = "Double tap to collapse";
+
+/*XTIT: On state for switch*/
+"Switch On" = "On";
+
+/*XTIT: Off state for switch*/
+"Switch Off" = "Off";
+/* Checkout Indicator accessibility label: failed */
+"failed" = "failed";
+
+/* Checkout Indicator accessibility label: AI processing */
+"AI processing" = "AI processing";
+
+/* Checkout Indicator accessibility label: Checkout Indicator */
+"Checkout Indicator" = "Checkout Indicator";

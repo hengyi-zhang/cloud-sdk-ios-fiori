@@ -29,6 +29,7 @@ public struct CardBaseStyle: CardStyle {
                 if !configuration._cardHeader.isEmpty {
                     configuration._cardHeader
                         .padding(EdgeInsets(top: 0, leading: 0, bottom: 6, trailing: 0))
+                        .accessibility(sortPriority: 3)
                 } else {
                     Spacer().frame(width: 1, height: 10)
                 }
@@ -36,6 +37,7 @@ public struct CardBaseStyle: CardStyle {
                 if !configuration.cardBody.isEmpty {
                     configuration.cardBody
                         .padding(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                        .accessibility(sortPriority: 2)
                 }
                 
                 if !(configuration._cardFooter.action.isEmpty && configuration._cardFooter.secondaryAction.isEmpty &&
@@ -1326,7 +1328,7 @@ public enum CardSkeletonLoadingPattern {
     public static let multipleLineCard = Card {
         Text("Title text for loading")
     } subtitle: {
-        Text("Subtitle text that goes to multiple lines")
+        Text("Subtitle text that goes to multiple lines").lineLimit(nil)
     } detailImage: {
         Image("ProfilePic")
     } headerAction: {
@@ -1344,6 +1346,9 @@ public enum CardSkeletonLoadingPattern {
                                          headerAction: FioriButton(title: "..."),
                                          tertiaryAction: FioriButton(title: "Tertiary"),
                                          overflowAction: FioriButton(title: "Overflow"))
+        .subtitleStyle { conf in
+            conf.subtitle.lineLimit(nil)
+        }.typeErased
 }
 
 #Preview {
