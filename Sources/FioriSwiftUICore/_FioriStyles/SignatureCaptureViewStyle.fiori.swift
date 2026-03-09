@@ -111,16 +111,17 @@ public struct SignatureCaptureViewBaseStyle: SignatureCaptureViewStyle {
                     Spacer()
                 }
                 .padding(.vertical, 11)
-                configuration.cancelAction
-                    .simultaneousGesture(
-                        TapGesture()
-                            .onEnded { _ in
-                                self.clear()
-                                self.isEditing = false
-                            }
-                    )
-                    .frame(minWidth: 44, minHeight: 44)
-                    .setHidden(!self.isEditing)
+                if self.isEditing {
+                    configuration.cancelAction
+                        .simultaneousGesture(
+                            TapGesture()
+                                .onEnded { _ in
+                                    self.clear()
+                                    self.isEditing = false
+                                }
+                        )
+                        .frame(minWidth: 44, minHeight: 44)
+                }
             }
             .frame(minHeight: 44)
             
@@ -267,17 +268,20 @@ public struct SignatureCaptureViewBaseStyle: SignatureCaptureViewStyle {
                     .accessibilityElement()
                     .accessibilityLabel(NSLocalizedString("Signature Area", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: "Signature Area"))
                     .accessibilityHint(NSLocalizedString("Double tap and drag to sign", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: "Double tap and drag to sign"))
+                    .accessibilitySortPriority(1)
                 HStack(alignment: .bottom) {
                     configuration.xmark
-                    Rectangle()
-                        .foregroundColor(configuration.signatureLineColor)
-                        .frame(height: 1)
-                        .setHidden(configuration.hidesSignatureLine)
+                    if !configuration.hidesSignatureLine {
+                        Rectangle()
+                            .foregroundColor(configuration.signatureLineColor)
+                            .frame(height: 1)
+                    }
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(NSLocalizedString("Signature Line", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: "Signature Line"))
                 .padding([.leading, .trailing]).padding(.bottom, 48)
             }
+            .accessibilityElement(children: .contain)
         } else {
             ZStack(alignment: .bottom) {
                 ZStack {
@@ -295,14 +299,14 @@ public struct SignatureCaptureViewBaseStyle: SignatureCaptureViewStyle {
                 }
                 .frame(maxWidth: .infinity, minHeight: 256, maxHeight: configuration.drawingViewMaxHeight)
                 HStack(alignment: .bottom) {
-                    configuration.xmark
-                    Rectangle()
-                        .foregroundColor(configuration.signatureLineColor.opacity(0.4))
-                        .frame(height: 1)
-                        .setHidden(configuration.hidesSignatureLine)
+                    configuration.xmark.opacity(0.4)
+                    if !configuration.hidesSignatureLine {
+                        Rectangle()
+                            .foregroundColor(configuration.signatureLineColor.opacity(0.4))
+                            .frame(height: 1)
+                    }
                 }
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(NSLocalizedString("Signature Line", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: "Signature Line"))
+                .accessibilityHidden(true)
                 .padding([.leading, .trailing]).padding(.bottom, 48)
             }
         }
@@ -342,7 +346,7 @@ extension SignatureCaptureViewFioriStyle {
         
         func makeBody(_ configuration: StartSignatureActionConfiguration) -> some View {
             StartSignatureAction(configuration)
-                .fioriButtonStyle(FioriTertiaryButtonStyle())
+                .fioriButtonStyle(SignatureButtonStyle())
         }
     }
     
@@ -351,7 +355,7 @@ extension SignatureCaptureViewFioriStyle {
         
         func makeBody(_ configuration: ReenterSignatureActionConfiguration) -> some View {
             ReenterSignatureAction(configuration)
-                .fioriButtonStyle(FioriTertiaryButtonStyle())
+                .fioriButtonStyle(SignatureButtonStyle())
         }
     }
     
@@ -360,7 +364,7 @@ extension SignatureCaptureViewFioriStyle {
         
         func makeBody(_ configuration: CancelActionConfiguration) -> some View {
             CancelAction(configuration)
-                .fioriButtonStyle(FioriTertiaryButtonStyle())
+                .fioriButtonStyle(SignatureButtonStyle())
         }
     }
     
@@ -369,7 +373,7 @@ extension SignatureCaptureViewFioriStyle {
         
         func makeBody(_ configuration: ClearActionConfiguration) -> some View {
             ClearAction(configuration)
-                .fioriButtonStyle(FioriTertiaryButtonStyle())
+                .fioriButtonStyle(SignatureButtonStyle())
         }
     }
     
@@ -378,7 +382,7 @@ extension SignatureCaptureViewFioriStyle {
         
         func makeBody(_ configuration: SaveActionConfiguration) -> some View {
             SaveAction(configuration)
-                .fioriButtonStyle(FioriTertiaryButtonStyle())
+                .fioriButtonStyle(SignatureButtonStyle())
         }
     }
     
@@ -400,5 +404,15 @@ extension SignatureCaptureViewFioriStyle {
                 .font(.fiori(forTextStyle: .caption1))
                 .foregroundStyle(Color.preferredColor(.tertiaryLabel))
         }
+    }
+}
+
+struct SignatureButtonStyle: FioriButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        let color = configuration.state == .highlighted ? Color.preferredColor(.tintColorTapState) : configuration.state == .disabled ? Color.preferredColor(.separator) : Color.preferredColor(.tintColor)
+        return configuration.label
+            .font(.fiori(forTextStyle: .body))
+            .fontWeight(.semibold)
+            .foregroundStyle(color)
     }
 }
