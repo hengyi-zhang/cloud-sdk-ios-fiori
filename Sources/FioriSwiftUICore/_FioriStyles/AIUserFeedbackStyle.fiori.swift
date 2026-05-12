@@ -2,6 +2,8 @@ import FioriThemeManager
 import Foundation
 import SwiftUI
 
+// swiftlint:disable file_length
+
 /// AIUserFeedback display mode
 public enum AIUserFeedbackDisplayMode {
     /// AIUserFeedback is pushed in from a navigation stack.
@@ -39,11 +41,14 @@ public enum AIUserFeedbackVoteState {
 public struct AIUserFeedbackBaseStyle: AIUserFeedbackStyle {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Environment(\.dismiss) private var dismiss
-    
     @State var shouldShowFeedbackDetail = false
     @State var submitRequestFailed = false
     @Environment(\.isSubmitRequestFailed) var isSubmitRequestFailed
     @Environment(\.disableMultipleVoteForAIUserFeedback) var disableMultipleVoteForAIUserFeedback
+    @Environment(\.filterFormViewTitleStyle) private var filterFormViewTitleStyle
+    @Environment(\.keyValueFormViewTitleStyle) private var keyValueFormViewTitleStyle
+    @Environment(\.illustratedMessageTitleStyle) private var illustratedMessageTitleStyle
+    @Environment(\.illustratedMessageDescriptionStyle) private var illustratedMessageDescriptionStyle
     @State var inlineFeedbackIsPresented: Bool = false
     
     /// Indicates if the submit button has been shown.
@@ -117,7 +122,7 @@ public struct AIUserFeedbackBaseStyle: AIUserFeedbackStyle {
                 }
             }
             .onChange(of: configuration.voteState) {
-                if configuration.voteState == .downVote {
+                if configuration.voteState == .downVote, configuration.action.isEmpty {
                     self.isShowSubmitButton = true
                 }
                 self.shouldApplyDetentHeight = true
@@ -160,6 +165,7 @@ public struct AIUserFeedbackBaseStyle: AIUserFeedbackStyle {
             ScrollView {
                 if self.isShowFailedView() {
                     self.defaultErrorView(configuration)
+                        .frame(maxWidth: .infinity)
                         .padding(.top, 20)
                         .padding(.bottom, 16)
                         .fixedSize(horizontal: false, vertical: true)
@@ -177,6 +183,9 @@ public struct AIUserFeedbackBaseStyle: AIUserFeedbackStyle {
                     VStack {
                         VStack {
                             self.illustratedMessage(configuration)
+                                .titleStyle(self.illustratedMessageTitleStyle)
+                                .descriptionStyle(self.illustratedMessageDescriptionStyle)
+                                .typeErased
                                 .frame(maxWidth: .infinity)
                             
                             if self.shouldShowFeedbackDetail {
@@ -269,10 +278,14 @@ public struct AIUserFeedbackBaseStyle: AIUserFeedbackStyle {
     func feedbackDetailView(_ configuration: AIUserFeedbackConfiguration) -> some View {
         if configuration.filterFormView != nil {
             configuration.filterFormView
+                .titleStyle(self.filterFormViewTitleStyle)
+                .typeErased
                 .padding(.bottom, 15)
         }
         if configuration.keyValueFormView != nil {
             configuration.keyValueFormView
+                .titleStyle(self.keyValueFormViewTitleStyle)
+                .typeErased
         }
     }
     
@@ -286,8 +299,10 @@ public struct AIUserFeedbackBaseStyle: AIUserFeedbackStyle {
                 }
                 .accessibilityLabel(self.accessibilityLabel(label: "Negative feedback".localizedFioriString(), selected: configuration.voteState == .downVote))
         } else {
+            // If host supplied a custom action view, do NOT implicitly run component internal logic.
+            // Instead, expose to the custom view an action context via environment values so the host can opt-in to call component helpers (downvote/upvote/submit)
             configuration.action
-                .onSimultaneousTapGesture {
+                .environment(\.aiUserFeedbackPerformDownVote) {
                     self.downvoteAction(configuration)
                 }
         }
@@ -299,7 +314,7 @@ public struct AIUserFeedbackBaseStyle: AIUserFeedbackStyle {
             self.inlineFeedbackIsPresented.toggle()
         }
         self.cachedLastVoteState = configuration.voteState
-        configuration.voteState = .downVote
+        configuration.voteState = self.cachedLastVoteState == .downVote ? .notDetermined : .downVote
         self.shouldShowFeedbackDetail = true
         self.isShowSubmitButton = true
         configuration.onDownVote?()
@@ -317,9 +332,14 @@ public struct AIUserFeedbackBaseStyle: AIUserFeedbackStyle {
                 }
                 .accessibilityLabel(self.accessibilityLabel(label: "Positive feedback".localizedFioriString(), selected: configuration.voteState == .upVote))
         } else {
+            // Host-supplied view: do not call any internal helpers implicitly.
+            // Provide helper closures to the host via environment so they can opt-in.
             configuration.secondaryAction
-                .onSimultaneousTapGesture {
+                .environment(\.aiUserFeedbackPerformUpVote) {
                     self.upvoteAction(configuration)
+                }
+                .environment(\.aiUserFeedbackPerformSubmit) {
+                    self.onSubmitAction(configuration)
                 }
         }
     }
@@ -327,7 +347,7 @@ public struct AIUserFeedbackBaseStyle: AIUserFeedbackStyle {
     func upvoteAction(_ configuration: AIUserFeedbackConfiguration) {
         guard !self.disableMultipleVoteForAIUserFeedback else { return }
         self.cachedLastVoteState = configuration.voteState
-        configuration.voteState = .upVote
+        configuration.voteState = self.cachedLastVoteState == .upVote ? .notDetermined : .upVote
         configuration.onUpVote?()
     }
     
@@ -437,8 +457,8 @@ public struct AIUserFeedbackBaseStyle: AIUserFeedbackStyle {
     }
     
     private func accessibilityLabel(label: String, selected: Bool) -> String {
-        var accLabel = selected ? "selected".localizedFioriString() : "enabled".localizedFioriString()
-        accLabel += ", " + label
+        var accLabel = selected ? "selected".localizedFioriString() + ", " : ""
+        accLabel += label
         return accLabel
     }
     
@@ -579,5 +599,172 @@ public extension View {
     /// - Returns: A new view with multiple vote is disabled or not in `AIUserFeedback`.
     func disableMultipleVoteForAIUserFeedback(_ disabled: Bool) -> some View {
         self.environment(\.disableMultipleVoteForAIUserFeedback, disabled)
+    }
+}
+
+public extension View {
+    /// :nodoc:
+    func illustratedMessageTitleStyle(_ style: some TitleStyle) -> some View {
+        self.transformEnvironment(\.illustratedMessageTitleStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+    
+    /// :nodoc:
+    func illustratedMessageTitleStyle(@ViewBuilder content: @escaping (TitleConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.illustratedMessageTitleStyleStack) { stack in
+            let style = AnyTitleStyle(content)
+            stack.append(style)
+        }
+    }
+    
+    /// :nodoc:
+    func illustratedMessageDescriptionStyle(_ style: some DescriptionStyle) -> some View {
+        self.transformEnvironment(\.illustratedMessageDescriptionStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+    
+    /// :nodoc:
+    func illustratedMessageDescriptionStyle(@ViewBuilder content: @escaping (DescriptionConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.illustratedMessageDescriptionStyleStack) { stack in
+            let style = AnyDescriptionStyle(content)
+            stack.append(style)
+        }
+    }
+    
+    /// :nodoc:
+    func filterFormViewTitleStyle(_ style: some TitleStyle) -> some View {
+        self.transformEnvironment(\.filterFormViewTitleStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+    
+    /// :nodoc:
+    func filterFormViewTitleStyle(@ViewBuilder content: @escaping (TitleConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.filterFormViewTitleStyleStack) { stack in
+            let style = AnyTitleStyle(content)
+            stack.append(style)
+        }
+    }
+    
+    /// :nodoc:
+    func keyValueFormViewTitleStyle(_ style: some TitleStyle) -> some View {
+        self.transformEnvironment(\.keyValueFormViewTitleStyleStack) { stack in
+            stack.append(style)
+        }
+    }
+    
+    /// :nodoc:
+    func keyValueFormViewTitleStyle(@ViewBuilder content: @escaping (TitleConfiguration) -> some View) -> some View {
+        self.transformEnvironment(\.keyValueFormViewTitleStyleStack) { stack in
+            let style = AnyTitleStyle(content)
+            stack.append(style)
+        }
+    }
+}
+
+// Expose lightweight action helpers to host-supplied custom action views via environment.
+// Hosts can optionally call these closures/bindings if they want the component's internal behavior (e.g. showing submit button, handling inline presentation, calling onDownVote/onUpVote) to run.
+// Important: the component will NOT implicitly call internal helpers when a custom action view is supplied; this lets hosts decide behavior.
+struct AIUserFeedbackPerformDownVoteKey: EnvironmentKey {
+    static let defaultValue: (() -> Void)? = nil
+}
+
+struct AIUserFeedbackPerformUpVoteKey: EnvironmentKey {
+    static let defaultValue: (() -> Void)? = nil
+}
+
+struct AIUserFeedbackPerformSubmitKey: EnvironmentKey {
+    static let defaultValue: (() -> Void)? = nil
+}
+
+struct IllustratedMessageTitleStyleStackKey: EnvironmentKey {
+    static let defaultValue: [any TitleStyle] = []
+}
+
+struct IllustratedMessageDescriptionStyleStackKey: EnvironmentKey {
+    static let defaultValue: [any DescriptionStyle] = []
+}
+
+struct FilterFormViewTitleStyleStackKey: EnvironmentKey {
+    static let defaultValue: [any TitleStyle] = []
+}
+
+struct KeyValueFormViewTitleStyleStackKey: EnvironmentKey {
+    static let defaultValue: [any TitleStyle] = []
+}
+
+extension EnvironmentValues {
+    /// A closure to perform the down vote action for custom `AIUserFeedback` action views.
+    ///
+    /// When providing a custom action view to `AIUserFeedback`, the component does not automatically perform internal down vote logic.
+    /// This environment value exposes a closure that custom views can call to trigger the component's down vote behavior,
+    /// including updating the vote state, showing feedback details, and invoking the `onDownVote` callback.
+    ///
+    /// - Note: This value is only available when used within a custom action view of `AIUserFeedback`.
+    public var aiUserFeedbackPerformDownVote: (() -> Void)? {
+        get { self[AIUserFeedbackPerformDownVoteKey.self] }
+        set { self[AIUserFeedbackPerformDownVoteKey.self] = newValue }
+    }
+    
+    /// A closure to perform the up vote action for custom `AIUserFeedback` action views.
+    ///
+    /// When providing a custom secondary action view to `AIUserFeedback`, the component does not automatically perform internal up vote logic.
+    /// This environment value exposes a closure that custom views can call to trigger the component's up vote behavior,
+    /// including updating the vote state and invoking the `onUpVote` callback.
+    ///
+    /// - Note: This value is only available when used within a custom secondary action view of `AIUserFeedback`.
+    public var aiUserFeedbackPerformUpVote: (() -> Void)? {
+        get { self[AIUserFeedbackPerformUpVoteKey.self] }
+        set { self[AIUserFeedbackPerformUpVoteKey.self] = newValue }
+    }
+    
+    /// A closure to perform the submit action for custom `AIUserFeedback` action views.
+    ///
+    /// When providing custom action or submit views to `AIUserFeedback`, the component does not automatically perform internal submission logic.
+    /// This environment value exposes a closure that custom views can call to trigger the component's submit behavior,
+    /// including gathering form data, invoking the `onSubmit` callback, and handling dismissal or error states.
+    ///
+    /// - Note: This value is only available when used within custom action or submit action views of `AIUserFeedback`.
+    public var aiUserFeedbackPerformSubmit: (() -> Void)? {
+        get { self[AIUserFeedbackPerformSubmitKey.self] }
+        set { self[AIUserFeedbackPerformSubmitKey.self] = newValue }
+    }
+    
+    var illustratedMessageTitleStyle: any TitleStyle {
+        self.illustratedMessageTitleStyleStack.last ?? .base
+    }
+
+    var illustratedMessageTitleStyleStack: [any TitleStyle] {
+        get { self[IllustratedMessageTitleStyleStackKey.self] }
+        set { self[IllustratedMessageTitleStyleStackKey.self] = newValue }
+    }
+    
+    var illustratedMessageDescriptionStyle: any DescriptionStyle {
+        self.illustratedMessageDescriptionStyleStack.last ?? .base
+    }
+
+    var illustratedMessageDescriptionStyleStack: [any DescriptionStyle] {
+        get { self[IllustratedMessageDescriptionStyleStackKey.self] }
+        set { self[IllustratedMessageDescriptionStyleStackKey.self] = newValue }
+    }
+    
+    var filterFormViewTitleStyle: any TitleStyle {
+        self.filterFormViewTitleStyleStack.last ?? .base
+    }
+
+    var filterFormViewTitleStyleStack: [any TitleStyle] {
+        get { self[FilterFormViewTitleStyleStackKey.self] }
+        set { self[FilterFormViewTitleStyleStackKey.self] = newValue }
+    }
+    
+    var keyValueFormViewTitleStyle: any TitleStyle {
+        self.keyValueFormViewTitleStyleStack.last ?? .base
+    }
+    
+    var keyValueFormViewTitleStyleStack: [any TitleStyle] {
+        get { self[KeyValueFormViewTitleStyleStackKey.self] }
+        set { self[KeyValueFormViewTitleStyleStackKey.self] = newValue }
     }
 }

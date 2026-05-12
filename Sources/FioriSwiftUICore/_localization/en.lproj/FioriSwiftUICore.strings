@@ -607,6 +607,9 @@
 /* XMSG: Drag tips in .expandable style, used in voiceOver in calendar view */
 "Handle to switch from month view to week view" = "Handle to switch from month view to week view";
 
+/* XMSG: Accessibility label for card container */
+"Card" = "Card";
+
 /*XTIT: Title for card*/
 "Card title" = "Card title";
 
@@ -700,3 +703,6 @@
 
 /* Checkout Indicator accessibility label: Checkout Indicator */
 "Checkout Indicator" = "Checkout Indicator";
+
+/*XMSG: More tag text shown when tags are truncated in MHStack, %d is the count of hidden tags */
+"+%d more" = "+%d more";

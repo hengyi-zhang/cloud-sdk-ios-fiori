@@ -15,9 +15,10 @@ public struct FilterFormViewBaseStyle: FilterFormViewStyle {
     @Environment(\.filterFormOptionsItemSpacing) var filterFormOptionsItemSpacing
     @Environment(\.filterFormOptionsLineSpacing) var filterFormOptionsLineSpacing
     @Environment(\.filterFormOptionMinTouchHeight) var filterFormOptionMinTouchHeight
-    @Environment(\.filterFormOptionCornerRadius) var filterFormOptionCornerRadius
+    @Environment(\.resolvedFilterFormOptionShape) var resolvedFilterFormOptionShape
     @Environment(\.filterFormOptionPadding) var filterFormOptionPadding
     @Environment(\.filterFormOptionTitleSpacing) var filterFormOptionTitleSpacing
+    @Environment(\.filterFormViewButtonSize) var customizedButtonSize
     
     private var filterFormOptionDefaultAttributes: [FilterFormOptionState: [NSAttributedString.Key: Any]] = [
         .enabledUnselected: [
@@ -96,9 +97,17 @@ public struct FilterFormViewBaseStyle: FilterFormViewStyle {
             }
     }
     
+    func buttonSize(_ configuration: FilterFormViewConfiguration) -> FilterButtonSize {
+        if let customizedButtonSize {
+            customizedButtonSize
+        } else {
+            configuration.buttonSize
+        }
+    }
+    
     @ViewBuilder
     func FilterFormViewLayoutView(_ configuration: FilterFormViewConfiguration, dynamicTypeSize: DynamicTypeSize, horizontalSizeClass: UserInterfaceSizeClass?) -> some View {
-        FilterFormViewLayout(buttonSize: configuration.buttonSize, dynamicTypeSize: dynamicTypeSize, horizontalSizeClass: horizontalSizeClass, filterFormOptionsItemSpacing: self.filterFormOptionsItemSpacing, filterFormOptionsLineSpacing: self.filterFormOptionsLineSpacing) {
+        FilterFormViewLayout(buttonSize: self.buttonSize(configuration), dynamicTypeSize: dynamicTypeSize, horizontalSizeClass: horizontalSizeClass, filterFormOptionsItemSpacing: self.filterFormOptionsItemSpacing, filterFormOptionsLineSpacing: self.filterFormOptionsLineSpacing) {
             ForEach(configuration.options.indices, id: \.self) { index in
                 let isSelected = configuration.value.contains(index)
                 let option = configuration.options[index]
@@ -110,16 +119,16 @@ public struct FilterFormViewBaseStyle: FilterFormViewStyle {
                             configuration.checkmarkImage
                         }
                         Text(option)
-                            .lineLimit(1)
+                            .lineLimit(configuration.numberOfLines)
                     })
                     .opacity(0)
-                    
+
                     HStack(alignment: .center, spacing: self.filterFormOptionTitleSpacing, content: {
                         if isSelected, !configuration.checkmarkImage.isEmpty {
                             configuration.checkmarkImage
                         }
                         Text(option)
-                            .lineLimit(1)
+                            .lineLimit(configuration.numberOfLines)
                     })
                 }
                 .padding(self.filterFormOptionPadding)
@@ -128,10 +137,13 @@ public struct FilterFormViewBaseStyle: FilterFormViewStyle {
                 .frame(minHeight: self.filterFormOptionMinHeight)
                 .frame(maxWidth: .infinity) // set maxWidth with .infinity can make the view use the proposal size
                 .background(self.optionsAttributesColor(isSelected, isEnabled: configuration.isEnabled, key: .backgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: self.filterFormOptionCornerRadius))
+                .optionClipShape(self.resolvedFilterFormOptionShape)
                 .overlay {
-                    RoundedRectangle(cornerRadius: self.filterFormOptionCornerRadius)
-                        .stroke(self.optionsAttributesColor(isSelected, isEnabled: configuration.isEnabled, key: .strokeColor), lineWidth: self.optionsStrokeWidth(isSelected, isEnabled: configuration.isEnabled))
+                    self.optionStrokeOverlay(
+                        shape: self.resolvedFilterFormOptionShape,
+                        color: self.optionsAttributesColor(isSelected, isEnabled: configuration.isEnabled, key: .strokeColor),
+                        lineWidth: self.optionsStrokeWidth(isSelected, isEnabled: configuration.isEnabled)
+                    )
                 }
                 .frame(minHeight: self.filterFormOptionMinTouchHeight)
                 .contentShape(Rectangle())
@@ -149,6 +161,18 @@ public struct FilterFormViewBaseStyle: FilterFormViewStyle {
         }
         .sizeReader { size in
             self.optionsContainerWidth = size.width
+        }
+    }
+    
+    @ViewBuilder
+    func optionStrokeOverlay(shape: FilterFormOptionShape, color: Color, lineWidth: CGFloat) -> some View {
+        switch shape {
+        case .roundedRectangle(let cornerRadius):
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(color, lineWidth: lineWidth)
+        case .capsule:
+            Capsule()
+                .stroke(color, lineWidth: lineWidth)
         }
     }
     
@@ -234,6 +258,20 @@ public struct FilterFormViewBaseStyle: FilterFormViewStyle {
     }
 }
 
+// MARK: - Shape Helper
+
+private extension View {
+    @ViewBuilder
+    func optionClipShape(_ shape: FilterFormOptionShape) -> some View {
+        switch shape {
+        case .roundedRectangle(let cornerRadius):
+            self.clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+        case .capsule:
+            self.clipShape(Capsule())
+        }
+    }
+}
+
 // Default fiori styles
 extension FilterFormViewFioriStyle {
     struct ContentFioriStyle: FilterFormViewStyle {
@@ -246,11 +284,14 @@ extension FilterFormViewFioriStyle {
 
     struct TitleFioriStyle: TitleStyle {
         let filterFormViewConfiguration: FilterFormViewConfiguration
+        @Environment(\.filterFormViewTitleStyle) private var filterFormViewTitleStyle
 
         func makeBody(_ configuration: TitleConfiguration) -> some View {
             Title(configuration)
+                .titleStyle(self.filterFormViewTitleStyle)
                 .font(.fiori(forTextStyle: .subheadline, weight: .semibold))
                 .foregroundStyle(Color.preferredColor(self.filterFormViewConfiguration.isEnabled ? .primaryLabel : .quaternaryLabel))
+                .typeErased
         }
     }
 
@@ -336,34 +377,42 @@ private struct FilterFormViewLayout: Layout {
         
         var maxWidth = 0.0
         var hasMoreLines = false
-        
-        var lastItemRect: CGRect = .zero
+
+        var rowOriginY = 0.0
+        var rowMaxHeight = 0.0
+        var rowCurrentX = 0.0
         for index in cache.columns.indices {
             var rect = cache.columns[index]
             if self.buttonSize != .flexible {
                 rect.size.width = cache.itemMaxWidth
             }
             if index == 0 {
-                totalHeight += rect.size.height
+                rect.origin = .zero
+                rowCurrentX = rect.size.width
+                rowMaxHeight = rect.size.height
+                totalHeight = rect.size.height
             } else {
-                if rect.size.width + self.filterFormOptionsItemSpacing + lastItemRect.maxX > availableWidth {
-                    rect.origin = CGPoint(x: 0, y: lastItemRect.origin.y + lastItemRect.size.height + self.filterFormOptionsLineSpacing)
-                    // when spare space is not enough, place the item to the new line
-                    totalHeight += rect.size.height
+                if rect.size.width + self.filterFormOptionsItemSpacing + rowCurrentX > availableWidth {
+                    // Not enough room — advance to the next row using the current row's max height.
+                    rowOriginY += rowMaxHeight + self.filterFormOptionsLineSpacing
+                    rect.origin = CGPoint(x: 0, y: rowOriginY)
+                    rowCurrentX = rect.size.width
+                    rowMaxHeight = rect.size.height
+                    totalHeight = rowOriginY + rect.size.height
                     hasMoreLines = true
-                    if index > 1 {
-                        totalHeight += self.filterFormOptionsLineSpacing
-                    }
                 } else {
-                    rect.origin = CGPoint(x: lastItemRect.maxX + self.filterFormOptionsItemSpacing, y: lastItemRect.minY)
+                    rect.origin = CGPoint(x: rowCurrentX + self.filterFormOptionsItemSpacing, y: rowOriginY)
+                    rowCurrentX += self.filterFormOptionsItemSpacing + rect.size.width
+                    if rect.size.height > rowMaxHeight {
+                        rowMaxHeight = rect.size.height
+                        totalHeight = rowOriginY + rowMaxHeight
+                    }
                 }
             }
-            lastItemRect = rect
             cache.columns[index] = rect
-            
-            maxWidth = rect.maxX
+            maxWidth = max(maxWidth, rect.maxX)
         }
-        
+
         return CGSize(width: hasMoreLines ? availableWidth : maxWidth, height: totalHeight)
     }
     
@@ -377,5 +426,25 @@ private struct FilterFormViewLayout: Layout {
             let pt = CGPoint(x: itemRect.origin.x + bounds.origin.x, y: itemRect.origin.y + bounds.origin.y)
             subview.place(at: pt, proposal: ProposedViewSize(itemRect.size))
         }
+    }
+}
+
+struct FilterFormViewButtonSizeKey: EnvironmentKey {
+    static var defaultValue: FilterButtonSize? = nil
+}
+
+extension EnvironmentValues {
+    var filterFormViewButtonSize: FilterButtonSize? {
+        get { self[FilterFormViewButtonSizeKey.self] }
+        set { self[FilterFormViewButtonSizeKey.self] = newValue }
+    }
+}
+
+public extension View {
+    /// Button size customization in `FilterFormView`
+    /// - Parameter buttonSize: Button size by `FilterButtonSize`
+    /// - Returns: New view with customized button size in `FilterFormView`
+    func filterFormViewButtonSize(_ buttonSize: FilterButtonSize) -> some View {
+        self.environment(\.filterFormViewButtonSize, buttonSize)
     }
 }

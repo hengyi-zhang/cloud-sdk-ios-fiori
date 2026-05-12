@@ -13,6 +13,7 @@ struct InternalWAForm: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.waHelperAction) private var waHelperAction
     @Environment(\.hideFeedbackFooterInWritingAssistant) private var hideFeedbackFooterInWritingAssistant
+    @Environment(\.waAutoSave) private var waAutoSave
     @Environment(\.colorScheme) var colorScheme
     @AccessibilityFocusState private var focusOnTitle: Bool
     @State private var tappedMenuId: UUID?
@@ -73,8 +74,10 @@ struct InternalWAForm: View {
                     Text(self.navigationBarTitleString)
                         .foregroundColor(Color.preferredColor(self.isEnabled ? .primaryLabel : .quaternaryLabel, background: self.backgroundColorScheme))
                         .font(Font.fiori(forTextStyle: .subheadline, weight: .black))
+                        .accessibilityAddTraits(.isHeader)
                     if self.context.rewriteTextSet.count > 1 {
                         self.versionView()
+                            .accessibilityAddTraits(.isHeader)
                     }
                 }
                 .accessibilityFocused(self.$focusOnTitle)
@@ -234,6 +237,7 @@ struct InternalWAForm: View {
     @ViewBuilder func sectionHeader() -> some View {
         HStack(spacing: 8) {
             self.configuration.undoAction
+                .accessibilityRemoveTraits(.isHeader)
                 .onSimultaneousTapGesture {
                     self.context.revertToPreviousValue()
                     if UIAccessibility.isVoiceOverRunning {
@@ -248,6 +252,7 @@ struct InternalWAForm: View {
                 .disabled(!self.context.revertIsEnabled)
             
             self.configuration.redoAction
+                .accessibilityRemoveTraits(.isHeader)
                 .onSimultaneousTapGesture {
                     self.context.forwardToNextValue()
                     if UIAccessibility.isVoiceOverRunning {
@@ -269,12 +274,14 @@ struct InternalWAForm: View {
                 self.configuration.footnote
                 Spacer()
                 self.configuration.upVoteAction
+                    .accessibilityAddTraits(self.context.feedbackVoteState == .upVote ? .isSelected : .isButton)
                     .onSimultaneousTapGesture {
                         if !self.context.feedbackUpvoted {
                             self.context.startFeedbackTask(voteState: .upVote, options: [])
                         }
                     }
                 self.configuration.downVoteAction
+                    .accessibilityAddTraits(self.context.feedbackVoteState == .downVote ? .isSelected : .isButton)
                     .onSimultaneousTapGesture {
                         if !self.context.feedbackDownvoted {
                             self.context.customDestination = CustomDestination(destination: WAFeedback())
@@ -289,25 +296,5 @@ struct InternalWAForm: View {
         Text("\(versionString)")
             .foregroundColor(Color.preferredColor(self.isEnabled ? .tertiaryLabel : .quaternaryLabel, background: self.backgroundColorScheme))
             .font(.fiori(forTextStyle: .caption1))
-    }
-}
-
-struct HideFeedbackFooterInWritingAssistantKey: EnvironmentKey {
-    static let defaultValue: Bool = false
-}
-
-extension EnvironmentValues {
-    var hideFeedbackFooterInWritingAssistant: Bool {
-        get { self[HideFeedbackFooterInWritingAssistantKey.self] }
-        set { self[HideFeedbackFooterInWritingAssistantKey.self] = newValue }
-    }
-}
-
-public extension View {
-    /// Hide feedback section footer for writing assistant.
-    /// - Parameter hide: A boolean value to indicate if hide/show the feedback footer.
-    /// - Returns: A new view with hidden or shown feedback footer for writing assistant.
-    func hideFeedbackFooterInWritingAssistant(_ hide: Bool = true) -> some View {
-        self.environment(\.hideFeedbackFooterInWritingAssistant, hide)
     }
 }

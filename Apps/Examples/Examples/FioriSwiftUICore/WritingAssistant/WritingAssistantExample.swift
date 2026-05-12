@@ -33,7 +33,12 @@ struct WritingAssistantExample: View {
     @State var isLoading = false
     @State var showWAAuthAlert = false
     @State var waAllowed = false
+    @State var showWAPanel = false
+    @State var customizeFeedbackTitles = false
+    @State var autoSave = false
+    
     @State private var alertCompletion: ((Bool) -> Void)? = nil
+    @State private var filterFormViewButtonSize: FilterButtonSize = .fixed
 
     @FocusState var isFocused: Bool
     
@@ -85,7 +90,6 @@ struct WritingAssistantExample: View {
     
     var body: some View {
         List {
-            Toggle("Show Error", isOn: self.$errorOccurred)
             NoteFormView(text: self.$text, placeholder: "NoteFormView1", errorMessage: "", hintText: AttributedString("Hint Text"), isCharCountEnabled: true, allowsBeyondLimit: false)
                 .environment(\.isLoading, self.isLoading)
                 .environment(\.isAILoading, self.isLoading)
@@ -108,13 +112,16 @@ struct WritingAssistantExample: View {
                         }
                     }
                 }
+                .waShowPanel(self.$showWAPanel)
                 .writingAssistantActionStyle { c in
                     c.writingAssistantAction.disabled(self.text.isEmpty)
                 }
                 .hideFeedbackFooterInWritingAssistant(self.hideFeedbackSection)
                 .frame(height: 100)
+                .waAutoSave(self.autoSave)
             
             TextFieldFormView(title: "TextFieldFormView Title: No waAuthorizationCheck required. WA disabled if input field is empty", text: self.$text2, placeholder: "Enter something")
+                .focused(self.$isFocused)
                 .waTextInput(self.$text2, menus: WAMenu.disabledMenus, menuHandler: { menu, value in
                     await self.fetchData(for: menu, value: value)
                 }, feedbackOptions: self.feedbackOptions, feedbackHandler: { state, values in
@@ -124,9 +131,45 @@ struct WritingAssistantExample: View {
                 .writingAssistantActionStyle { c in
                     c.writingAssistantAction.disabled(self.text2.isEmpty)
                 }
+                .waAutoSave(self.autoSave)
             
+            Toggle("Show Error", isOn: self.$errorOccurred)
+            Toggle("Toggle W.A. panel for the first text input", isOn: self.$showWAPanel)
+                .onChange(of: self.showWAPanel) { _, _ in
+                    self.isFocused = false
+                }
+            Toggle("Customize feedback view titles", isOn: self.$customizeFeedbackTitles)
+            Toggle("Auto Save", isOn: self.$autoSave)
+            Picker("Buttons size of filter form view in feedback", selection: self.$filterFormViewButtonSize) {
+                Text("Fixed").tag(FilterButtonSize.fixed)
+                Text("Flexible").tag(FilterButtonSize.flexible)
+                Text("Flexible by max chip").tag(FilterButtonSize.flexibleByMaxChip)
+            }
             Spacer()
         }
+        .illustratedMessageTitleStyle {
+            if self.customizeFeedbackTitles {
+                Text("This is a customized title for illustrated message in feedback")
+            } else {
+                $0.title
+            }
+        }
+        .illustratedMessageDescriptionStyle {
+            if self.customizeFeedbackTitles {
+                Text("This is a customized description for illustrated message in feedback")
+            } else {
+                $0.description
+            }
+        }
+        .filterFormViewTitleStyle {
+            if self.customizeFeedbackTitles {
+                Text("This is a customized title for filter form view in feedback.")
+            } else {
+                $0.title
+            }
+        }
+        .waFeedbackNavigationTitle(self.customizeFeedbackTitles ? "Customized Title" : "Feedback")
+        .filterFormViewButtonSize(self.filterFormViewButtonSize)
         .padding()
         .alert("W.A. Authorization", isPresented: self.$showWAAuthAlert) {
             Button("No", role: .destructive) {

@@ -24,7 +24,7 @@ struct ListPickerItemExample: View {
     
     @State var selections: Set<String> = []
     @State var selection: String? = nil
-    @State var noneEmptySelection: String = "First"
+    @State var noneEmptySelection: String = "One"
     
     @State var uuidSelections: Set<UUID> = []
     @State var uuidSelection: UUID? = nil
@@ -47,8 +47,19 @@ struct ListPickerItemExample: View {
     @State var showsErrorMessage = false
     @State var showsPrompt = false
     @State var showAINotice: Bool = false
+    @State var destinationDisplayMode: DestinationDisplayMode = .push
+
+    enum ConfirmationDialogMode: String, CaseIterable {
+        case defaultMode = "Default"
+        case customLabels = "Custom Labels"
+        case withCallback = "With Callback"
+        case disabled = "Disabled"
+    }
+
+    @State var confirmationDialogMode: ConfirmationDialogMode = .defaultMode
+    
     var value: AttributedString? {
-        self.state == .readOnly ? self.defaultValue() : nil
+        self.defaultValue()
     }
 
     var body: some View {
@@ -75,13 +86,14 @@ struct ListPickerItemExample: View {
                     })
                 }
             }
+            .destinationDisplayMode(self.destinationDisplayMode)
             .onChange(of: self.dataType) {
                 self.selections.removeAll()
                 self.uuidSelections.removeAll()
                 self.selection = nil
                 switch self.dataType {
                 case .text:
-                    self.noneEmptySelection = "First"
+                    self.noneEmptySelection = "One"
                 case .frameworks:
                     self.noneEmptySelection = "UIKit"
                 case .object:
@@ -138,6 +150,17 @@ struct ListPickerItemExample: View {
                 }
                 
                 Toggle("AI Notice", isOn: self.$showAINotice)
+                
+                Picker("Destination display mode", selection: self.$destinationDisplayMode) {
+                    Text("Push").tag(DestinationDisplayMode.push)
+                    Text("Present").tag(DestinationDisplayMode.sheet)
+                }
+
+                Picker("Confirmation Dialog", selection: self.$confirmationDialogMode) {
+                    ForEach(ConfirmationDialogMode.allCases, id: \.self) { mode in
+                        Text(mode.rawValue).tag(mode)
+                    }
+                }
             }
         }
         .navigationTitle("List Picker Item")
@@ -149,6 +172,36 @@ struct ListPickerItemExample: View {
             .disableContentSection(self.disableContentSection)
             .autoDismissDestination(self.autoDismissDestination)
             .navigationTitle("Destination Title")
+            .ifApply(self.confirmationDialogMode == .customLabels) {
+                $0.confirmationDialogConfiguration(
+                    ConfirmationDialogConfiguration(
+                        title: "Unsaved changes will be lost."
+                    ) { dismiss in
+                        Button(role: .destructive) {
+                            dismiss()
+                        } label: {
+                            Text("Discard")
+                        }
+                    }
+                )
+            }
+            .ifApply(self.confirmationDialogMode == .withCallback) {
+                $0.confirmationDialogConfiguration(
+                    ConfirmationDialogConfiguration(
+                        title: "Are you sure?"
+                    ) { dismiss in
+                        Button(role: .destructive) {
+                            print("User discarded selections")
+                            dismiss()
+                        } label: {
+                            Text("Discard Changes")
+                        }
+                    }
+                )
+            }
+            .ifApply(self.confirmationDialogMode == .disabled) {
+                $0.confirmationDialogConfiguration(.disabled)
+            }
             .ifApply(self.customDestination) {
                 $0.cancelActionStyle { _ in
                     Button {

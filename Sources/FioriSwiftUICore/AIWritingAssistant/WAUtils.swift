@@ -95,6 +95,22 @@ struct WAAuthorizationKey: EnvironmentKey {
     static let defaultValue: (() async -> Bool)? = nil
 }
 
+struct WAShowPanelKey: EnvironmentKey {
+    static let defaultValue: Binding<Bool> = .constant(false)
+}
+
+struct WAFeedbackNavigationBarTitleKey: EnvironmentKey {
+    static let defaultValue: AttributedString = .init("Feedback".localizedFioriString())
+}
+
+struct HideFeedbackFooterInWritingAssistantKey: EnvironmentKey {
+    static let defaultValue: Bool = false
+}
+
+struct WAAutoSaveKey: EnvironmentKey {
+    static let defaultValue: Bool = false
+}
+
 extension EnvironmentValues {
     var waHelperAction: Binding<WAHelperAction> {
         get { self[WAHelperActionKey.self] }
@@ -109,6 +125,26 @@ extension EnvironmentValues {
     var waAuthorizationCheck: (() async -> Bool)? {
         get { self[WAAuthorizationKey.self] }
         set { self[WAAuthorizationKey.self] = newValue }
+    }
+    
+    var waShowPanel: Binding<Bool> {
+        get { self[WAShowPanelKey.self] }
+        set { self[WAShowPanelKey.self] = newValue }
+    }
+    
+    var waFeedbackNavigationBarTitle: AttributedString {
+        get { self[WAFeedbackNavigationBarTitleKey.self] }
+        set { self[WAFeedbackNavigationBarTitleKey.self] = newValue }
+    }
+    
+    var hideFeedbackFooterInWritingAssistant: Bool {
+        get { self[HideFeedbackFooterInWritingAssistantKey.self] }
+        set { self[HideFeedbackFooterInWritingAssistantKey.self] = newValue }
+    }
+    
+    var waAutoSave: Bool {
+        get { self[WAAutoSaveKey.self] }
+        set { self[WAAutoSaveKey.self] = newValue }
     }
 }
 
@@ -132,5 +168,33 @@ public extension View {
     /// - Returns: A view with the writing assistant authorization check environment value set.
     func waAuthorizationCheck(_ block: (() async -> Bool)?) -> some View {
         self.environment(\.waAuthorizationCheck, block)
+    }
+    
+    /// Showing writing assistant panel programmatically.
+    /// - Parameter show: A boolean value to indicate whether to show panel for writing assistant.
+    /// - Returns: A view with the writing assistant panel or not.
+    func waShowPanel(_ show: Binding<Bool>) -> some View {
+        self.environment(\.waShowPanel, show)
+    }
+    
+    /// Customize the title string for the navigation bar title in feedback view.
+    /// - Parameter title: String value for the navigation bar.
+    /// - Returns: New view with customized navigation bar title for feedback in writing assistant component.
+    func waFeedbackNavigationTitle(_ title: String) -> some View {
+        self.environment(\.waFeedbackNavigationBarTitle, AttributedString(title))
+    }
+    
+    /// Hide feedback section footer for writing assistant.
+    /// - Parameter hide: A boolean value to indicate if hide/show the feedback footer.
+    /// - Returns: A new view with hidden or shown feedback footer for writing assistant.
+    func hideFeedbackFooterInWritingAssistant(_ hide: Bool = true) -> some View {
+        self.environment(\.hideFeedbackFooterInWritingAssistant, hide)
+    }
+    
+    /// Set whether auto save is enabled for writing assistant. When auto save is enabled, writing assistant will automatically save the content after quit W.A. flow without showing the confirmation pop-up. When auto save is disabled, writing assistant will show a confirmation pop-up to ask whether to save the content.
+    /// - Parameter isAutoSaveEnabled: A boolean value to indicate whether auto save is enabled for writing assistant.
+    /// - Returns: A view with auto save enabled or not for writing assistant.
+    func waAutoSave(_ isAutoSaveEnabled: Bool = true) -> some View {
+        self.environment(\.waAutoSave, isAutoSaveEnabled)
     }
 }

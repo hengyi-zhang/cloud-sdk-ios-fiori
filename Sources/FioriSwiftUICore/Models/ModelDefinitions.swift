@@ -119,82 +119,6 @@ public protocol _ProgressIndicatorModel: ProgressIndicatorComponent {}
 
 @available(*, unavailable, renamed: "_ProgressIndicatorModel", message: "Will be removed in the future release. Please use LoadingIndicator instead.")
 public protocol ProgressIndicatorModel {}
-    
-/// Deprecated SideBarListItem
-// sourcery: add_env_props = "sideBarListItemConfigMode"
-// sourcery: add_env_props = "sizeCategory"
-// sourcery: virtualPropSidebarIconScaleMetric = "@ScaledMetric var scale: CGFloat = 1"
-// sourcery: generated_component
-public protocol _SideBarListItemModel: IconComponent, TitleComponent, SubtitleComponent, AccessoryIconComponent {}
-
-/// Deprecated SideBarListItem
-@available(*, unavailable, renamed: "_SideBarListItemModel", message: "Will be removed in the future release. Please create SideBarListItem with other initializers instead.")
-public protocol SideBarListItemModel {}
-
-/// Deprecated SideBar
-// sourcery: availableAttributeContent = "iOS 14, *"
-// sourcery: add_view_builder_params = "detail"
-// sourcery: add_view_builder_params = "footer"
-// sourcery: generated_component
-public protocol _SideBarModel: SubtitleComponent {}
-
-/// Deprecated SideBar
-@available(*, unavailable, renamed: "_SideBarModel", message: "Will be removed in the future release. Please create SideBar with other initializers instead.")
-public protocol SideBarModel {}
-
-// sourcery: generated_component_composite
-public protocol _InfoViewModel: TitleComponent, DescriptionTextComponent {
-    // sourcery: default.value = nil
-    // sourcery: no_view
-    var showLoadingIndicator: Bool? { get }
-    
-    // sourcery: default.value = nil
-    // sourcery: no_view
-    var loadingIndicatorText: String? { get }
-    
-    // sourcery: genericParameter.name = ActionView
-    var action: _ActionModel? { get }
-    
-    // sourcery: genericParameter.name = SecondaryActionView
-    var secondaryAction: _ActionModel? { get }
-}
-
-/// Deprecated InfoViewModel
-@available(*, deprecated, renamed: "_InfoViewModel", message: "Will be removed in the future release. Please create InfoViewModel with other initializers instead.")
-public protocol InfoViewModel {}
-
-// sourcery: generated_component_composite
-// sourcery: virtualPropContentHeight = "@State var contentHeight: CGFloat = .zero"
-// sourcery: add_env_props = ["presentationMode"]
-public protocol _EULAViewModel: TitleComponent, BodyAttributedTextComponent {
-    // sourcery: genericParameter.name = ActionView
-    // sourcery: default.value = _AgreeActionDefault()
-    var action: _ActionModel? { get }
-    
-    // sourcery: genericParameter.name = SecondaryActionView
-    // sourcery: default.value = _DisagreeActionDefault()
-    var secondaryAction: _ActionModel? { get }
-    
-    // sourcery: genericParameter.name = CancelActionView
-    // sourcery: default.value = _CancelActionDefault()
-    var cancelAction: _ActionModel? { get }
-    
-    // sourcery: default.value = nil
-    // sourcery: no_view
-    var didAgree: (() -> Void)? { get }
-    
-    // sourcery: default.value = nil
-    // sourcery: no_view
-    var didDisagree: (() -> Void)? { get }
-    
-    // sourcery: default.value = nil
-    // sourcery: no_view
-    var didCancel: (() -> Void)? { get }
-}
-
-/// Deprecated EULAViewModel
-@available(*, deprecated, renamed: "_EULAViewModel", message: "Will be removed in the future release. Please create EULAViewModel with other initializers instead.")
-public protocol EULAViewModel {}
 
 // sourcery: virtualPropFormIndex = "@State var _formIndex = 0"
 // sourcery: virtualPropAllowedFormIndexes = "@State var _allowedFormIndexes: [Int] = []"
@@ -340,11 +264,3 @@ public protocol SearchListPickerItemModel: OptionListPickerComponent {
     // sourcery: no_view
     var onTap: ((_ index: Int) -> Void)? { get }
 }
-
-// sourcery: add_env_props = "_filterFeedbackBarStyle"
-// sourcery: generated_component_not_configurable
-public protocol _SliderPickerItemModel: SliderPickerComponent {}
-
-/// Deprecated SliderPickerItemModel
-@available(*, deprecated, renamed: "_SliderPickerItemModel", message: "Will be removed in the future release. Please create FioriSlider with other initializers instead.")
-public protocol SliderPickerItemModel {}
