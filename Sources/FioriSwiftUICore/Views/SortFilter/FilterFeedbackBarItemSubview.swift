@@ -69,12 +69,18 @@ struct SliderMenuItem: View {
                     .fioriButtonStyle(FioriNavigationButtonStyle())
                 } resetAction: {
                     FioriButton(action: { _ in
-                        self.item.reset()
+                        if self.item.resetButtonConfiguration.type == .deactivate {
+                            self.item.deactivate()
+                            self.onUpdate()
+                            self.isSheetVisible.toggle()
+                        } else {
+                            self.item.reset()
+                        }
                     }, label: { _ in
-                        Text("Reset".localizedFioriString())
+                        Text(self.item.resetButtonConfiguration.title)
                     })
                     .fioriButtonStyle(FioriNavigationButtonStyle())
-                    .disabled(self.item.isOriginal)
+                    .disabled(self.item.resetButtonConfiguration.type == .deactivate ? !self.item.isChecked : self.item.isOriginal)
                 } applyAction: {
                     FioriButton(action: { _ in
                         self.item.apply()
@@ -87,6 +93,14 @@ struct SliderMenuItem: View {
                 } components: {
                     self.sliderView()
                         .padding([.leading, .trailing], 8)
+                        .onAppear {
+                            if self.item.sliderMode == .single {
+                                self.item.workingValue = self.item.value ?? self.item.minimumValue
+                            } else {
+                                self.item.workingLowerValue = self.item.lowerValue ?? self.item.minimumValue
+                                self.item.workingUpperValue = self.item.upperValue ?? self.item.maximumValue
+                            }
+                        }
                 }
                 .preferredColorScheme(self.colorScheme)
             }
@@ -316,10 +330,15 @@ struct PickerMenuItem: View {
                         EmptyView()
                     } else {
                         FioriButton(action: { _ in
-                            if self.item.resetButtonConfiguration.type == .reset {
+                            switch self.item.resetButtonConfiguration.type {
+                            case .reset:
                                 self.item.reset()
-                            } else {
+                            case .clearAll:
                                 self.item.clearAll()
+                            case .deactivate:
+                                self.item.deactivate()
+                                self.onUpdate()
+                                self.isSheetVisible.toggle()
                             }
                         }, label: { _ in
                             Text(self.item.resetButtonConfiguration.title)
@@ -381,13 +400,25 @@ struct PickerMenuItem: View {
                             self.item.apply()
                             self.onUpdate()
                         } label: {
-                            Label { Text(self.item.valueOptions[idx]) } icon: { Image(fioriName: "fiori.accept") }
+                            Label {
+                                if let provider = self.item.configuration?.rowContentProvider {
+                                    provider(idx)
+                                } else {
+                                    Text(self.item.valueOptions[idx])
+                                }
+                            } icon: { Image(fioriName: "fiori.accept") }
                         }
                     } else {
-                        Button(self.item.valueOptions[idx]) {
+                        Button {
                             self.item.optionOnTap(idx)
                             self.item.apply()
                             self.onUpdate()
+                        } label: {
+                            if let provider = self.item.configuration?.rowContentProvider {
+                                provider(idx)
+                            } else {
+                                Text(self.item.valueOptions[idx])
+                            }
                         }
                     }
                 }
@@ -430,10 +461,15 @@ struct PickerMenuItem: View {
                         EmptyView()
                     } else {
                         FioriButton(action: { _ in
-                            if self.item.resetButtonConfiguration.type == .reset {
+                            switch self.item.resetButtonConfiguration.type {
+                            case .reset:
                                 self.item.reset()
-                            } else {
+                            case .clearAll:
                                 self.item.clearAll()
+                            case .deactivate:
+                                self.item.deactivate()
+                                self.onUpdate()
+                                self.isSheetVisible.toggle()
                             }
                         }, label: { _ in
                             Text(self.item.resetButtonConfiguration.title)
@@ -471,16 +507,22 @@ struct PickerMenuItem: View {
     }
     
     private func resetButtonDisable() -> Bool {
-        if self.item.resetButtonConfiguration.type == .reset {
+        switch self.item.resetButtonConfiguration.type {
+        case .reset:
             return self.item.isOriginal
-        } else {
+        case .clearAll:
             return self.item.workingValue.isEmpty
+        case .deactivate:
+            return !self.item.isChecked
         }
     }
     
     @MainActor private func configListPickerDestination() -> some View {
         let filter: ((SortFilterItem.PickerItem.ValueOptionModel, String) -> Bool) = { f, s in
             if !s.isEmpty {
+                if let customFilter = self.item.configuration?.searchFilter {
+                    return customFilter(f.value, s)
+                }
                 return f.value.localizedCaseInsensitiveContains(s)
             } else {
                 return true
@@ -493,7 +535,27 @@ struct PickerMenuItem: View {
                 self.$item.workingValueSet.asOptionalSelection() :
                 self.$item.workingValueSet.asRequiredSelection(defaultValue: defaultSingleSelection).toOptionalBinding()
         }
-        
+
+        let rowContentBuilder: (SortFilterItem.PickerItem.ValueOptionModel) -> AnyView = { e in
+            if let provider = self.item.configuration?.rowContentProvider {
+                return AnyView(provider(e.index).destinationRowBackgroundColor(.clear))
+            } else {
+                return AnyView(Text(e.value).destinationRowBackgroundColor(.clear))
+            }
+        }
+
+        let paginationRowContent: (SortFilterItem.PickerItem.ValueOptionModel) -> AnyView = { e in
+            let baseView = rowContentBuilder(e)
+            if e.index == self.item.uuidValueOptions.count - 1,
+               self.item.configuration?.hasMoreData == true
+            {
+                return AnyView(baseView.onAppear {
+                    self.item.configuration?.onLoadMore?()
+                })
+            }
+            return baseView
+        }
+
         let listPickerDestination = self.item.allowsMultipleSelection ?
             ListPickerDestination(
                 self.item.uuidValueOptions,
@@ -504,8 +566,7 @@ struct PickerMenuItem: View {
                 searchPrompt: self.item.searchPrompt,
                 searchFilter: self.item.isSearchBarHidden == false ? filter : nil
             ) { e in
-                Text(e.value)
-                    .destinationRowBackgroundColor(.clear)
+                paginationRowContent(e)
             } :
             ListPickerDestination(
                 self.item.uuidValueOptions,
@@ -515,8 +576,7 @@ struct PickerMenuItem: View {
                 searchPrompt: self.item.searchPrompt,
                 searchFilter: self.item.isSearchBarHidden == false ? filter : nil
             ) { e in
-                Text(e.value)
-                    .destinationRowBackgroundColor(.clear)
+                paginationRowContent(e)
             }
         return listPickerDestination
             .disableEntriesSection(self.item.disableListEntriesSection)
@@ -650,12 +710,18 @@ struct DateTimeMenuItem: View {
                     .fioriButtonStyle(FioriNavigationButtonStyle())
                 } resetAction: {
                     FioriButton(action: { _ in
-                        self.item.reset()
+                        if self.item.resetButtonConfiguration.type == .deactivate {
+                            self.item.deactivate()
+                            self.onUpdate()
+                            self.isSheetVisible.toggle()
+                        } else {
+                            self.item.reset()
+                        }
                     }, label: { _ in
-                        Text("Reset".localizedFioriString())
+                        Text(self.item.resetButtonConfiguration.title)
                     })
                     .fioriButtonStyle(FioriNavigationButtonStyle())
-                    .disabled(self.item.isOriginal)
+                    .disabled(self.item.resetButtonConfiguration.type == .deactivate ? !self.item.isChecked : self.item.isOriginal)
                 } applyAction: {
                     FioriButton(action: { _ in
                         self.item.apply()
@@ -667,6 +733,9 @@ struct DateTimeMenuItem: View {
                     .fioriButtonStyle(SortFilterApplyButtonStyle(true, self.horizontalSizeClass))
                 } components: {
                     self.datePickerView()
+                        .onAppear {
+                            self.item.workingValue = self.item.value ?? Date()
+                        }
                 }
                 .preferredColorScheme(self.colorScheme)
             }
@@ -712,12 +781,18 @@ struct DateTimeMenuItem: View {
                     .fioriButtonStyle(FioriNavigationButtonStyle())
                 } resetAction: {
                     FioriButton(action: { _ in
-                        self.item.reset()
+                        if self.item.resetButtonConfiguration.type == .deactivate {
+                            self.item.deactivate()
+                            self.onUpdate()
+                            self.isSheetVisible.toggle()
+                        } else {
+                            self.item.reset()
+                        }
                     }, label: { _ in
-                        Text("Reset".localizedFioriString())
+                        Text(self.item.resetButtonConfiguration.title)
                     })
                     .fioriButtonStyle(FioriNavigationButtonStyle())
-                    .disabled(self.item.isOriginal)
+                    .disabled(self.item.resetButtonConfiguration.type == .deactivate ? !self.item.isChecked : self.item.isOriginal)
                 } applyAction: {
                     FioriButton(action: { _ in
                         self.item.apply()
@@ -729,6 +804,9 @@ struct DateTimeMenuItem: View {
                     .fioriButtonStyle(SortFilterApplyButtonStyle(true, self.horizontalSizeClass))
                 } components: {
                     self.datePickerView()
+                        .onAppear {
+                            self.item.workingValue = self.item.value ?? Date()
+                        }
                 }
                 .preferredColorScheme(self.colorScheme)
             }
@@ -819,12 +897,18 @@ struct StepperMenuItem: View {
                     .fioriButtonStyle(FioriNavigationButtonStyle())
                 } resetAction: {
                     FioriButton(action: { _ in
-                        self.item.reset()
+                        if self.item.resetButtonConfiguration.type == .deactivate {
+                            self.item.deactivate()
+                            self.onUpdate()
+                            self.isSheetVisible.toggle()
+                        } else {
+                            self.item.reset()
+                        }
                     }, label: { _ in
-                        Text("Reset".localizedFioriString())
+                        Text(self.item.resetButtonConfiguration.title)
                     })
                     .fioriButtonStyle(FioriNavigationButtonStyle())
-                    .disabled(self.item.isOriginal)
+                    .disabled(self.item.resetButtonConfiguration.type == .deactivate ? !self.item.isChecked : self.item.isOriginal)
                 } applyAction: {
                     FioriButton(action: { _ in
                         self.item.apply()
@@ -838,12 +922,17 @@ struct StepperMenuItem: View {
                     StepperView(
                         title: { Text(self.item.stepperTitle) },
                         text: Binding<String>(get: {
-                            if self.item.isDecimalSupported {
-                                String(describing: self.item.workingValue)
+                            let v = self.item.workingValue ?? self.item.stepRange.lowerBound
+                            return self.item.isDecimalSupported
+                                ? String(describing: v)
+                                : String(describing: Int(v))
+                        }, set: { newText in
+                            if newText.isEmpty {
+                                self.item.workingValue = nil
                             } else {
-                                String(describing: Int(self.item.workingValue))
+                                self.item.workingValue = Double(newText)
                             }
-                        }, set: { self.item.workingValue = Double($0) ?? 0 }),
+                        }),
                         step: self.item.step,
                         stepRange: self.item.stepRange,
                         isDecimalSupported: self.item.isDecimalSupported,
@@ -868,6 +957,9 @@ struct StepperMenuItem: View {
                     }
                     .ifApply(!self.item.incrementActionActive) { v in
                         v.incrementActionStyle(.deactivate)
+                    }
+                    .onAppear {
+                        self.item.workingValue = self.item.value ?? self.item.stepRange.lowerBound
                     }
                 }
                 .preferredColorScheme(self.colorScheme)
@@ -929,12 +1021,18 @@ struct TitleMenuItem: View {
                     .fioriButtonStyle(FioriNavigationButtonStyle())
                 } resetAction: {
                     FioriButton(action: { _ in
-                        self.item.reset()
+                        if self.item.resetButtonConfiguration.type == .deactivate {
+                            self.item.deactivate()
+                            self.onUpdate()
+                            self.isSheetVisible.toggle()
+                        } else {
+                            self.item.reset()
+                        }
                     }, label: { _ in
-                        Text("Reset".localizedFioriString())
+                        Text(self.item.resetButtonConfiguration.title)
                     })
                     .fioriButtonStyle(FioriNavigationButtonStyle())
-                    .disabled(self.item.isOriginal)
+                    .disabled(self.item.resetButtonConfiguration.type == .deactivate ? !self.item.isChecked : self.item.isOriginal)
                 } applyAction: {
                     FioriButton(action: { _ in
                         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -1039,12 +1137,18 @@ struct NoteMenuItem: View {
             .fioriButtonStyle(FioriNavigationButtonStyle())
         } resetAction: {
             FioriButton(action: { _ in
-                self.item.reset()
+                if self.item.resetButtonConfiguration.type == .deactivate {
+                    self.item.deactivate()
+                    self.onUpdate()
+                    self.isSheetVisible.toggle()
+                } else {
+                    self.item.reset()
+                }
             }, label: { _ in
-                Text("Reset".localizedFioriString())
+                Text(self.item.resetButtonConfiguration.title)
             })
             .fioriButtonStyle(FioriNavigationButtonStyle())
-            .disabled(self.item.isOriginal)
+            .disabled(self.item.resetButtonConfiguration.type == .deactivate ? !self.item.isChecked : self.item.isOriginal)
         } applyAction: {
             FioriButton(action: { _ in
                 UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -1117,12 +1221,18 @@ struct DurationPickerMenuItem: View {
                     .fioriButtonStyle(FioriNavigationButtonStyle())
                 } resetAction: {
                     FioriButton(action: { _ in
-                        self.item.reset()
+                        if self.item.resetButtonConfiguration.type == .deactivate {
+                            self.item.deactivate()
+                            self.onUpdate()
+                            self.isSheetVisible.toggle()
+                        } else {
+                            self.item.reset()
+                        }
                     }, label: { _ in
-                        Text("Reset".localizedFioriString())
+                        Text(self.item.resetButtonConfiguration.title)
                     })
                     .fioriButtonStyle(FioriNavigationButtonStyle())
-                    .disabled(self.item.isOriginal)
+                    .disabled(self.item.resetButtonConfiguration.type == .deactivate ? !self.item.isChecked : self.item.isOriginal)
                 } applyAction: {
                     FioriButton(action: { _ in
                         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -1134,7 +1244,10 @@ struct DurationPickerMenuItem: View {
                     })
                     .fioriButtonStyle(SortFilterApplyButtonStyle(true, self.horizontalSizeClass))
                 } components: {
-                    DurationPickerViewWrapper(selection: self.$item.workingValue, maximumMinutes: self.item.maximumMinutes, minimumMinutes: self.item.minimumMinutes, minuteInterval: self.item.minuteInterval, measurementFormatter: self.item.measurementFormatter)
+                    DurationPickerViewWrapper(selection: Binding<Int>(
+                        get: { self.item.workingValue ?? 0 },
+                        set: { self.item.workingValue = $0 }
+                    ), maximumMinutes: self.item.maximumMinutes, minimumMinutes: self.item.minimumMinutes, minuteInterval: self.item.minuteInterval, measurementFormatter: self.item.measurementFormatter)
                         .frame(height: 204)
                         .foregroundColor(Color.preferredColor(.primaryLabel))
                         .padding([.leading, .trailing], 16)
@@ -1202,12 +1315,18 @@ struct OrderPickerMenuItem: View {
                     .fioriButtonStyle(FioriNavigationButtonStyle())
                 }, resetAction: {
                     FioriButton(action: { _ in
-                        self.item.reset()
+                        if self.item.resetButtonConfiguration.type == .deactivate {
+                            self.item.deactivate()
+                            self.onUpdate()
+                            self.isSheetVisible.toggle()
+                        } else {
+                            self.item.reset()
+                        }
                     }, label: { _ in
-                        Text("Reset".localizedFioriString())
+                        Text(self.item.resetButtonConfiguration.title)
                     })
                     .fioriButtonStyle(FioriNavigationButtonStyle())
-                    .disabled(self.item.isOriginal)
+                    .disabled(self.item.resetButtonConfiguration.type == .deactivate ? !self.item.isChecked : self.item.isOriginal)
                 }, applyAction: {
                     FioriButton(action: { _ in
                         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -1231,6 +1350,7 @@ struct OrderPickerMenuItem: View {
                     .padding(.bottom, 8)
                     .onAppear {
                         self.item.workingValue = self.item.value
+                        self.item.workingIsInactive = false
                     }
                 })
                 .preferredColorScheme(self.colorScheme)

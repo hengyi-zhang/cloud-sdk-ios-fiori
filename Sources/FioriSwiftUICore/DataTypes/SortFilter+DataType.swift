@@ -549,6 +549,8 @@ public enum FilterFeedbackBarResetButtonType {
     case reset
     /// Clear selected value, only effective for single selection.
     case clearAll
+    /// Deactivate the filter and dismiss the popover. The chip becomes inactive (its label shows only the item's name) and any pending edits are committed as the inactive state.
+    case deactivate
 }
 
 extension CGRect {
@@ -672,6 +674,47 @@ public enum OptionListPickerItemLayoutType {
 }
 
 public extension SortFilterItem {
+    /// Configuration for advanced PickerItem capabilities.
+    /// When provided, enables features like custom search, custom row content, and pagination.
+    struct PickerItemConfiguration: Equatable {
+        /// Custom search filter closure. Receives (displayText, searchText) and returns Bool.
+        /// When nil, the default `localizedCaseInsensitiveContains` is used.
+        public var searchFilter: ((String, String) -> Bool)?
+
+        /// Type-erased closure that produces a custom row view for a given option index.
+        /// When nil, the default `Text(valueOptions[index])` is used.
+        public var rowContentProvider: ((Int) -> AnyView)?
+
+        /// Callback invoked when the list scrolls near the end of current data.
+        /// The consumer should load more data and update `valueOptions` on the PickerItem.
+        public var onLoadMore: (() -> Void)?
+
+        /// Indicates whether more data is available for pagination.
+        public var hasMoreData: Bool
+
+        /// Create a PickerItemConfiguration.
+        /// - Parameters:
+        ///   - searchFilter: Custom search filter closure receiving (displayText, searchText).
+        ///   - rowContentProvider: Type-erased closure producing a custom row view for a given option index.
+        ///   - onLoadMore: Callback invoked when the list scrolls near the end of current data.
+        ///   - hasMoreData: Indicates whether more data is available for pagination.
+        public init(
+            searchFilter: ((String, String) -> Bool)? = nil,
+            rowContentProvider: ((Int) -> AnyView)? = nil,
+            onLoadMore: (() -> Void)? = nil,
+            hasMoreData: Bool = false
+        ) {
+            self.searchFilter = searchFilter
+            self.rowContentProvider = rowContentProvider
+            self.onLoadMore = onLoadMore
+            self.hasMoreData = hasMoreData
+        }
+
+        public static func == (lhs: PickerItemConfiguration, rhs: PickerItemConfiguration) -> Bool {
+            lhs.hasMoreData == rhs.hasMoreData
+        }
+    }
+
     ///  Data structure for filter feedback, option list picker,
     struct PickerItem: Identifiable, Equatable {
         public let id: String
@@ -696,7 +739,10 @@ public extension SortFilterItem {
         var disableListContentSection: Bool = false
         var allowsDisplaySelectionCount: Bool = true
         var resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = .init()
-        
+
+        /// Advanced configuration for custom search, row content, and pagination.
+        public var configuration: PickerItemConfiguration?
+
         var uuidValueOptions: [ValueOptionModel] = []
         var workingValueSet: Set<UUID> = []
         
@@ -765,8 +811,9 @@ public extension SortFilterItem {
         ///   - disableContentSection: A boolean value to control the display of the unselected area section.
         ///   - allowsDisplaySelectionCount: A boolean value to indicate to allow display selection count or not.
         ///   - resetButtonConfiguration: A configuration to customize the reset button.
-        public init(id: String = UUID().uuidString, name: String, title: String? = nil, value: Int, valueOptions: [String], allowsEmptySelection: Bool, barItemDisplayMode: BarItemDisplayMode = .name, searchPrompt: String? = nil, isSearchBarHidden: Bool = false, icon: String? = nil, itemLayout: OptionListPickerItemLayoutType = .fixed, displayMode: DisplayMode = .automatic, listEntriesSectionMode: ListEntriesSectionMode = .default, disableContentSection: Bool = false, allowsDisplaySelectionCount: Bool = true, resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = FilterFeedbackBarResetButtonConfiguration()) {
-            self.init(id: id, name: name, title: title, value: [value], valueOptions: valueOptions, allowsMultipleSelection: false, allowsEmptySelection: allowsEmptySelection, barItemDisplayMode: barItemDisplayMode, searchPrompt: searchPrompt, isSearchBarHidden: isSearchBarHidden, icon: icon, itemLayout: itemLayout, displayMode: displayMode, listEntriesSectionMode: listEntriesSectionMode, disableContentSection: disableContentSection, allowsDisplaySelectionCount: allowsDisplaySelectionCount, resetButtonConfiguration: resetButtonConfiguration)
+        ///   - configuration: Advanced configuration for custom search, row content, pagination, and display/data value separation.
+        public init(id: String = UUID().uuidString, name: String, title: String? = nil, value: Int, valueOptions: [String], allowsEmptySelection: Bool, barItemDisplayMode: BarItemDisplayMode = .name, searchPrompt: String? = nil, isSearchBarHidden: Bool = false, icon: String? = nil, itemLayout: OptionListPickerItemLayoutType = .fixed, displayMode: DisplayMode = .automatic, listEntriesSectionMode: ListEntriesSectionMode = .default, disableContentSection: Bool = false, allowsDisplaySelectionCount: Bool = true, resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = FilterFeedbackBarResetButtonConfiguration(), configuration: PickerItemConfiguration? = nil) {
+            self.init(id: id, name: name, title: title, value: [value], valueOptions: valueOptions, allowsMultipleSelection: false, allowsEmptySelection: allowsEmptySelection, barItemDisplayMode: barItemDisplayMode, searchPrompt: searchPrompt, isSearchBarHidden: isSearchBarHidden, icon: icon, itemLayout: itemLayout, displayMode: displayMode, listEntriesSectionMode: listEntriesSectionMode, disableContentSection: disableContentSection, allowsDisplaySelectionCount: allowsDisplaySelectionCount, resetButtonConfiguration: resetButtonConfiguration, configuration: configuration)
         }
         
         /// Create PickerItem for filter feedback.
@@ -789,7 +836,8 @@ public extension SortFilterItem {
         ///   - disableContentSection: A boolean value to control the display of the unselected area section.
         ///   - allowsDisplaySelectionCount: A boolean value to indicate to allow display selection count or not.
         ///   - resetButtonConfiguration: A configuration to customize the reset button.
-        public init(id: String = UUID().uuidString, name: String, title: String? = nil, value: [Int], valueOptions: [String], allowsMultipleSelection: Bool, allowsEmptySelection: Bool, barItemDisplayMode: BarItemDisplayMode = .name, searchPrompt: String? = nil, isSearchBarHidden: Bool = false, icon: String? = nil, itemLayout: OptionListPickerItemLayoutType = .fixed, displayMode: DisplayMode = .automatic, listEntriesSectionMode: ListEntriesSectionMode = .default, disableContentSection: Bool = false, allowsDisplaySelectionCount: Bool = true, resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = FilterFeedbackBarResetButtonConfiguration()) {
+        ///   - configuration: Advanced configuration for custom search, row content, pagination, and display/data value separation.
+        public init(id: String = UUID().uuidString, name: String, title: String? = nil, value: [Int], valueOptions: [String], allowsMultipleSelection: Bool, allowsEmptySelection: Bool, barItemDisplayMode: BarItemDisplayMode = .name, searchPrompt: String? = nil, isSearchBarHidden: Bool = false, icon: String? = nil, itemLayout: OptionListPickerItemLayoutType = .fixed, displayMode: DisplayMode = .automatic, listEntriesSectionMode: ListEntriesSectionMode = .default, disableContentSection: Bool = false, allowsDisplaySelectionCount: Bool = true, resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = FilterFeedbackBarResetButtonConfiguration(), configuration: PickerItemConfiguration? = nil) {
             self.id = id
             self.name = name
             self.title = title
@@ -797,6 +845,7 @@ public extension SortFilterItem {
             self.workingValue = value
             self.originalValue = value
             self.valueOptions = valueOptions
+            self.configuration = configuration
             self.uuidValueOptions = valueOptions.enumerated().map { index, option in
                 ValueOptionModel(index: index, value: option)
             }
@@ -884,7 +933,13 @@ public extension SortFilterItem {
             self.workingValue.removeAll()
             self.workingValueSet.removeAll()
         }
-        
+
+        mutating func deactivate() {
+            self.workingValue = []
+            self.workingValueSet = []
+            self.value = []
+        }
+
         mutating func apply() {
             self.value = self.workingValue.map { $0 }
         }
@@ -936,6 +991,21 @@ public extension SortFilterItem {
         
         var isOriginal: Bool {
             self.workingValue == self.originalValue
+        }
+
+        /// Append new options to the picker without resetting selection state.
+        /// Use this for pagination scenarios where data is loaded incrementally.
+        /// - Parameters:
+        ///   - newOptions: Display texts to append.
+        ///   - hasMoreData: Whether more data is still available after this append.
+        public mutating func appendOptions(_ newOptions: [String], hasMoreData: Bool = false) {
+            let startIndex = self.valueOptions.count
+            self.valueOptions.append(contentsOf: newOptions)
+            let newModels = newOptions.enumerated().map { offset, option in
+                ValueOptionModel(index: startIndex + offset, value: option)
+            }
+            self.uuidValueOptions.append(contentsOf: newModels)
+            self.configuration?.hasMoreData = hasMoreData
         }
     }
     
@@ -1010,7 +1080,11 @@ public extension SortFilterItem {
         public let hint: String?
         
         public var onValueChange: SliderValueChangeHandler?
-        
+
+        /// Configuration of the Reset button in the popover. Defaults to `.reset` type (restore original value).
+        /// Set its `type` to `.deactivate` to make the Reset button deactivate the chip and dismiss the popover.
+        var resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = .init()
+
         let sliderMode: SliderMode
         /// Enum for slider mode of the FilterFeedbackBar SliderItem.
         /// The  value is inited in func init().
@@ -1029,7 +1103,8 @@ public extension SortFilterItem {
         ///   - formatter: The title formatter of the slider
         ///   - icon: The icon image in the item bar
         ///   - hint: The hint text of the slider
-        public init(id: String = UUID().uuidString, name: String, value: Int? = nil, minimumValue: Int, maximumValue: Int, formatter: String? = nil, icon: String? = nil, hint: String? = nil) {
+        ///   - resetButtonConfiguration: A configuration to customize the reset button.
+        public init(id: String = UUID().uuidString, name: String, value: Int? = nil, minimumValue: Int, maximumValue: Int, formatter: String? = nil, icon: String? = nil, hint: String? = nil, resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = FilterFeedbackBarResetButtonConfiguration()) {
             self.id = id
             self.name = name
             self.value = Double(value ?? minimumValue)
@@ -1049,6 +1124,7 @@ public extension SortFilterItem {
             self.decimalPlaces = 0
             self.sliderMode = .single
             self.onValueChange = nil
+            self.resetButtonConfiguration = resetButtonConfiguration
         }
         
         /// Create a single slider with Double type value and selection range
@@ -1062,7 +1138,8 @@ public extension SortFilterItem {
         ///   - formatter: The title formatter of the slider
         ///   - icon: The icon image in the item bar
         ///   - hint: The hint text of the slider
-        public init(id: String = UUID().uuidString, name: String, value: Double? = nil, range: ClosedRange<Double> = 0 ... 100, step: Double = 1, decimalPlaces: Int = 0, formatter: String? = nil, icon: String? = nil, hint: String? = nil) {
+        ///   - resetButtonConfiguration: A configuration to customize the reset button.
+        public init(id: String = UUID().uuidString, name: String, value: Double? = nil, range: ClosedRange<Double> = 0 ... 100, step: Double = 1, decimalPlaces: Int = 0, formatter: String? = nil, icon: String? = nil, hint: String? = nil, resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = FilterFeedbackBarResetButtonConfiguration()) {
             self.id = id
             self.name = name
             self.value = value
@@ -1082,6 +1159,7 @@ public extension SortFilterItem {
             self.step = step
             self.decimalPlaces = decimalPlaces
             self.sliderMode = .single
+            self.resetButtonConfiguration = resetButtonConfiguration
         }
         
         /// Create a range slider with Double type value and selection range
@@ -1097,7 +1175,8 @@ public extension SortFilterItem {
         ///   - icon: The icon image in the item bar
         ///   - hint: The hint text of the slider
         ///   - onValueChange: The call back for value changing, return a tuple (hint style type, hint description), if the hint description has value, the hint label will show this value in stead of hint.
-        public init(id: String = UUID().uuidString, name: String, lowerValue: Double? = nil, upperValue: Double? = nil, range: ClosedRange<Double> = 0 ... 100, step: Double = 1, decimalPlaces: Int = 0, formatter: String? = nil, icon: String? = nil, hint: String? = nil, onValueChange: SliderValueChangeHandler? = nil) {
+        ///   - resetButtonConfiguration: A configuration to customize the reset button.
+        public init(id: String = UUID().uuidString, name: String, lowerValue: Double? = nil, upperValue: Double? = nil, range: ClosedRange<Double> = 0 ... 100, step: Double = 1, decimalPlaces: Int = 0, formatter: String? = nil, icon: String? = nil, hint: String? = nil, onValueChange: SliderValueChangeHandler? = nil, resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = FilterFeedbackBarResetButtonConfiguration()) {
             self.id = id
             self.name = name
             self.lowerValue = lowerValue
@@ -1121,6 +1200,7 @@ public extension SortFilterItem {
             self.step = step
             self.decimalPlaces = decimalPlaces
             self.sliderMode = .range
+            self.resetButtonConfiguration = resetButtonConfiguration
         }
         
         mutating func reset() {
@@ -1149,7 +1229,19 @@ public extension SortFilterItem {
                 self.upperValue = self.workingUpperValue
             }
         }
-        
+
+        mutating func deactivate() {
+            if self.sliderMode == .single {
+                self.workingValue = nil
+                self.value = nil
+            } else {
+                self.workingLowerValue = nil
+                self.workingUpperValue = nil
+                self.lowerValue = nil
+                self.upperValue = nil
+            }
+        }
+
         var isChecked: Bool {
             if self.sliderMode == .single {
                 self.value != nil
@@ -1208,7 +1300,11 @@ public extension SortFilterItem {
         public var icon: String?
         public let formatter: String?
         public let components: DatePickerComponents
-        
+
+        /// Configuration of the Reset button in the popover. Defaults to `.reset` type (restore original value).
+        /// Set its `type` to `.deactivate` to make the Reset button deactivate the chip and dismiss the popover.
+        var resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = .init()
+
         /// Convenience init to create DateTimeItem with custom date picker components.
         /// - Parameters:
         ///   - id: Unique identifier for the DateTimeItem.
@@ -1216,11 +1312,13 @@ public extension SortFilterItem {
         ///   - value: Date value of the DateTimeItem.
         ///   - formatter: Formatter string for the date value.
         ///   - icon: Icon name for the DateTimeItem. Default value is `nil`.
+        ///   - resetButtonConfiguration: A configuration to customize the reset button.
         public init(id: String = UUID().uuidString,
                     name: String,
                     value: Date?,
                     formatter: String? = nil,
-                    icon: String? = nil)
+                    icon: String? = nil,
+                    resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = FilterFeedbackBarResetButtonConfiguration())
         {
             self.id = id
             self.name = name
@@ -1230,6 +1328,7 @@ public extension SortFilterItem {
             self.formatter = formatter
             self.icon = icon
             self.components = [.hourAndMinute, .date]
+            self.resetButtonConfiguration = resetButtonConfiguration
         }
         
         /// Convenience init to create DateTimeItem with custom date picker components.
@@ -1240,12 +1339,14 @@ public extension SortFilterItem {
         ///   - formatter: Formatter string for the date value.
         ///   - icon: Icon name for the DateTimeItem. Default value is `nil`.
         ///   - components: Date picker components to display in view hierarchy. If set to `.date`, the "Hour and Minute" field will not show up in the picker. Default value is `[.hourAndMinute, .date]`.
+        ///   - resetButtonConfiguration: A configuration to customize the reset button.
         public init(id: String = UUID().uuidString,
                     name: String,
                     value: Date?,
                     formatter: String? = nil,
                     icon: String? = nil,
-                    components: DatePickerComponents = [.hourAndMinute, .date])
+                    components: DatePickerComponents = [.hourAndMinute, .date],
+                    resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = FilterFeedbackBarResetButtonConfiguration())
         {
             self.id = id
             self.name = name
@@ -1255,6 +1356,7 @@ public extension SortFilterItem {
             self.formatter = formatter
             self.icon = icon
             self.components = components
+            self.resetButtonConfiguration = resetButtonConfiguration
         }
         
         public func hash(into hasher: inout Hasher) {
@@ -1279,7 +1381,12 @@ public extension SortFilterItem {
         mutating func cancel() {
             self.workingValue = self.value
         }
-        
+
+        mutating func deactivate() {
+            self.workingValue = nil
+            self.value = nil
+        }
+
         var isChecked: Bool {
             self.value != nil
         }
@@ -1314,9 +1421,9 @@ public extension SortFilterItem {
     struct StepperItem: Identifiable, Equatable {
         public let id: String
         public var name: String
-        public var value: Double
-        var workingValue: Double
-        let originalValue: Double
+        public var value: Double?
+        var workingValue: Double?
+        let originalValue: Double?
         public let icon: String?
 
         public let stepperTitle: String
@@ -1330,8 +1437,12 @@ public extension SortFilterItem {
         public let decrementActionActive: Bool
         public let stepperIcon: UIImage?
         public let description: String?
-        
-        public init(id: String = UUID().uuidString, name: String, stepperTitle: String, value: Double, step: Double = 1, stepRange: ClosedRange<Double>, isDecimalSupported: Bool = false, incrementActionActive: Bool = true, decrementActionActive: Bool = true, icon: String? = nil, stepperIcon: UIImage? = nil, description: String? = nil) {
+
+        /// Configuration of the Reset button in the popover. Defaults to `.reset` type (restore original value).
+        /// Set its `type` to `.deactivate` to make the Reset button deactivate the chip and dismiss the popover.
+        var resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = .init()
+
+        public init(id: String = UUID().uuidString, name: String, stepperTitle: String, value: Double? = nil, step: Double = 1, stepRange: ClosedRange<Double>, isDecimalSupported: Bool = false, incrementActionActive: Bool = true, decrementActionActive: Bool = true, icon: String? = nil, stepperIcon: UIImage? = nil, description: String? = nil, resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = FilterFeedbackBarResetButtonConfiguration()) {
             self.id = id
             self.name = name
             self.value = value
@@ -1346,6 +1457,7 @@ public extension SortFilterItem {
             self.icon = icon
             self.stepperIcon = stepperIcon
             self.description = description
+            self.resetButtonConfiguration = resetButtonConfiguration
         }
         
         mutating func reset() {
@@ -1359,17 +1471,21 @@ public extension SortFilterItem {
         mutating func apply() {
             self.value = self.workingValue
         }
-        
+
+        mutating func deactivate() {
+            self.workingValue = nil
+            self.value = nil
+        }
+
         var isChecked: Bool {
-            true
+            self.value != nil
         }
         
         var label: String {
-            if self.isDecimalSupported {
-                return "\(self.name): \(String(describing: self.value))"
-            } else {
-                return "\(self.name): \(String(describing: Int(self.value)))"
-            }
+            guard let v = self.value else { return self.name }
+            return self.isDecimalSupported
+                ? "\(self.name): \(String(describing: v))"
+                : "\(self.name): \(String(describing: Int(v)))"
         }
         
         mutating func setValue(newValue: StepperItem) {
@@ -1405,7 +1521,11 @@ public extension SortFilterItem {
         public let allowsBeyondLimit: Bool
         public let charCountReachLimitMessage: String?
         public let charCountBeyondLimitMsg: String?
-        
+
+        /// Configuration of the Reset button in the popover. Defaults to `.reset` type (restore original value).
+        /// Set its `type` to `.deactivate` to make the Reset button deactivate the chip and dismiss the popover.
+        var resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = .init()
+
         /// Create a textfiled.
         /// - Parameters:
         ///   - id: The unique identifier for TitleItem.
@@ -1423,7 +1543,7 @@ public extension SortFilterItem {
         ///   - charCountBeyondLimitMsg: A text for char beyond maximum limit.
         ///   - icon: The icon image in the item bar.
         ///   - hintText: The hint text of the textfiled.
-        public init(id: String = UUID().uuidString, name: String, text: String, isSecureEnabled: Bool? = false, placeholder: String? = nil, controlState: ControlState = .normal, errorMessage: String? = nil, maxTextLength: Int? = nil, hidesReadOnlyHint: Bool = false, isCharCountEnabled: Bool = false, allowsBeyondLimit: Bool = false, charCountReachLimitMessage: String? = nil, charCountBeyondLimitMsg: String? = nil, icon: String? = nil, hintText: String? = nil) {
+        public init(id: String = UUID().uuidString, name: String, text: String, isSecureEnabled: Bool? = false, placeholder: String? = nil, controlState: ControlState = .normal, errorMessage: String? = nil, maxTextLength: Int? = nil, hidesReadOnlyHint: Bool = false, isCharCountEnabled: Bool = false, allowsBeyondLimit: Bool = false, charCountReachLimitMessage: String? = nil, charCountBeyondLimitMsg: String? = nil, icon: String? = nil, hintText: String? = nil, resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = FilterFeedbackBarResetButtonConfiguration()) {
             self.id = id
             self.name = name
             self.text = text
@@ -1441,6 +1561,7 @@ public extension SortFilterItem {
             self.charCountReachLimitMessage = charCountReachLimitMessage
             self.charCountBeyondLimitMsg = charCountBeyondLimitMsg
             self.hintText = hintText
+            self.resetButtonConfiguration = resetButtonConfiguration
         }
         
         mutating func reset() {
@@ -1469,6 +1590,11 @@ public extension SortFilterItem {
         
         var label: String {
             "\(self.name): \(self.text)"
+        }
+
+        mutating func deactivate() {
+            self.workingText = ""
+            self.text = ""
         }
     }
     
@@ -1493,7 +1619,11 @@ public extension SortFilterItem {
         public let charCountBeyondLimitMsg: String?
         public let minTextEditorHeight: CGFloat?
         public let maxTextEditorHeight: CGFloat?
-        
+
+        /// Configuration of the Reset button in the popover. Defaults to `.reset` type (restore original value).
+        /// Set its `type` to `.deactivate` to make the Reset button deactivate the chip and dismiss the popover.
+        var resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = .init()
+
         /// Create a textfiled.
         /// - Parameters:
         ///   - id: The unique identifier for TitleItem.
@@ -1512,7 +1642,7 @@ public extension SortFilterItem {
         ///   - charCountBeyondLimitMsg: A text for char beyond maximum limit.
         ///   - icon: The icon image in the item bar.
         ///   - hintText: The hint text of the textfiled.
-        public init(id: String = UUID().uuidString, name: String, text: String, isSecureEnabled: Bool? = false, placeholder: String? = nil, controlState: ControlState = .normal, errorMessage: String? = nil, minTextEditorHeight: CGFloat? = nil, maxTextEditorHeight: CGFloat? = nil, maxTextLength: Int? = nil, hidesReadOnlyHint: Bool = false, isCharCountEnabled: Bool = false, allowsBeyondLimit: Bool = false, charCountReachLimitMessage: String? = nil, charCountBeyondLimitMsg: String? = nil, icon: String? = nil, hintText: String? = nil) {
+        public init(id: String = UUID().uuidString, name: String, text: String, isSecureEnabled: Bool? = false, placeholder: String? = nil, controlState: ControlState = .normal, errorMessage: String? = nil, minTextEditorHeight: CGFloat? = nil, maxTextEditorHeight: CGFloat? = nil, maxTextLength: Int? = nil, hidesReadOnlyHint: Bool = false, isCharCountEnabled: Bool = false, allowsBeyondLimit: Bool = false, charCountReachLimitMessage: String? = nil, charCountBeyondLimitMsg: String? = nil, icon: String? = nil, hintText: String? = nil, resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = FilterFeedbackBarResetButtonConfiguration()) {
             self.id = id
             self.name = name
             self.text = text
@@ -1531,6 +1661,7 @@ public extension SortFilterItem {
             self.charCountReachLimitMessage = charCountReachLimitMessage
             self.charCountBeyondLimitMsg = charCountBeyondLimitMsg
             self.hintText = hintText
+            self.resetButtonConfiguration = resetButtonConfiguration
         }
         
         mutating func reset() {
@@ -1560,22 +1691,32 @@ public extension SortFilterItem {
         var label: String {
             "\(self.name): \(self.text)"
         }
+
+        mutating func deactivate() {
+            self.workingText = ""
+            self.text = ""
+        }
     }
     
     ///  Data structure for integer type durantion picker
     struct DurationPickerItem: Identifiable, Equatable {
         public let id: String
         public var name: String
-        public var value: Int
-        var workingValue: Int
-        let originalValue: Int
+        public var value: Int?
+        var workingValue: Int?
+        let originalValue: Int?
         public let icon: String?
         
         public let maximumMinutes: Int
         public let minimumMinutes: Int
         public let minuteInterval: Int
         public let measurementFormatter: MeasurementFormatter
-        public init(id: String = UUID().uuidString, name: String, value: Int, maximumMinutes: Int = 1439, minimumMinutes: Int = 0, minuteInterval: Int = 1, measurementFormatter: MeasurementFormatter = MeasurementFormatter(), icon: String? = nil) {
+
+        /// Configuration of the Reset button in the popover. Defaults to `.reset` type (restore original value).
+        /// Set its `type` to `.deactivate` to make the Reset button deactivate the chip and dismiss the popover.
+        var resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = .init()
+
+        public init(id: String = UUID().uuidString, name: String, value: Int? = nil, maximumMinutes: Int = 1439, minimumMinutes: Int = 0, minuteInterval: Int = 1, measurementFormatter: MeasurementFormatter = MeasurementFormatter(), icon: String? = nil, resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = FilterFeedbackBarResetButtonConfiguration()) {
             self.id = id
             self.name = name
             self.value = value
@@ -1586,6 +1727,7 @@ public extension SortFilterItem {
             self.minuteInterval = minuteInterval
             self.measurementFormatter = measurementFormatter
             self.icon = icon
+            self.resetButtonConfiguration = resetButtonConfiguration
         }
         
         mutating func reset() {
@@ -1599,17 +1741,23 @@ public extension SortFilterItem {
         mutating func apply() {
             self.value = self.workingValue
         }
-        
+
+        mutating func deactivate() {
+            self.workingValue = nil
+            self.value = nil
+        }
+
         var isChecked: Bool {
-            true
+            self.value != nil
         }
 
         var label: String {
-            let hour = self.value / 60
-            let min = self.value % 60
+            guard let v = self.value else { return self.name }
+            let hour = v / 60
+            let min = v % 60
             var durationString = ""
-            
-            if self.value == 0 {
+
+            if v == 0 {
                 durationString = "0" + " " + self.measurementFormatter.string(from: UnitDuration.minutes)
             } else {
                 if hour > 0 {
@@ -1651,7 +1799,18 @@ public extension SortFilterItem {
         
         public let isAtLeastOneSelected: Bool
         public let controlState: ControlState
-        
+
+        /// Configuration of the Reset button in the popover. Defaults to `.reset` type (restore original value).
+        /// Set its `type` to `.deactivate` to make the Reset button deactivate the chip and dismiss the popover.
+        var resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = .init()
+
+        /// True when the user has explicitly deactivated the chip via the Reset button (in `.deactivate` mode).
+        /// Unlike other item types, OrderPickerItem cannot use empty `value` to signal inactive — its `value`
+        /// array carries both configuration (criterion names, ascending labels) and per-row selection state,
+        /// so clearing it would lose the criteria themselves. We track activation as a separate flag instead.
+        var isInactive: Bool = false
+        var workingIsInactive: Bool = false
+
         /// Create a order picker item.
         /// - Parameters:
         ///   - id: Item id.
@@ -1661,7 +1820,7 @@ public extension SortFilterItem {
         ///   - isAtLeastOneSelected: Whether At least one sort criterion should be selected. The default is `true`.
         ///   - controlState: The `ControlState` of the  view. Currently, `.disabled`, `.normal` and `.readOnly` are supported. The default is `normal`.
         ///   - icon: The icon image in the item bar.
-        public init(id: String = UUID().uuidString, name: String, title: AttributedString? = nil, value: [OrderPickerItemModel], isAtLeastOneSelected: Bool = true, controlState: ControlState = .normal, icon: String? = nil) {
+        public init(id: String = UUID().uuidString, name: String, title: AttributedString? = nil, value: [OrderPickerItemModel], isAtLeastOneSelected: Bool = true, controlState: ControlState = .normal, icon: String? = nil, resetButtonConfiguration: FilterFeedbackBarResetButtonConfiguration = FilterFeedbackBarResetButtonConfiguration()) {
             self.id = id
             self.name = name
             self.title = title
@@ -1671,22 +1830,31 @@ public extension SortFilterItem {
             self.icon = icon
             self.isAtLeastOneSelected = isAtLeastOneSelected
             self.controlState = controlState
+            self.resetButtonConfiguration = resetButtonConfiguration
         }
         
         mutating func reset() {
             self.workingValue = self.originalValue
+            self.workingIsInactive = false
         }
         
         mutating func cancel() {
             self.workingValue = self.value
+            self.workingIsInactive = self.isInactive
         }
         
         mutating func apply() {
             self.value = self.workingValue
+            self.isInactive = self.workingIsInactive
         }
-        
+
+        mutating func deactivate() {
+            self.workingIsInactive = true
+            self.isInactive = true
+        }
+
         var isChecked: Bool {
-            true
+            !self.isInactive
         }
 
         var label: String {
@@ -1698,11 +1866,11 @@ public extension SortFilterItem {
         }
         
         var isChanged: Bool {
-            self.value != self.workingValue
+            self.value != self.workingValue || self.isInactive != self.workingIsInactive
         }
         
         var isOriginal: Bool {
-            self.workingValue == self.originalValue
+            self.workingValue == self.originalValue && !self.workingIsInactive
         }
     }
 }

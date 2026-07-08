@@ -118,25 +118,44 @@ struct CardFullWidthSingleButtonExample: View {
                 
                 if self.isGridView {
                     let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 2)
-                    LazyVGrid(columns: columns, spacing: 10) {
-                        ForEach(self._dataSource) { item in
-                            self.cardView(for: item)
-                                .frame(maxWidth: .infinity)
+                    ScrollViewReader { proxy in
+                        LazyVGrid(columns: columns, spacing: 10) {
+                            ForEach(self._dataSource) { item in
+                                self.cardView(for: item)
+                                    .frame(maxWidth: .infinity)
+                                    .id(item.id)
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .onAppear {
+                            if let firstID = self._dataSource.first?.id {
+                                proxy.scrollTo(firstID, anchor: .topLeading)
+                            }
                         }
                     }
-                    .padding(.horizontal, 16)
                 } else {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
-                            ForEach(0 ..< self._dataSource.count, id: \.self) { index in
-                                let item = self._dataSource[index]
-                                self.cardView(for: item)
-                                    .frame(maxWidth: 300)
-                                    .accessibility(sortPriority: Double(self._dataSource.count - index))
+                    ScrollViewReader { proxy in
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(0 ..< self._dataSource.count, id: \.self) { index in
+                                    let item = self._dataSource[index]
+                                    self.cardView(for: item)
+                                        .frame(maxWidth: 300)
+                                        .accessibility(sortPriority: Double(self._dataSource.count - index))
+                                        .id(item.id)
+                                }
+                            }
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .shadow(color: .preferredColor(.cardShadow), radius: 16)
+                            .padding(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
+                        }
+                        .onAppear {
+                            if let firstID = self._dataSource.first?.id {
+                                proxy.scrollTo(firstID, anchor: .leading)
                             }
                         }
                         .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .shadow(color: .preferredColor(.cardShadow), radius: 16) //
+                        .shadow(color: .preferredColor(.cardShadow), radius: 16)
                         .padding(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
                     }
                 }
@@ -159,8 +178,12 @@ struct CardFullWidthSingleButtonExample: View {
     func cardView(for item: CardFullWidthSingleButtonItem) -> some View {
         Card {
             Text("Schedule \(item.title)")
+                .lineLimit(1)
+                .minimumScaleFactor(0.1)
         } subtitle: {
             Text("Subtitle")
+                .lineLimit(1)
+                .minimumScaleFactor(0.1)
         } detailImage: {
             Image("ProfilePic")
                 .resizable()
@@ -170,7 +193,6 @@ struct CardFullWidthSingleButtonExample: View {
             FioriIcon.shopping.cart
         } row1: {
             Text("Body text could be really long description that requires wrapping, with suggested 2 lines from Fiori Design Guideline perspective to make the UI concise. SDK default setting of numberOfLines for body is 6. Application Developer can override it with : cell.body.numOfLines = preferredNumberOfLines.")
-                .lineLimit(2)
         } action: {
             FioriButton(action: { _ in
                 self.updateDataSource(id: item.id)
@@ -184,6 +206,8 @@ struct CardFullWidthSingleButtonExample: View {
         .frame(width: 300)
         .fixedSize(horizontal: false, vertical: true)
         .background(Color.white)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Schedule \(item.title)")
     }
 
     func updateDataSource(id: UUID) {
@@ -195,14 +219,24 @@ struct CardFullWidthSingleButtonExample: View {
                     item.loadingState = .processing
                     self._dataSource[i] = item
                     timeInterval = 2.0
+                    UIAccessibility.post(notification: .announcement, argument: "Checking in for Schedule \(item.title).")
                 } else if item.loadingState == .processing {
                     item.loadingState = .success
                     self._dataSource[i] = item
                     timeInterval = 1.0
+                    UIAccessibility.post(notification: .announcement, argument: "Checked in for Schedule \(item.title).")
                 } else {
+                    let removedTitle = item.title
                     self._dataSource.remove(at: i)
-                    if self._dataSource.isEmpty {
+                    let remaining = self._dataSource.count
+                    if remaining == 0 {
+                        UIAccessibility.post(notification: .announcement, argument: "All schedules checked in.")
                         self.dismiss()
+                    } else {
+                        UIAccessibility.post(
+                            notification: .announcement,
+                            argument: "Schedule \(removedTitle) removed. \(remaining) schedule\(remaining == 1 ? "" : "s") remaining."
+                        )
                     }
                     return
                 }

@@ -83,10 +83,14 @@ extension SortFilterCFGItemContainer: View {
                             switch self._items[r][c] {
                             case .picker:
                                 var pickerItem: SortFilterItem.PickerItem = self._items[r][c].picker
-                                if pickerItem.resetButtonConfiguration.type == .reset {
+                                switch pickerItem.resetButtonConfiguration.type {
+                                case .reset:
                                     pickerItem.reset()
-                                } else {
+                                case .clearAll:
                                     pickerItem.clearAll()
+                                case .deactivate:
+                                    pickerItem.deactivate()
+                                    self._items[r][c].picker = pickerItem
                                 }
                             default:
                                 self._items[r][c].reset()
@@ -216,58 +220,143 @@ extension SortFilterCFGItemContainer: View {
     func listPickerDestination(row r: Int, column c: Int) -> some View {
         let filter: ((SortFilterItem.PickerItem.ValueOptionModel, String) -> Bool) = { f, s in
             if !s.isEmpty {
+                if let customFilter = self._items[r][c].picker.configuration?.searchFilter {
+                    return customFilter(f.value, s)
+                }
                 return f.value.localizedCaseInsensitiveContains(s)
             } else {
                 return true
             }
         }
-        
-        return ListPickerDestination(self._items[r][c].picker.uuidValueOptions,
-                                     id: \.id,
-                                     selections: Binding<Set<UUID>>(get: { self._items[r][c].picker.workingValueSet }, set: { self._items[r][c].picker.workingValueSet = $0 }),
-                                     allowEmpty: self._items[r][c].picker.allowsEmptySelection,
-                                     isTrackingLiveChanges: true,
-                                     searchFilter: self._items[r][c].picker.isSearchBarHidden == false ? filter : nil)
-        { e in
-            Text(e.value)
-        }
-        .disableEntriesSection(self._items[r][c].picker.disableListEntriesSection)
-        .disableContentSection(self._items[r][c].picker.disableListContentSection)
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-        .environment(\.defaultMinListRowHeight, 0)
-        .environment(\.defaultMinListHeaderHeight, 0)
-        .isFilterFeedbackBarListPickerStyle(true)
-        .onChange(of: self._items[r][c].picker.workingValueSet) {
-            self._items[r][c].picker.workingValue = self._items[r][c].picker.workingValueSet.flatMap { selectedId in
-                self._items[r][c].picker.uuidValueOptions.filter { $0.id == selectedId }.map(\.index)
-            }
-        }
-        .modifier(FioriIntrospectModifier<UIScrollView> { scrollView in
-            DispatchQueue.main.async {
-                let calculateHeight = max(scrollView.contentSize.height + scrollView.adjustedContentInset.top, 88)
-                self.sortFilterContentHeight.wrappedValue = calculateHeight
-            }
-        })
-        .selectedEntriesSectionTitleStyle { _ in
-            if self._items[r][c].picker.allowsDisplaySelectionCount {
-                Text(NSLocalizedString("Selected", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: "") + " " + "(\(self._items[r][c].picker.workingValue.count))")
-                    .foregroundStyle(Color.preferredColor(.secondaryLabel))
-                    .font(.fiori(forTextStyle: .subheadline, weight: .regular))
+
+        let rowContentBuilder: (SortFilterItem.PickerItem.ValueOptionModel) -> AnyView = { e in
+            if let provider = self._items[r][c].picker.configuration?.rowContentProvider {
+                return AnyView(provider(e.index))
             } else {
-                Text(NSLocalizedString("Selected", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: ""))
+                return AnyView(Text(e.value))
+            }
+        }
+
+        let allowsMultipleSelection = self._items[r][c].picker.allowsMultipleSelection
+
+        if allowsMultipleSelection {
+            return ListPickerDestination(self._items[r][c].picker.uuidValueOptions,
+                                         id: \.id,
+                                         selections: Binding<Set<UUID>>(get: { self._items[r][c].picker.workingValueSet }, set: { self._items[r][c].picker.workingValueSet = $0 }),
+                                         allowEmpty: self._items[r][c].picker.allowsEmptySelection,
+                                         isTrackingLiveChanges: true,
+                                         searchFilter: self._items[r][c].picker.isSearchBarHidden == false ? filter : nil)
+            { e in
+                let baseView = rowContentBuilder(e)
+                if e.index == self._items[r][c].picker.uuidValueOptions.count - 1,
+                   self._items[r][c].picker.configuration?.hasMoreData == true
+                {
+                    AnyView(baseView.onAppear {
+                        self._items[r][c].picker.configuration?.onLoadMore?()
+                    })
+                } else {
+                    baseView
+                }
+            }
+            .disableEntriesSection(self._items[r][c].picker.disableListEntriesSection)
+            .disableContentSection(self._items[r][c].picker.disableListContentSection)
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .environment(\.defaultMinListRowHeight, 0)
+            .environment(\.defaultMinListHeaderHeight, 0)
+            .isFilterFeedbackBarListPickerStyle(true)
+            .onChange(of: self._items[r][c].picker.workingValueSet) {
+                self._items[r][c].picker.workingValue = self._items[r][c].picker.workingValueSet.flatMap { selectedId in
+                    self._items[r][c].picker.uuidValueOptions.filter { $0.id == selectedId }.map(\.index)
+                }
+            }
+            .modifier(FioriIntrospectModifier<UIScrollView> { scrollView in
+                DispatchQueue.main.async {
+                    let calculateHeight = max(scrollView.contentSize.height + scrollView.adjustedContentInset.top, 88)
+                    self.sortFilterContentHeight.wrappedValue = calculateHeight
+                }
+            })
+            .selectedEntriesSectionTitleStyle { _ in
+                if self._items[r][c].picker.allowsDisplaySelectionCount {
+                    Text(NSLocalizedString("Selected", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: "") + " " + "(\(self._items[r][c].picker.workingValue.count))")
+                        .foregroundStyle(Color.preferredColor(.secondaryLabel))
+                        .font(.fiori(forTextStyle: .subheadline, weight: .regular))
+                } else {
+                    Text(NSLocalizedString("Selected", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: ""))
+                        .foregroundStyle(Color.preferredColor(.secondaryLabel))
+                        .font(.fiori(forTextStyle: .subheadline, weight: .regular))
+                }
+            }
+            .allEntriesSectionTitleStyle { _ in
+                Text(NSLocalizedString("All", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: ""))
                     .foregroundStyle(Color.preferredColor(.secondaryLabel))
                     .font(.fiori(forTextStyle: .subheadline, weight: .regular))
             }
+            .ifApply(!self._items[r][c].picker.resetButtonConfiguration.isHidden, content: { v in
+                self.toolbarForListPicker(v: v, row: r, column: c)
+            })
+        } else {
+            let singleSelection = Binding<UUID?>(
+                get: { self._items[r][c].picker.workingValueSet.first },
+                set: { newValue in
+                    self._items[r][c].picker.workingValueSet = newValue.map { [$0] } ?? []
+                }
+            )
+            return ListPickerDestination(self._items[r][c].picker.uuidValueOptions,
+                                         id: \.id,
+                                         selection: singleSelection,
+                                         isTrackingLiveChanges: true,
+                                         searchFilter: self._items[r][c].picker.isSearchBarHidden == false ? filter : nil)
+            { e in
+                let baseView = rowContentBuilder(e)
+                if e.index == self._items[r][c].picker.uuidValueOptions.count - 1,
+                   self._items[r][c].picker.configuration?.hasMoreData == true
+                {
+                    AnyView(baseView.onAppear {
+                        self._items[r][c].picker.configuration?.onLoadMore?()
+                    })
+                } else {
+                    baseView
+                }
+            }
+            .disableEntriesSection(self._items[r][c].picker.disableListEntriesSection)
+            .disableContentSection(self._items[r][c].picker.disableListContentSection)
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .environment(\.defaultMinListRowHeight, 0)
+            .environment(\.defaultMinListHeaderHeight, 0)
+            .isFilterFeedbackBarListPickerStyle(true)
+            .onChange(of: self._items[r][c].picker.workingValueSet) {
+                self._items[r][c].picker.workingValue = self._items[r][c].picker.workingValueSet.flatMap { selectedId in
+                    self._items[r][c].picker.uuidValueOptions.filter { $0.id == selectedId }.map(\.index)
+                }
+            }
+            .modifier(FioriIntrospectModifier<UIScrollView> { scrollView in
+                DispatchQueue.main.async {
+                    let calculateHeight = max(scrollView.contentSize.height + scrollView.adjustedContentInset.top, 88)
+                    self.sortFilterContentHeight.wrappedValue = calculateHeight
+                }
+            })
+            .selectedEntriesSectionTitleStyle { _ in
+                if self._items[r][c].picker.allowsDisplaySelectionCount {
+                    Text(NSLocalizedString("Selected", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: "") + " " + "(\(self._items[r][c].picker.workingValue.count))")
+                        .foregroundStyle(Color.preferredColor(.secondaryLabel))
+                        .font(.fiori(forTextStyle: .subheadline, weight: .regular))
+                } else {
+                    Text(NSLocalizedString("Selected", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: ""))
+                        .foregroundStyle(Color.preferredColor(.secondaryLabel))
+                        .font(.fiori(forTextStyle: .subheadline, weight: .regular))
+                }
+            }
+            .allEntriesSectionTitleStyle { _ in
+                Text(NSLocalizedString("All", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: ""))
+                    .foregroundStyle(Color.preferredColor(.secondaryLabel))
+                    .font(.fiori(forTextStyle: .subheadline, weight: .regular))
+            }
+            .ifApply(!self._items[r][c].picker.resetButtonConfiguration.isHidden, content: { v in
+                self.toolbarForListPicker(v: v, row: r, column: c)
+            })
         }
-        .allEntriesSectionTitleStyle { _ in
-            Text(NSLocalizedString("All", tableName: "FioriSwiftUICore", bundle: Bundle.accessor, comment: ""))
-                .foregroundStyle(Color.preferredColor(.secondaryLabel))
-                .font(.fiori(forTextStyle: .subheadline, weight: .regular))
-        }
-        .ifApply(!self._items[r][c].picker.resetButtonConfiguration.isHidden, content: { v in
-            self.toolbarForListPicker(v: v, row: r, column: c)
-        })
     }
     
     private func toolbarForListPicker(v: some View, row r: Int, column c: Int) -> some View {
@@ -278,14 +367,27 @@ extension SortFilterCFGItemContainer: View {
                     EmptyView()
                 } else {
                     _Action(actionText: item.resetButtonConfiguration.title, didSelectAction: {
-                        if item.resetButtonConfiguration.type == .reset {
+                        switch item.resetButtonConfiguration.type {
+                        case .reset:
                             item.reset()
-                        } else {
+                        case .clearAll:
                             item.clearAll()
+                        case .deactivate:
+                            item.deactivate()
+                            self._items[r][c].picker = item
                         }
                     })
                     .buttonStyle(ResetButtonStyle())
-                    .disabled(item.resetButtonConfiguration.type == .reset ? item.isOriginal : item.workingValue.isEmpty)
+                    .disabled({
+                        switch item.resetButtonConfiguration.type {
+                        case .reset:
+                            return item.isOriginal
+                        case .clearAll:
+                            return item.workingValue.isEmpty
+                        case .deactivate:
+                            return !item.isChecked
+                        }
+                    }())
                 }
             }
         }
@@ -452,12 +554,24 @@ extension SortFilterCFGItemContainer: View {
                             self._items[r][c].picker.onTap(option: self._items[r][c].picker.valueOptions[idx])
                             self._items[r][c].picker.apply()
                         } label: {
-                            Label { Text(self._items[r][c].picker.valueOptions[idx]) } icon: { Image(fioriName: "fiori.accept") }
+                            Label {
+                                if let provider = self._items[r][c].picker.configuration?.rowContentProvider {
+                                    provider(idx)
+                                } else {
+                                    Text(self._items[r][c].picker.valueOptions[idx])
+                                }
+                            } icon: { Image(fioriName: "fiori.accept") }
                         }
                     } else {
-                        Button(self._items[r][c].picker.valueOptions[idx]) {
+                        Button {
                             self._items[r][c].picker.onTap(option: self._items[r][c].picker.valueOptions[idx])
                             self._items[r][c].picker.apply()
+                        } label: {
+                            if let provider = self._items[r][c].picker.configuration?.rowContentProvider {
+                                provider(idx)
+                            } else {
+                                Text(self._items[r][c].picker.valueOptions[idx])
+                            }
                         }
                     }
                 }
@@ -479,12 +593,17 @@ extension SortFilterCFGItemContainer: View {
             StepperView(
                 title: { Text(self._items[r][c].stepper.stepperTitle) },
                 text: Binding<String>(get: {
-                    if self._items[r][c].stepper.isDecimalSupported {
-                        String(describing: self._items[r][c].stepper.workingValue)
+                    let v = self._items[r][c].stepper.workingValue ?? self._items[r][c].stepper.stepRange.lowerBound
+                    return self._items[r][c].stepper.isDecimalSupported
+                        ? String(describing: v)
+                        : String(describing: Int(v))
+                }, set: { newText in
+                    if newText.isEmpty {
+                        self._items[r][c].stepper.workingValue = nil
                     } else {
-                        String(describing: Int(self._items[r][c].stepper.workingValue))
+                        self._items[r][c].stepper.workingValue = Double(newText)
                     }
-                }, set: { self._items[r][c].stepper.workingValue = Double($0) ?? 0 }),
+                }),
                 step: self._items[r][c].stepper.step,
                 stepRange: self._items[r][c].stepper.stepRange,
                 isDecimalSupported: self._items[r][c].stepper.isDecimalSupported,
@@ -574,7 +693,10 @@ extension SortFilterCFGItemContainer: View {
                 Spacer()
             }
             
-            DurationPickerViewWrapper(selection: self.$_items[r][c].durationPicker.workingValue, maximumMinutes: self._items[r][c].durationPicker.maximumMinutes, minimumMinutes: self._items[r][c].durationPicker.minimumMinutes, minuteInterval: self._items[r][c].durationPicker.minuteInterval, measurementFormatter: self._items[r][c].durationPicker.measurementFormatter)
+            DurationPickerViewWrapper(selection: Binding<Int>(
+                get: { self._items[r][c].durationPicker.workingValue ?? 0 },
+                set: { self._items[r][c].durationPicker.workingValue = $0 }
+            ), maximumMinutes: self._items[r][c].durationPicker.maximumMinutes, minimumMinutes: self._items[r][c].durationPicker.minimumMinutes, minuteInterval: self._items[r][c].durationPicker.minuteInterval, measurementFormatter: self._items[r][c].durationPicker.measurementFormatter)
                 .frame(height: 204)
                 .foregroundColor(Color.preferredColor(.primaryLabel))
         }

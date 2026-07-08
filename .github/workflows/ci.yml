@@ -12,8 +12,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-26]
-        xcode: ['Xcode_26.4']
+        xcode: ['Xcode_26.6']
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
     env:
       DEVELOPER_DIR: /Applications/${{ matrix.xcode }}.app/Contents/Developer
 
@@ -24,7 +26,7 @@ jobs:
       run: xcrun xcodebuild -downloadPlatform iOS 
 
     - name: Build and Test
-      run: set -o pipefail && xcodebuild -parallel-testing-enabled NO -verbose -enableCodeCoverage YES -scheme FioriSwiftUI-Package -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.2' ARCHS=arm64 OTHER_SWIFT_FLAGS="-Xfrontend -solver-expression-time-threshold=500 -Xfrontend -warn-long-function-bodies=50" clean build test | xcpretty
+      run: set -o pipefail && xcodebuild -parallel-testing-enabled NO -verbose -enableCodeCoverage YES -scheme FioriSwiftUI-Package -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' ARCHS=arm64 OTHER_SWIFT_FLAGS="-Xfrontend -solver-expression-time-threshold=500 -Xfrontend -warn-long-function-bodies=50" clean build test | xcpretty
       
     - name: Create code coverage report
       run: ./scripts/xccov-to-sonarqube-generic.sh /Users/runner/Library/Developer/Xcode/DerivedData/cloud-sdk-ios-fiori*/Logs/Test/*.xcresult/ > sonarqube-generic-coverage.xml
@@ -38,6 +40,9 @@ jobs:
     needs: build
     if: github.event_name == 'push' && github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     steps:
     - uses: actions/checkout@v3
       with:
@@ -57,8 +62,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-26]
-        xcode: ['Xcode_26.4']
+        xcode: ['Xcode_26.6']
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
     env:
       DEVELOPER_DIR: /Applications/${{ matrix.xcode }}.app/Contents/Developer
     
@@ -74,8 +81,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-26]
-        xcode: ['Xcode_26.4']
+        xcode: ['Xcode_26.6']
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
     env:
       DEVELOPER_DIR: /Applications/${{ matrix.xcode }}.app/Contents/Developer
     
