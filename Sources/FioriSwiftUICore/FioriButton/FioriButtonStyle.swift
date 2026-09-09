@@ -258,8 +258,7 @@ public struct FioriNavigationButtonStyle: FioriButtonStyle {
         }
         let config = FioriButtonConfiguration(foregroundColor: foregroundColor,
                                               backgroundColor: Color.clear,
-                                              font: .fiori(forTextStyle: .body, weight: .semibold),
-                                              padding: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                                              font: .fiori(forTextStyle: .body, weight: .semibold))
         return configuration.containerView(.unspecified)
             .fioriButtonConfiguration(config)
             .contentShape(.accessibility, .rect.scale(x: 1.4, y: 1.1))
@@ -356,6 +355,7 @@ public struct FioriGlassButtonStyle: FioriButtonStyle {
             .tint(config.foregroundColor)
             .padding(config.padding)
             .frame(minWidth: 44, maxWidth: config.maxWidth, minHeight: config.minHeight)
+            .contentShape(Rectangle())
             .ifApply(self.glassEffect == .tint, content: {
                 $0.glassEffect(.regular.tint(.preferredColor(.tintColor)))
             })

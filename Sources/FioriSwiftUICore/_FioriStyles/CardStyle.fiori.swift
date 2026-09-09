@@ -396,7 +396,7 @@ public struct CardCardStyle: CardStyle {
                     .inset(by: 0.3)
                     .stroke(Color.preferredColor(.tertiaryLabel).opacity(0.24), lineWidth: 0.3)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .clipShape(RoundedRectangle(cornerRadius: 26))
             .accessibilityElement(children: .contain)
             .accessibilityLabel("Card".localizedFioriString())
             .ifApply(self.shadowEffectConfiguration.showShadow) { content in
@@ -603,6 +603,9 @@ public enum CardTests {
             ChartView(CardTests.chartModel)
                 .frame(minWidth: 128)
                 .frame(height: 168)
+                .accessibilityLabel("Column chart: Top Products")
+                .accessibilityValue("Single Beds: Jan: 30, Feb: 22, Mar: 80, Apr: 70, May: 60, Jun: 64, Jul: 50, Aug: 20, Sep: 90, Oct: 80, Nov: 50, Dec: 16. Double Beds: Jan: 22, Feb: 30, Mar: 90, Apr: 80, May: 70, Jun: 32, Jul: 28, Aug: 36, Sep: 84, Oct: 70, Nov: 30, Dec: 32.")
+                .accessibilityHint("Chart showing monthly data for two product series")
             
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
@@ -637,6 +640,9 @@ public enum CardTests {
     } cardBody: {
         DataTable(model: CardTests.tableCard)
             .frame(height: 70)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Status table: Need Attention, Critical, Yesterday. Stable, Jul 5, 2021. Need Attention, Jul 4, 2021.")
+
     } action: {
         Button {
             print("Tapped")
@@ -1271,10 +1277,16 @@ public enum CardTests {
         Text("1 of 3")
     } action: {
         FioriButton(title: "Primary")
+            .accessibilityLabel("Primary")
+            .accessibilityHint("Primary action button")
     } secondaryAction: {
         FioriButton(title: "Secondary")
+            .accessibilityLabel("Secondary")
+            .accessibilityHint("Secondary action button")
     } tertiaryAction: {
         FioriButton(title: "Tertiary")
+            .accessibilityLabel("Tertiary")
+            .accessibilityHint("Tertiary action button")
     }
     
     static let sampleCard14 = Card(title: "Title",
