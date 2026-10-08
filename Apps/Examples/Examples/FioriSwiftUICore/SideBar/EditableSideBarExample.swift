@@ -217,10 +217,12 @@ func loadItemModelData() -> [SideBarItemModel] {
         }
     }
     
-    for category in groupdedItems.keys {
-        var section = SideBarItemModel(title: category.rawValue)
-        section.children = groupdedItems[category]
-        barItems.append(section)
+    for category in DeviceCategory.allCases {
+        if let groupedItems = groupdedItems[category] {
+            var section = SideBarItemModel(title: category.rawValue)
+            section.children = groupedItems
+            barItems.append(section)
+        }
     }
     
     return barItems
@@ -279,7 +281,7 @@ struct DeviceDetailView: View {
             .navigationTitle(device.name)
             .navigationBarTitleDisplayMode(.inline)
         } else {
-            Group {}
+            EmptyView()
         }
     }
 }
