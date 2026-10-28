@@ -413,22 +413,23 @@ public struct AIUserFeedbackBaseStyle: AIUserFeedbackStyle {
                 FioriButton { _ in
                     HStack {
                         Image(systemName: "chevron.backward")
-                        Text("Back".localizedFioriString())
-                            .font(.fiori(forTextStyle: .body, weight: .semibold))
+                        if !LiquidGlassHelper.usesLiquidGlassUI {
+                            Text("Back".localizedFioriString())
+                                .font(.fiori(forTextStyle: .body, weight: .semibold))
+                        }
                     }
                 }
-                .fioriButtonStyle(FioriNavigationButtonStyle())
-                .fixedSize()
+                .fioriButtonStyle(self.cancelFioriButtonStyle())
                 .onSimultaneousTapGesture {
                     configuration.onCancel?()
                     self.dismiss()
                 }
             }
+            .hideSharedBackground()
         } else {
             ToolbarItem(placement: .topBarLeading) {
                 configuration.cancelAction
-                    .fioriButtonStyle(FioriNavigationButtonStyle())
-                    .fixedSize()
+                    .fioriButtonStyle(self.cancelFioriButtonStyle())
                     .onSimultaneousTapGesture {
                         configuration.onCancel?()
                         switch configuration.displayMode {
@@ -441,6 +442,21 @@ public struct AIUserFeedbackBaseStyle: AIUserFeedbackStyle {
                         }
                     }
             }
+            .hideSharedBackground()
+        }
+    }
+    
+    func cancelFioriButtonStyle() -> some FioriButtonStyle {
+        if LiquidGlassHelper.usesLiquidGlassUI, #available(iOS 26.0, watchOS 26.0, visionOS 26.0, *) {
+            FilterFeedbackGlassButtonStyle(
+                foregroundColor: .preferredColor(.secondaryLabel),
+                font: .fiori(forTextStyle: .body, weight: .medium),
+                shape: .circle
+            )
+            .eraseToAnyFioriButtonStyle()
+        } else {
+            FioriNavigationButtonStyle()
+                .eraseToAnyFioriButtonStyle()
         }
     }
     

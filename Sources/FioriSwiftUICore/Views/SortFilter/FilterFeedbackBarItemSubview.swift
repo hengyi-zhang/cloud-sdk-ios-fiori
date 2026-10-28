@@ -1,7 +1,7 @@
 import FioriThemeManager
 import SwiftUI
 
-@available(iOS 26.0, watchOS 26.0, *)
+@available(iOS 26.0, watchOS 26.0, visionOS 26.0, *)
 struct FilterFeedbackGlassButtonStyle: FioriButtonStyle {
     enum GlassEffectShape {
         case normal

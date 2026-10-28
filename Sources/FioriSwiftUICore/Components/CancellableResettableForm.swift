@@ -417,7 +417,25 @@ private struct WindowTraitReader: UIViewControllerRepresentable {
     }
 }
 
-extension ToolbarContent {
+public extension ToolbarContent {
+    /// Hides the shared background of a toolbar item introduced in iOS 26 / macOS 26
+    /// under the Liquid Glass design system.
+    ///
+    /// In iOS 26 and macOS 26, toolbar items that share the same placement area are
+    /// grouped together and rendered on a common "shared background" material by default.
+    /// This modifier opts a specific toolbar item out of that grouped appearance,
+    /// making its background invisible while keeping the item itself fully interactive.
+    ///
+    /// This is typically used for toolbar buttons (e.g., Cancel, Reset) that should
+    /// appear as plain text or icon controls without the pill-shaped glass background.
+    ///
+    /// On older OS versions and on visionOS, this modifier has no visual effect and
+    /// returns `self` unchanged, so it is safe to call unconditionally.
+    ///
+    /// - Parameter visibility: The desired visibility of the shared background.
+    ///   Defaults to `.hidden`.
+    /// - Returns: A toolbar content view with the shared background visibility applied
+    ///   on supported platforms, or the original content on unsupported platforms.
     func hideSharedBackground(_ visibility: Visibility = .hidden) -> some ToolbarContent {
         if #available(iOS 26.0, macOS 26.0, *) {
             #if !os(visionOS)
