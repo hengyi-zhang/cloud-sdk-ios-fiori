@@ -192,7 +192,7 @@ public struct AIUserFeedbackBaseStyle: AIUserFeedbackStyle {
                                 self.feedbackDetailView(configuration)
                             }
                             
-                            if self.isShowSubmitButton {
+                            if self.isShowSubmitButton, !LiquidGlassHelper.usesLiquidGlassUI {
                                 self.submitButton(configuration)
                                     .onSimultaneousTapGesture {
                                         self.onSubmitAction(configuration)
@@ -249,6 +249,18 @@ public struct AIUserFeedbackBaseStyle: AIUserFeedbackStyle {
                     .foregroundColor(Color.preferredColor(.primaryLabel))
                     .font(Font.fiori(forTextStyle: .subheadline, weight: .black))
                     .accessibilityAddTraits(.isHeader)
+            }
+            if self.isShowSubmitButton, LiquidGlassHelper.usesLiquidGlassUI, #available(iOS 26.0, watchOS 26.0, *) {
+                ToolbarItem(placement: .bottomBar) {
+                    self.submitButton(configuration)
+                        .onSimultaneousTapGesture {
+                            self.onSubmitAction(configuration)
+                        }
+                        .disabled(configuration.submitButtonState == .disabled)
+                }
+                #if !os(visionOS)
+                .sharedBackgroundVisibility(.hidden)
+                #endif
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -357,10 +369,34 @@ public struct AIUserFeedbackBaseStyle: AIUserFeedbackStyle {
         if configuration.submitAction.isEmpty {
             if configuration.submitButtonState == .inProgress {
                 FioriButton { _ in Text("Loading...".localizedFioriString()) }
-                    .fioriButtonStyle(FioriSecondaryButtonStyle(maxWidth: .infinity, loadingState: .processing))
+                    .ifApply(LiquidGlassHelper.usesLiquidGlassUI, content: {
+                        #if !os(visionOS)
+                            if #available(iOS 26.0, watchOS 26.0, *) {
+                                return $0.fioriButtonStyle(FioriGlassButtonStyle(glassEffect: .tint, maxWidth: .infinity))
+                                    .typeErased
+                            }
+                        #endif
+                        return $0.fioriButtonStyle(FioriSecondaryButtonStyle(maxWidth: .infinity, loadingState: .processing))
+                            .typeErased
+                    })
+                    .ifApply(!LiquidGlassHelper.usesLiquidGlassUI, content: {
+                        $0.fioriButtonStyle(FioriSecondaryButtonStyle(maxWidth: .infinity, loadingState: .processing))
+                    })
             } else {
                 FioriButton { _ in Text("Submit".localizedFioriString()) }
-                    .fioriButtonStyle(FioriSecondaryButtonStyle(maxWidth: .infinity, loadingState: .unspecified))
+                    .ifApply(LiquidGlassHelper.usesLiquidGlassUI, content: {
+                        #if !os(visionOS)
+                            if #available(iOS 26.0, watchOS 26.0, *) {
+                                return $0.fioriButtonStyle(FioriGlassButtonStyle(glassEffect: .tint, maxWidth: .infinity))
+                                    .typeErased
+                            }
+                        #endif
+                        return $0.fioriButtonStyle(FioriSecondaryButtonStyle(maxWidth: .infinity, loadingState: .unspecified))
+                            .typeErased
+                    })
+                    .ifApply(!LiquidGlassHelper.usesLiquidGlassUI, content: {
+                        $0.fioriButtonStyle(FioriSecondaryButtonStyle(maxWidth: .infinity, loadingState: .unspecified))
+                    })
             }
         } else {
             configuration.submitAction

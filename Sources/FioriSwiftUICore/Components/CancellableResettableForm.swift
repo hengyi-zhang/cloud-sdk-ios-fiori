@@ -12,14 +12,8 @@ struct CancellableResettableDialogNavigationForm<Title: View, CancelAction: View
     let calculateScrollView: Bool
     @State private var sheetContentHeight: CGFloat = 0
     @State private var hasInitialMeasurement: Bool = false
-    @State private var bottomHeight: CGFloat = 0
-    @State private var navigationBarHeight: CGFloat = {
-        if LiquidGlassHelper.usesLiquidGlassUI {
-            return UIDevice.current.userInterfaceIdiom != .phone ? 67 : 74
-        } else {
-            return UIDevice.current.userInterfaceIdiom != .phone ? 50.0 : 56.0
-        }
-    }()
+    @State private var bottomHeight: CGFloat = LiquidGlassHelper.usesLiquidGlassUI ? 86 : 0
+    @State private var navigationBarHeight: CGFloat
 
     @State private var scrollViewHeight: CGFloat? = nil
     @State private var subScrollViewHeight: CGFloat = 0
@@ -41,12 +35,39 @@ struct CancellableResettableDialogNavigationForm<Title: View, CancelAction: View
                 @ViewBuilder applyAction: () -> ApplyAction,
                 @ViewBuilder components: () -> Components)
     {
+        self.init(calculateScrollView: calculateScrollView, isSearchable: false, dynamicDetentHeight: dynamicDetentHeight, title: title, cancelAction: cancelAction, resetAction: resetAction, applyAction: applyAction, components: components)
+    }
+    
+    public init(calculateScrollView: Bool = false,
+                isSearchable: Bool = false,
+                dynamicDetentHeight: Binding<CGFloat> = .constant(0),
+                @ViewBuilder title: () -> Title,
+                @ViewBuilder cancelAction: () -> CancelAction,
+                @ViewBuilder resetAction: () -> ResetAction,
+                @ViewBuilder applyAction: () -> ApplyAction,
+                @ViewBuilder components: () -> Components)
+    {
         self.calculateScrollView = calculateScrollView
         self.title = title()
         self.cancelAction = cancelAction()
         self.resetAction = resetAction()
         self.applyAction = applyAction()
         self.components = components()
+        
+        self.navigationBarHeight = {
+            var topBarHeight: CGFloat = 0
+            if LiquidGlassHelper.usesLiquidGlassUI {
+                if UIDevice.current.userInterfaceIdiom == .vision {
+                    topBarHeight = 92
+                } else {
+                    topBarHeight = UIDevice.current.userInterfaceIdiom != .phone ? 67 : 74
+                }
+            } else {
+                topBarHeight = UIDevice.current.userInterfaceIdiom != .phone ? 50.0 : 56.0
+            }
+            topBarHeight += (isSearchable ? 56 : 0)
+            return topBarHeight
+        }()
     }
     
     var body: some View {
@@ -65,10 +86,9 @@ struct CancellableResettableDialogNavigationForm<Title: View, CancelAction: View
                         .ifApply(self.calculateScrollView) {
                             if #available(iOS 18, *) {
                                 return $0.onScrollGeometryChange(for: [Double].self) { geo in
-                                    [geo.contentSize.height,
-                                     geo.contentInsets.top]
+                                    [geo.contentSize.height]
                                 } action: { _, newValue in
-                                    self.scrollViewHeight = max(newValue.reduce(0, +), 88)
+                                    self.scrollViewHeight = max(newValue.reduce(0, +), 88) + self.navigationBarHeight
                                 }
                                 .typeErased
                             } else {
@@ -112,17 +132,19 @@ struct CancellableResettableDialogNavigationForm<Title: View, CancelAction: View
                                 }.typeErased
                             }
                         }
-                    VStack(spacing: 0) {
-                        self.applyAction
-                            .accessibilityIdentifier("Apply")
-                        Spacer().frame(height: self.horizontalSizeClass == .regular ? 16 : 6)
-                    }
-                    .background {
-                        GeometryReader { proxy in
-                            Color.clear
-                                .task {
-                                    self.bottomHeight = proxy.size.height
-                                }
+                    if !LiquidGlassHelper.usesLiquidGlassUI {
+                        VStack(spacing: 0) {
+                            self.applyAction
+                                .accessibilityIdentifier("Apply")
+                            Spacer().frame(height: self.horizontalSizeClass == .regular ? 16 : 6)
+                        }
+                        .background {
+                            GeometryReader { proxy in
+                                Color.clear
+                                    .task {
+                                        self.bottomHeight = proxy.size.height
+                                    }
+                            }
                         }
                     }
                 }
@@ -137,11 +159,20 @@ struct CancellableResettableDialogNavigationForm<Title: View, CancelAction: View
                         .fixedSize()
                         .accessibilityIdentifier("Cancel")
                 }.hideSharedBackground()
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: LiquidGlassHelper.usesLiquidGlassUI ? .bottomBar : .topBarTrailing) {
                     self.resetAction
                         .fixedSize()
                         .accessibilityIdentifier("Reset")
                 }.hideSharedBackground()
+                
+                if LiquidGlassHelper.usesLiquidGlassUI {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        self.applyAction
+                            .fixedSize()
+                            .accessibilityIdentifier("Apply")
+                    }
+                    .hideSharedBackground()
+                }
             }
         }
         .frame(idealWidth: self.popoverIdealWidth, idealHeight: self.hasIdealHeight ? self.idealHeight() : nil)
@@ -168,7 +199,7 @@ struct CancellableResettableDialogNavigationForm<Title: View, CancelAction: View
             } else {
                 let halfScreenHeight = self.presentingViewHeight / 2
                 if #available(iOS 26.0, *) {
-                    return [.height(scrollViewHeight + self.bottomHeight), .medium, .large]
+                    return [.height(scrollViewHeight + self.bottomHeight), .large]
                 } else if scrollViewHeight + self.bottomHeight > halfScreenHeight {
                     return [.medium, .fraction(0.999)]
                 } else {

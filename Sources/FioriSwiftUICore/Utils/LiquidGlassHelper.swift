@@ -17,11 +17,11 @@ enum LiquidGlassHelper {
     }
 
     static var usesLiquidGlassUI: Bool {
-        if #available(iOS 27, *) {
+        if #available(iOS 27, watchOS 27, *) {
             // On iOS 27, UIDesignRequiresCompatibility is only honored when built with Xcode 26 (DTXcode < 2700).
             // Apps built with Xcode 27+ have it ignored by the system.
             return hostAppXcodeVersion >= 2700 || !requiresDesignCompatibility
-        } else if #available(iOS 26, *) {
+        } else if #available(iOS 26, watchOS 26, *) {
             #if os(iOS)
                 return !requiresDesignCompatibility
             #else
