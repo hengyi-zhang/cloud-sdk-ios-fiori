@@ -17,7 +17,7 @@ struct CancellableResettableDialogNavigationForm<Title: View, CancelAction: View
 
     @State private var scrollViewHeight: CGFloat? = nil
     @State private var subScrollViewHeight: CGFloat = 0
-    @State var horizontalSizeClass: UserInterfaceSizeClass = UIDevice.current.userInterfaceIdiom != .phone ? .regular : .compact
+    @State var horizontalSizeClass: UserInterfaceSizeClass = .compact
     
     @State private var presentingViewHeight: CGFloat = 0
 
@@ -189,6 +189,7 @@ struct CancellableResettableDialogNavigationForm<Title: View, CancelAction: View
             )
             .background(WindowTraitReader { sizeClass in
                 self.horizontalSizeClass = sizeClass
+                self.navigationBarHeight = LiquidGlassHelper.usesLiquidGlassUI ? (sizeClass == .regular ? 67 : 74) : (sizeClass == .regular ? 50.0 : 56.0)
             })
     }
     
