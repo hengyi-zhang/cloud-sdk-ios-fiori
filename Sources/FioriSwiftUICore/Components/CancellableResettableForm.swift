@@ -174,6 +174,7 @@ struct CancellableResettableDialogNavigationForm<Title: View, CancelAction: View
                     .hideSharedBackground()
                 }
             }
+            .hideToolbarBackground(.hidden, for: .bottomBar)
         }
         .frame(idealWidth: self.popoverIdealWidth, idealHeight: self.hasIdealHeight ? self.idealHeight() : nil)
         .presentationDetents(self.presentationDetent())
@@ -446,5 +447,21 @@ public extension ToolbarContent {
         } else {
             return self
         }
+    }
+}
+
+extension View {
+    /// Specifies the preferred visibility of backgrounds on a bar managed by SwiftUI.
+    /// - Parameters:
+    ///   - visibility: The preferred visibility of the background of the bar.
+    ///   - bars: The bars to update the color scheme of or ``ToolbarPlacement/automatic`` if empty.
+    nonisolated func hideToolbarBackground(_ visibility: Visibility, for bars: ToolbarPlacement...) -> some View {
+        var result = AnyView(self)
+        if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
+            for bar in bars {
+                result = AnyView(result.toolbarBackgroundVisibility(visibility, for: bar))
+            }
+        }
+        return result
     }
 }

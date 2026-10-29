@@ -726,9 +726,9 @@ struct PickerMenuItem: View {
 
         let rowContentBuilder: (SortFilterItem.PickerItem.ValueOptionModel) -> AnyView = { e in
             if let provider = self.item.configuration?.rowContentProvider {
-                return AnyView(provider(e.index).destinationRowBackgroundColor(.clear))
+                return AnyView(provider(e.index).destinationRowBackgroundColor(.preferredColor(.secondaryGroupedBackground)))
             } else {
-                return AnyView(Text(e.value).destinationRowBackgroundColor(.clear))
+                return AnyView(Text(e.value).destinationRowBackgroundColor(.preferredColor(.secondaryGroupedBackground)))
             }
         }
 
@@ -769,8 +769,14 @@ struct PickerMenuItem: View {
         return listPickerDestination
             .disableEntriesSection(self.item.disableListEntriesSection)
             .disableContentSection(self.item.disableListContentSection)
-            .listStyle(.plain)
+            .ifApply(LiquidGlassHelper.usesLiquidGlassUI, content: {
+                $0.listStyle(.insetGrouped)
+            })
+            .ifApply(!LiquidGlassHelper.usesLiquidGlassUI, content: {
+                $0.listStyle(.plain)
+            })
             .scrollContentBackground(.hidden)
+            .background(Color.preferredColor(.primaryGroupedBackground))
             .environment(\.defaultMinListRowHeight, 0)
             .environment(\.defaultMinListHeaderHeight, 0)
             .isFilterFeedbackBarListPickerStyle(true)
